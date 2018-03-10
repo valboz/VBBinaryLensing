@@ -23,7 +23,7 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'pyVBB',
+        'VBBinaryLensingLibrary',
         ['src/bindings.cpp', 'src/VBBinaryLensingLibrary.cpp'],
         include_dirs=[
             # Path to pybind11 headers
@@ -90,7 +90,7 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='pyVBB',
+    name='VBBinaryLensingLibrary',
     version=__version__,
     author='Valerio Bozza, Fran Bartolić, Etienne Bachelet',
     author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, ebachelet@lco.global',

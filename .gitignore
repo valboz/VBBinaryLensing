@@ -9,3 +9,4 @@ _generate
 build
 dist
 tmp
+.ipynb-checkpoints

@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: pyVBB
+Version: 0.0.1
+Summary: Python wrapper of the VBBinaryLensingLibrary code for             computing microlensing light curves.
+Home-page: https://github.com/pybind/python_example
+Author: Valerio Bozza, Fran Bartolić, Etienne Bachelet
+Author-email: valboz@sa.infn.it, fb90@st-andrews.ac.uk, ebachelet@lco.global
+License: UNKNOWN
+Description-Content-Type: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN

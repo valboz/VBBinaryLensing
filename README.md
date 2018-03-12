@@ -23,3 +23,6 @@ The package contains the following files:
 - `LICENSE.txt` // GNU LESSER GENERAL PUBLIC LICENSE Version 3
 
 !!! Please follow `instructions.cpp` to learn how to use all functions !!!
+
+# License
+VBBinaryLensing is provided under the GNU Lesser General Public License Version 3

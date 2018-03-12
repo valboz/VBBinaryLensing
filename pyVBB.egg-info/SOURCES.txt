@@ -1,0 +1,10 @@
+README.md
+setup.py
+pyVBB.egg-info/PKG-INFO
+pyVBB.egg-info/SOURCES.txt
+pyVBB.egg-info/dependency_links.txt
+pyVBB.egg-info/not-zip-safe
+pyVBB.egg-info/requires.txt
+pyVBB.egg-info/top_level.txt
+src/VBBinaryLensingLibrary.cpp
+src/bindings.cpp

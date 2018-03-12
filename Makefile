@@ -1,9 +1,9 @@
 CC = g++ # define the C compiler to use
 CFLAGS = -O3 -Wall -Wextra -pedantic -fPIC
 # define any directories containing header files other than /usr/include
-INCLUDES = -I/home/fran/drive/projects/VBBinaryLensing
+INCLUDES = -I/VBBinaryLensing/lib
 # define the C++ source files
-SRCS = VBBinaryLensingLibrary.cpp 
+SRCS = VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp 
 # define the C object files 
 # This uses Suffix Replacement within a macro:
 #   $(name:string1=string2)

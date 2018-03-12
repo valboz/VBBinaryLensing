@@ -1,0 +1,24 @@
+CC = g++ # define the C/C++ compiler to use
+CFLAGS = -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes`
+DIR = 
+# define any directories containing header files other than /usr/include
+INCLUDES = -I$(DIR)
+# define library paths in addition to /usr/lib
+LFLAGS = -L$(DIR)
+# define any libraries to link into executable:
+LIBS = 
+# define the C/C++ source files
+SRCS = bindings.cpp VBBinaryLensingLibrary.cpp
+# define the C/C++ object files 
+# This uses Suffix Replacement within a macro:
+#   $(name:string1=string2)
+#         For each word in 'name' replace 'string1' with 'string2'
+# define the executable file 
+TARGET = VBBinaryLensingLibrary
+
+all:    $(TARGET)
+	@echo  Successfully compiled.
+
+$(TARGET): $(SRCS) 
+	$(CC) $(CFLAGS) $(SRCS) -o VBBinaryLensingLibrary`python3-config --extension-suffix` 
+

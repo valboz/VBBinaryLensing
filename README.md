@@ -1,4 +1,10 @@
-# VBBinaryLensing v2.0.1 (released 2018-02-05)
+[![Join the chat at https://gitter.im/VBBinaryLensing/Lobby](https://badges.gitter.im/VBBinaryLensing/Lobby.svg)](https://gitter.im/VBBinaryLensing/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+
+
+# VBBinaryLensing
+Microlensing light curve calculation using the advanced contour integration method
+
 - This code has been developed by Valerio Bozza, University of Salerno.
 - The root finding algorithm has been adopted from Jan Skowron & Andy Gould
 (http://www.astrouw.edu.pl/~jskowron/cmplx_roots_sg/)

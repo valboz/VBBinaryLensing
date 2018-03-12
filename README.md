@@ -1,4 +1,6 @@
 # VBBinaryLensing
+
+[![Join the chat at https://gitter.im/VBBinaryLensing/Lobby](https://badges.gitter.im/VBBinaryLensing/Lobby.svg)](https://gitter.im/VBBinaryLensing/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Microlensing light curve calculation using the advanced contour integration method
 
 - This code has been developed by Valerio Bozza, University of Salerno.

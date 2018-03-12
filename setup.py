@@ -23,8 +23,8 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'VBBinaryLensingLibrary',
-        ['src/bindings.cpp', 'src/VBBinaryLensingLibrary.cpp'],
+        'VBBinaryLensing',
+        ['VBBinaryLensing/lib/bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
@@ -90,12 +90,12 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='VBBinaryLensingLibrary',
+    name='VBBinaryLensing',
     version=__version__,
     author='Valerio Bozza, Fran Bartolić, Etienne Bachelet',
     author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, ebachelet@lco.global',
     url='https://github.com/pybind/python_example',
-    description='Python wrapper of the VBBinaryLensingLibrary code for \
+    description='Python wrapper of the VBBinaryLensing code for \
             computing microlensing light curves.',
     long_description='',
     ext_modules=ext_modules,

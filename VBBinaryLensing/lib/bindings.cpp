@@ -3,7 +3,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(VBBinaryLensingLibrary, m) {
+PYBIND11_MODULE(VBBinaryLensing, m) {
     py::class_<VBBinaryLensing>(m, "VBBinaryLensing")
         .def(py::init())
         .def("LoadESPLTable", &VBBinaryLensing::LoadESPLTable,

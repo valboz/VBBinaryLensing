@@ -92,7 +92,7 @@ class BuildExt(build_ext):
 setup(
     name='VBBinaryLensing',
     version=__version__,
-    author='Valerio Bozza, Fran Bartolić, Etienne Bachelet',
+    author='Valerio Bozza, Fran Bartolic, Etienne Bachelet',
     author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, ebachelet@lco.global',
     url='https://github.com/pybind/python_example',
     description='Python wrapper of the VBBinaryLensing code for \

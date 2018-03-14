@@ -24,7 +24,7 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'VBBinaryLensing',
-        ['VBBinaryLensing/lib/bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'],
+        ['VBBinaryLensing/lib/python_bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),

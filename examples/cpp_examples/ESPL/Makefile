@@ -1,6 +1,6 @@
 CC = g++ # define the C/C++ compiler to use
 CFLAGS = -O3 -Wall -Wextra -pedantic -DNDEBUG 
-DIR = /home/fran/drive/projects/VBBinaryLensing
+DIR = ../../../VBBinaryLensing/lib 
 # define any directories containing header files other than /usr/include
 INCLUDES = -I$(DIR)
 # define library paths in addition to /usr/lib

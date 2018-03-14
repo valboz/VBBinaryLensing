@@ -55,7 +55,7 @@ int main()
 	
     std::ofstream file2("caustics.csv");
 
-    // This lists stores both the crit. curves and the caustics, if the list contains 2n curves the first n curves
+    // This object stores both the crit. curves and the caustics, if the object contains 2n curves the first n curves
     // are the cirt. curves and the second n curves are the caustics
 	Mycurves = VBBL.PlotCrit(s, q);
 
@@ -77,11 +77,6 @@ int main()
 	}
 	file2.close();
 
-	 //Note that critical curves and caustics are in the same list Mycurves. 
+	 //Note that critical curves and caustics are in the same object Mycurves. 
 	// If the list contains 2n curves, the first n are the critical curves and the second n curves are the caustics.
-
-	// Implementation notes:
-	// ESPLMag2 works the same way as BinaryMag2. It checks whether we are far enough to use the point-source approximation.
-	// If necessary, it goes for the full computation by calling ESPLMagDark(double u, double rho, double a1);
-    
 }

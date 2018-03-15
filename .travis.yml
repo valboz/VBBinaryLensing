@@ -1,38 +1,52 @@
-language: cpp
+language: python
 
-dist: trusty
+sudo: false
 
 matrix:
-    # Don't wait for allowed failures
-    fast_finish: true
-    include:
-        - os: linux
-          env: PYTHON=2.7
-        - os: linux
-          env: PYTHON=3.5
-        - os: osx
-          env: PYTHON=2.7
-        - os: osx
-          env: PYTHON=3.6
-
-before_install:
-    - |
-      if [ "$TRAVIS_OS_NAME" = "linux" ]; then export CXX=g++-4.8 CC=gcc-4.8; fi
-      if [ -n "$PYTHON" ]; then
-        if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "${PYTHON:0:1}" = "3" ]; then
-          brew update; brew install python3;
-        fi
-        pip install --user --upgrade pip virtualenv
-        virtualenv -p python$PYTHON venv
-        source venv/bin/activate
-      fi
+  include:
+    - os: linux
+      compiler: gcc
+      addons: &gcc49
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.9', 'gcc-4.9']
+      env:
+        - CXX='g++-4.9'
+        - CC='gcc-4.9'
+      python: 2.7
+    - os: linux
+      compiler: gcc
+      addons: &gcc49
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.9', 'gcc-4.9']
+      env:
+        - CXX='g++-4.9'
+        - CC='gcc-4.9'
+      python: 3.5
+    - os: osx
+      osx_image: xcode7.3
+      compiler: gcc
+      sudo: required
+      language: generic
 
 install:
-    - |
-      if [ -n "$PYTHON" ]; then
-        python setup.py sdist
-        pip install --verbose dist/*.tar.gz
-        pip install -r pytest
-      fi
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+        # manually install python on osx
+        brew update
+        brew install python3
+        brew reinstall gcc
+        virtualenv venv
+        source venv/bin/activate
+        pip install -r requirements.txt --upgrade
+    fi
+  - pip install -r requirements.txt --upgrade
+  - python --version
+
 script:
-    - py.test
+  - python setup.py install
+  - py.test
+
+notifications:
+  email: false 

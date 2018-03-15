@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/valboz/VBBinaryLensing.svg?branch=python_implementation)](https://travis-ci.org/valboz/VBBinaryLensing)
 [![Join the chat at https://gitter.im/VBBinaryLensing/Lobby](https://badges.gitter.im/VBBinaryLensing/Lobby.svg)](https://gitter.im/VBBinaryLensing/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 

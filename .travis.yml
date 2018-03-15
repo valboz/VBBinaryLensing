@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 language: cpp
 
 dist: trusty
@@ -36,3 +37,4 @@ install:
       fi
 script:
     - py.test
+>>>>>>> 766e8903920fe9a7fc9d56478155d056952ec6bb

@@ -9,23 +9,49 @@ def test_ESPL_magnification():
     VBBL.LoadESPLTable("../data/ESPL.tbl")
     magnification = VBBL.ESPLMag2(u, rho)
 
-    assert np.allclose(magnification, 3./np.sqrt(5.))
+    assert magnification ==  3./np.sqrt(5.)
 
-#def test_amplification_USBL():
-#    s = 1.
-#    q = 0.02
-#    y1 = 0.5 
-#    y2 = 0.5 
-#    rho = 0.0033
-#    VBBL.Tol = 1.e-3
-#
-#    magnification = VBBL.BinaryMag2(s, q, y1, y2, rho);
-#
-#    # Reset Tol
-#    VBBL.Tol = 0.01
-#
-#    assert np.allclose(magnification, 1.6311724868)
-#
+def test_amplification_USBL():
+    s = 1.
+    q = 0.02
+    y1 = 0.5 
+    y2 = 0.5 
+    rho = 0.0033
+
+
+    magnification = VBBL.BinaryMag2(s, q, y1, y2, rho)
+
+    assert np.allclose(magnification, 1.6310924403681109)
+    
+def test_amplification_USBL_far_from_caustics():
+   
+    s = 1.
+    q = 0.02
+    y1 = 0.5 
+    y2 = 0.5 
+    rho = 0.0033
+
+
+    magnification = VBBL.BinaryMag2(s, q, y1, y2, rho)
+    magnification0 = VBBL.BinaryMag0(s, q, y1, y2)
+    assert magnification == magnification0
+    
+    
+def test_amplification_USBL_with_RELTOL():
+   
+    s = 1.
+    q = 0.0002
+    y1 = 0.005 
+    y2 = 0.005 
+    rho = 0.0033
+
+
+    magnification = VBBL.BinaryMag2(s, q, y1, y2, rho)
+    VBBL.RelTol=10**-4
+    
+    magnification0 = VBBL.BinaryMag2(s, q, y1, y2, rho)
+    assert (magnification-magnification0)<10**-4*magnification  
+
 def test_amplification_PSBL():
     s = 1.
     q = 0.02

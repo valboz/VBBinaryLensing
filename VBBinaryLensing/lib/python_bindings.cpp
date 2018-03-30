@@ -25,7 +25,10 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             "Binary light curve computation assuming a point source")
         .def("BinaryMag2", &VBBinaryLensing::BinaryMag2,
             py::return_value_policy::reference,
-            "Full binary light curve computation")
+            "Full binary light curve computation")     
+        .def("BinaryMagDark", &VBBinaryLensing::BinaryMagDark,
+            py::return_value_policy::reference,
+            "Linear limb darkening")
         .def("PlotCrit", &VBBinaryLensing::PlotCrit,
             py::return_value_policy::reference,
             "Returns critical curves and caustic curves.");

@@ -51,6 +51,18 @@ def test_amplification_USBL_with_RELTOL():
     
     magnification0 = VBBL.BinaryMag2(s, q, y1, y2, rho)
     assert (magnification-magnification0)<10**-4*magnification  
+    
+def test_amplification_FSBL():
+   
+    s = 1.
+    q = 0.0002
+    y1 = 0.005 
+    y2 = 0.005 
+    rho = 0.0033
+    a1 = 0.2	
+
+    magnification = VBBL.BinaryMagDark(s, q, y1, y2, rho, a1, 0.1)
+    assert magnification == 144.38155079136942
 
 def test_amplification_PSBL():
     s = 1.

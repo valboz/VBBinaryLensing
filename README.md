@@ -33,3 +33,31 @@ The package contains the following files:
 
 # License
 VBBinaryLensing is provided under the GNU Lesser General Public License Version 3
+
+# Python wrapper
+Currently supported is Linux, MacOs and python >= 2.7. 
+In order to construct the python wrapper, please install pybind11 :
+
+pip install pybind11
+
+Then clone the repository. Finally, install :
+
+python setup.py install
+
+To check the installatio, try :
+
+>>>import VBBinaryLensing
+
+>>>VBBL = VBBinaryLensing.VBBinaryLensing()
+
+>>>s = 1.
+>>>q = 0.02
+>>>y1 = 0.5 
+>>>y2 = 0.5 
+>>>rho = 0.0033
+
+
+>>>magnification = VBBL.BinaryMag2(s, q, y1, y2, rho)
+>>>print(magnification)
+>>>1.6310924403681109
+

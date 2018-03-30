@@ -44,7 +44,7 @@ Then clone the repository. Finally, install :
 
 python setup.py install
 
-To check the installatio, try :
+To check the installation, try :
 
 ```python
 >>>import VBBinaryLensing

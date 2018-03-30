@@ -45,7 +45,7 @@ Then clone the repository. Finally, install :
 python setup.py install
 
 To check the installatio, try :
-
+'''python
 >>>import VBBinaryLensing
 
 >>>VBBL = VBBinaryLensing.VBBinaryLensing()
@@ -60,4 +60,4 @@ To check the installatio, try :
 >>>magnification = VBBL.BinaryMag2(s, q, y1, y2, rho)
 >>>print(magnification)
 >>>1.6310924403681109
-
+'''

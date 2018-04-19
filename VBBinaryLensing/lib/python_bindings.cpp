@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "VBBinaryLensingLibrary.h"
 
 namespace py = pybind11;
@@ -9,11 +10,11 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
 
         // Settings
         .def("LoadESPLTable", &VBBinaryLensing::LoadESPLTable,
-                "Loads pre-calculated table needed for ESPL light curve computation")
+            """Loads a pre calculated binary table for extended source calculation.""")
         .def_readwrite("Tol", &VBBinaryLensing::Tol,
-                "Absolute accuracy")
+                "Absolute accuracy goal.")
         .def_readwrite("RelTol", &VBBinaryLensing::RelTol,
-                "Relative accuracy")
+                "Relative precision goal.")
         .def_readwrite("a1", &VBBinaryLensing::a1,
                 "Linear limb darkening coefficient. I(r)=I(0)(1-a1(1-\sqrt{1-r^2/\rho^2}))")
         .def_readwrite("minannuli", &VBBinaryLensing::minannuli,
@@ -31,34 +32,189 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
         // Maginfication calculations
         .def("ESPLMag", &VBBinaryLensing::ESPLMag,
             py::return_value_policy::reference,
-            "Magnification of a uniform brightness source by a single lens.\
-            This uses the pre-calculated table.")
-        .def("ESPLMag2", &VBBinaryLensing::ESPLMag2,
-            py::return_value_policy::reference,
-            "ESPLMag2 works the same way as BinaryMag2. It checks whether we are\
-            far enough to use the point-source approximation and if necessary,\
-            it goes for the full computation by calling\
-            ESPLMagDark(double u, double rho, double a1)")
+            R"mydelimiter(
+            Extended Source Point Lens magnification calculation.
+
+            Magnification of a uniform brightness-source by a single lens.
+            This uses the pre-calculated table which has to be loaded before
+            calling this function.
+
+            Parameters
+            ----------
+            u : float 
+                Distance of source from the center of the lens.
+            rho : float 
+                Source radius in units of the Einstein radius of the lens.
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
+       .def("ESPLMag2", &VBBinaryLensing::ESPLMag2,
+            R"mydelimiter(
+            Extended Source Point Lens magnification calculation v2.0.
+
+            ESPLMag2 works the same way as BinaryMag2. It checks whether we are
+            far enough to use the point-source approximation and if necessary,
+            it goes for the full computation by calling ESPLMagDark
+            
+            Parameters
+            ----------
+            u : float 
+                Distance of source from the center of the lens.
+            rho : float 
+                Source radius in units of the Einstein radius of the lens.
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
         .def("ESPLMagDark", &VBBinaryLensing::ESPLMagDark,
             py::return_value_policy::reference,
-            "Magnification of a limb-darkened source by a single lens.")
+            R"mydelimiter(
+            Extended Source Point Lens magnification calculation v2.0. 
+            including limb darkening.
+
+            Parameters
+            ----------
+            u : float 
+                Distance of source from the center of the lens.
+            rho : float 
+                Source radius in units of the Einstein radius of the lens.
+            a1 : float 
+                Linear limb darkening coefficient. 
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
         .def("BinaryMag0",
             (double (VBBinaryLensing::*)(double, double, double, double)) 
             &VBBinaryLensing::BinaryMag0,
             py::return_value_policy::reference,
-            "Magnification of a point-source by a binary lens.")
+            R"mydelimiter(
+            Magnification of a point-source by a binary lens.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 s.t. m1<m2 
+            y1 : float 
+                x-position of source in source plane.
+            y2 : float 
+                x-position of source in source plane.
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
+
         .def("BinaryMag", 
             (double (VBBinaryLensing::*)(double, double, double, double, double, double))
             &VBBinaryLensing::BinaryMag,
             py::return_value_policy::reference,
-            "Full binary light curve computation.")     
-        .def("BinaryMagDark", &VBBinaryLensing::BinaryMagDark,
+            R"mydelimiter(
+            Magnification of a uniform brightness finite source 
+            by a binary lens.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 s.t. m1<m2 
+            y1 : float 
+                x-position of source in source plane.
+            y2 : float 
+                x-position of source in source plane.
+            rho : float 
+                Source angular radius in units of the Einstein radius 
+                corresponding to the total mass.
+            accuracy : float 
+                Absolute accuracy goal for the magnification calculation. 
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
+        .def("BinaryMagDark", 
+            &VBBinaryLensing::BinaryMagDark,
             py::return_value_policy::reference,
-            "Magnification of a limb-darkened source by a binary lens.")
-        .def("BinaryMagMultiDark", &VBBinaryLensing::BinaryMagMultiDark,
+            R"mydelimiter(
+            Magnification of a limb-darkened finite source 
+            by a binary lens.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 s.t. m1<m2 
+            y1 : float 
+                x-position of source in source plane.
+            y2 : float 
+                x-position of source in source plane.
+            rho : float 
+                Source angular radius in units of the Einstein radius 
+                corresponding to the total mass.
+            a1 : float 
+                Source angular radius in units of the Einstein radius 
+                corresponding to the total mass.
+
+            accuracy : float 
+                Absolute accuracy goal for the magnification calculation. 
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
+        .def("BinaryMagMultiDark", 
+            (void (VBBinaryLensing::*)(double, double, double, double, double, double *, int, double *, double)) 
+            &VBBinaryLensing::BinaryMagMultiDark,
             py::return_value_policy::reference,
-            "Magnification of a limb-darkened source by a binary lens in \
-            different filters with different limb darkening coefficients. ")
+            R"mydelimiter(
+            Magnification of a limb-darkened source by a binary lens in \
+            different filters with different limb darkening coefficients.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 s.t. m1<m2 
+            y1 : float 
+                x-position of source in source plane.
+            y2 : float 
+                x-position of source in source plane.
+            rho : float 
+                Source angular radius in units of the Einstein radius 
+                corresponding to the total mass.
+            a1_list : ndarray 
+                Array of linear limb darkening coefficients.    
+            n_filters : int 
+                Number of filters. 
+            mag_list : ndarray 
+                Array of magnifications to be calculated by the function. 
+            accuracy : float 
+                Absolute accuracy goal for the magnification calculation. 
+
+            Returns
+            -------
+            void
+            )mydelimiter")
+
         .def("BinaryMag2", &VBBinaryLensing::BinaryMag2,
             py::return_value_policy::reference,
             "Magnification of a generic source by a binary lens. New in\
@@ -66,12 +222,10 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
 
         // Light curve calculations
         .def("PSPLLightCurve",
-            (void (VBBinaryLensing::*)(double *, double *, double *, double *, double *, int))
-            &VBBinaryLensing::PSPLLightCurve,
-            py::return_value_policy::reference,
-            "PSPL light curve for a given set of parameters. This and all light curve\
-            functions are available for a single epoch or for a full array of \
-            observation epochs.")
+            [](const std::vector<int> &params)
+            {
+                return params[0];
+            })
         .def("PSPLLightCurveParallax", 
             (void (VBBinaryLensing::*)(double *, double *, double *, double *, double *, int))
             &VBBinaryLensing::PSPLLightCurveParallax,

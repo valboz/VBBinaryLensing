@@ -98,7 +98,8 @@ namespace VBBinaryLensingLibrary {
 
 	// New (v2) light curve functions, operating on arrays
 
-		void PSPLLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
+		void PSPLLightCurve(std::vector<double> &parameters, std::vector<double> &t_array, 
+               std::vector<double> &mag_array, std::vector<double> &y1_array, std::vector<double> &y2_array, int np);
 		void PSPLLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void ESPLLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void ESPLLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);

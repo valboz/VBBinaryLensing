@@ -29,6 +29,8 @@ char systemslash = '/';
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #ifndef __unmanaged
 using namespace VBBinaryLensingLibrary;
@@ -1178,7 +1180,8 @@ double VBBinaryLensing::ESPLMagDark(double u, double RSv, double a1) {
 //////////////////////////////
 //////////////////////////////
 
-void VBBinaryLensing::PSPLLightCurve(double *pr, double *ts, double *mags, double *y1s, double *y2s, int np) {
+void VBBinaryLensing::PSPLLightCurve(double* pr, double* ts,
+        double* mags, double* y1s, double* y2s, int np) {
 	double u0=exp(pr[0]), t0=pr[2],tE_inv=exp(-pr[1]),tn,u;
 
 	for (int i = 0; i < np; i++) {

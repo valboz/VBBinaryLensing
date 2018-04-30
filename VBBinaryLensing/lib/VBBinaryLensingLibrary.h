@@ -32,6 +32,7 @@
 #define _sign(x) ((x>0)? +1 : -1)
 
 #include<stdio.h>
+#include<vector>
 
 
 class _curve;
@@ -98,7 +99,8 @@ namespace VBBinaryLensingLibrary {
 
 	// New (v2) light curve functions, operating on arrays
 
-		void PSPLLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
+		void PSPLLightCurve(double* parameters, double* t_array, 
+               double* mag_array, double* y1_array, double* y2_array, int np);
 		void PSPLLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void ESPLLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void ESPLLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);

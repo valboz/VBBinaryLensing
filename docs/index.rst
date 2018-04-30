@@ -1,5 +1,5 @@
-python_example Documentation
-============================
+VBBinaryLensing Documentation
+=============================
 
 Contents:
 

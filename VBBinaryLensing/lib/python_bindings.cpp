@@ -9,6 +9,8 @@ namespace py = pybind11;
 VBBinaryLensing VBBL;
 
 PYBIND11_MODULE(VBBinaryLensing, m) {
+    py::options options;
+    options.disable_function_signatures();
     py::class_<VBBinaryLensing>(m, "VBBinaryLensing")
         .def(py::init())
         // Settings

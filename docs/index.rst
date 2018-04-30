@@ -9,7 +9,8 @@ Welcome to VBBinaryLensing's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+   source/VBBinaryLensing
+   source/modules
 
 
 Indices and tables

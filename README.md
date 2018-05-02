@@ -10,6 +10,7 @@ Microlensing light curve calculation using the advanced contour integration meth
 - The root finding algorithm has been adopted from Jan Skowron & Andy Gould
 (http://www.astrouw.edu.pl/~jskowron/cmplx_roots_sg/)
 and translated to C++ by Tyler M. Heintz and Ava R. Hoag.
+- The new Python wrapper has been created by Fran Bartolic in collaboration with Etienne Bachelet and Markus Hundertmark.
 - Any use of this code for scientific publications should be acknowledged by citations to: 
 V. Bozza, MNRAS 408 (2010) 2188.
 If specifically relevant to your work, please also cite

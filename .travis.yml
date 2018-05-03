@@ -46,6 +46,7 @@ matrix:
       env:
         - CXX='g++-4.9'
         - CC='gcc-4.9'
+     python: 3.6
 install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then

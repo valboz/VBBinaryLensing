@@ -42,6 +42,7 @@ matrix:
       env: PYTHON=3.6 CPP=11 CLANGinstall:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+        export CXX=clang++ CC=clang;
         # manually install python on osx
         brew update
         brew install python3

@@ -222,8 +222,33 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
 
         .def("BinaryMag2", &VBBinaryLensing::BinaryMag2,
             py::return_value_policy::reference,
-            "Magnification of a generic source by a binary lens. New in\
-            v2.0, implements tests described in paper.")     
+            R"mydelimiter(
+            Magnification of a uniform brightness finite source 
+            by a binary lens. New in v2.0, implements test described
+            in VBBinaryLensing 2.0 paper.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 s.t. m1<m2 
+            y1 : float 
+                x-position of the source in the source plane.
+            y2 : float 
+                y-position of the source in the source plane.
+            rho : float 
+                Source angular radius in units of the Einstein radius 
+                corresponding to the total mass.
+            accuracy : float 
+                Absolute accuracy goal for the magnification calculation. 
+
+            Returns
+            -------
+            float
+                Magnification.
+            )mydelimiter")
 
         // Light curve calculations
         .def("PSPLLightCurve",
@@ -605,7 +630,7 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 The projected separation of the binary lens in units of the 
                 Einstein radius corresponding to the total mass.
             q : float 
-                Binary lens mass fraction q = m1/m2 s.t. m1<m2 
+                Binary lens mass fraction q = m1/m2 such that m1<m2 
 
             Returns
             -------

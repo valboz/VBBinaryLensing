@@ -95,7 +95,7 @@ VBBinaryLensing::~VBBinaryLensing() {
 
 _sols *VBBinaryLensing::PlotCrit(double a1, double q1) {
 	complex  a, q, ej, zr[4], x1, x2;
-	int NPS = 200;
+	int NPS = 1000;
 	_sols *CriticalCurves;
 	_curve *Prov, *Prov2, *isso;
 	_point *pisso;
@@ -162,7 +162,7 @@ _sols *VBBinaryLensing::PlotCrit(double a1, double q1) {
 		for (_point *scanpoint = Prov->first; scanpoint; scanpoint = scanpoint->next) {
 			x1 = complex(scanpoint->x1 - centeroffset, 0.0);
 			x2 = complex(scanpoint->x2, 0.0);
-			Prov2->append(real(_L1) + centeroffset, real(_L2));
+			Prov2->append(real(_l1) + centeroffset, real(_l2));
 		}
 		CriticalCurves->append(Prov2);
 	}

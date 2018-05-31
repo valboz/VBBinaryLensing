@@ -2,6 +2,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
+import os
 
 __version__ = '0.0.1'
 
@@ -74,6 +75,8 @@ class BuildExt(build_ext):
 
     if sys.platform == 'darwin':
         c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
+        os.environ["CC"] = "g++-4.7" 
+        os.environ["CXX"] = "g++-4.7"
 
     def build_extensions(self):
         ct = self.compiler.compiler_type

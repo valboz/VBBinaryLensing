@@ -39,6 +39,7 @@ matrix:
       osx_image: xcode8
       env:
         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+        - PYTHON_VERSION=3.6
 
 before_install:
     - eval "${MATRIX_EVAL}"
@@ -48,18 +49,11 @@ install:
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         if [ "$PY" = "3" ]; then
           brew update && brew upgrade python
-        else
-          curl -fsSL https://bootstrap.pypa.io/get-pip.py | $PY_CMD - --user
         fi
-      fi
+    fi
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
         export CXX=g++-4.9 CC=gcc-4.9;
         # manually install python on osx
-        brew update
-        brew install python3
-        brew reinstall gcc
-        virtualenv venv
-        source venv/bin/activate
         pip install -r requirements.txt --upgrade
     fi
   - pip install -r requirements.txt --upgrade

@@ -75,8 +75,6 @@ class BuildExt(build_ext):
 
     if sys.platform == 'darwin':
         c_opts['unix'] += ['-stdlib=libc++', '-mmacosx-version-min=10.7']
-        os.environ["CC"] = "g++-4.7" 
-        os.environ["CXX"] = "g++-4.7"
 
     def build_extensions(self):
         ct = self.compiler.compiler_type

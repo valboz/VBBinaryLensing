@@ -11,7 +11,7 @@ VBBL.RelTol = rel_tol
 VBBL.a1 = a1
 
 # Load ESPL table
-VBBL.LoadESPLTable("../data/ESPL.tbl")
+VBBL.LoadESPLTable("VBBinaryLensing/data/ESPL.tbl")
 
 def test_BinSourceLightCurve():
 
@@ -21,8 +21,8 @@ def test_BinSourceLightCurve():
 
 def test_BinSourceLightCurveParallax():
 
-    VBBL.SetObjectCoordinates("../data/OB151212coords.txt",
-                              "../data/satellite1.txt")
+    VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
+                              "VBBinaryLensing/data/satellite1.txt")
     mag = VBBL.BinSourceLightCurveParallax([1,np.log10(0.5),0.01,0.025,10,15,0.1,-0.1],
                                            [10.25,2,69],[0.018],[0.0035])
      
@@ -44,8 +44,8 @@ def test_BinaryLightCurve():
     assert np.allclose(mag,[14.989374837435403, 1.0842731547424023, 1.0], rtol=rel_tol, atol=tol)
 
 def test_BinaryLightCurveOrbital():
-    VBBL.SetObjectCoordinates("../data/OB151212coords.txt",
-                              "../data/satellite1.txt")
+    VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
+                              "VBBinaryLensing/data/satellite1.txt")
 
     mag =  VBBL.BinaryLightCurveOrbital([np.log10(0.97),
                                          -1.5,0.01,0.1,-2.5,1.5,10,-0.25,0.36,0.1,0.056,0.03],

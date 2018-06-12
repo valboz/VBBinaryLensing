@@ -2,6 +2,10 @@ language: python
 
 sudo: false
 
+branches:
+  only:
+    - /.*/
+
 matrix:
   include:
     - os: linux

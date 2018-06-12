@@ -2,10 +2,6 @@ language: python
 
 sudo: false
 
-branches:
-  only:
-    - /.*/
-
 matrix:
   include:
     - os: linux
@@ -39,12 +35,12 @@ matrix:
         - CC='gcc-4.9'
       python: 3.6
 
-          - os: osx
-            osx_image: xcode8
-            env:
-              - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-              - PYTHON_VERSION=3.6
-
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+        - PYTHON_VERSION=3.6
+      python: 3.6
 before_install:
     - eval "${MATRIX_EVAL}"
 

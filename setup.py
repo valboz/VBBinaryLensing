@@ -4,7 +4,7 @@ import sys
 import setuptools
 import os
 
-__version__ = '0.0.1'
+__version__ = '2.0.1'
 
 
 class get_pybind_include(object):
@@ -25,7 +25,8 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'VBBinaryLensing',
-        ['VBBinaryLensing/lib/python_bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'],
+        ['VBBinaryLensing/lib/python_bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp',
+            'VBBinaryLensing/lib/VBBinaryLensingLibrary.h'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
@@ -95,7 +96,7 @@ setup(
     version=__version__,
     author='Valerio Bozza, Fran Bartolic, Etienne Bachelet',
     author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, ebachelet@lco.global',
-    url='https://github.com/pybind/python_example',
+    url='https://github.com/valboz/VBBinaryLensing',
     description='Python wrapper of the VBBinaryLensing code for \
             computing microlensing light curves.',
     long_description='',

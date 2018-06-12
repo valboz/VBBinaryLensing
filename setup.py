@@ -4,7 +4,7 @@ import sys
 import setuptools
 import os
 
-__version__ = '2.0.1'
+__version__ = '2.0.5'
 
 
 class get_pybind_include(object):
@@ -25,8 +25,7 @@ class get_pybind_include(object):
 ext_modules = [
     Extension(
         'VBBinaryLensing',
-        ['VBBinaryLensing/lib/python_bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp',
-            'VBBinaryLensing/lib/VBBinaryLensingLibrary.h'],
+        ['VBBinaryLensing/lib/python_bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),

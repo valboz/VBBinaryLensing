@@ -1,4 +1,4 @@
-// VBBinaryLensing v2.0.1 (2018)
+// VBBinaryLensing v2.0.2 (2018)
 //
 // This code has been developed by Valerio Bozza, University of Salerno.
 // Any use of this code for scientific publications should be acknowledged by a citation to

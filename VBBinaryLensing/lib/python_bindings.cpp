@@ -398,7 +398,7 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             Parameters
             ----------
             params : list[float]
-                List of parameters [log_s, log_q, u0, log_alpha, log_rho, log_tE, t0]
+                List of parameters [log_s, log_q, u0, alpha, log_rho, log_tE, t0]
             times : list[float] 
                 Array of times at which the magnification is calculated.
             y1 : list[float]
@@ -429,7 +429,7 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             Parameters
             ----------
             params : list[float]
-                List of parameters [log_s, log_q, u0_c, log_alpha, log_rho, log_tE, t0_c]
+                List of parameters [log_s, log_q, u0_c, alpha, log_rho, log_tE, t0_c]
                 where u0_c and t0_c are defined with respect to the center of the caustic.
             times : list[float] 
                 Array of times at which the magnification is calculated.
@@ -459,7 +459,7 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             Parameters
             ----------
             params : list[float]
-                List of parameters [log_s, log_q, u0, log_alpha, log_rho, log_tE, t0, pai1, pai2]
+                List of parameters [log_s, log_q, u0, alpha, log_rho, log_tE, t0, pai1, pai2]
                 where pai1 and pai2 are the components of parallax parallel and orthogonal to the
                 Earth's acceleration.
             times : list[float] 

@@ -50,14 +50,10 @@ matrix:
 
 before_install:
     - eval "${MATRIX_EVAL}"
+    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update          ; fi
 
 install:
-  - |
-    if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-        if [ "$PY" = "3" ]; then
-          brew update && brew upgrade python
-        fi
-    fi
+  -
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
         export CXX=g++-4.9 CC=gcc-4.9;
         # manually install python on osx

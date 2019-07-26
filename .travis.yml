@@ -41,6 +41,7 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
         - TOXENV=py32
+
  - os: osx
       osx_image: xcode8
       language: generic

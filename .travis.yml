@@ -61,7 +61,6 @@ install:
         fi
     fi
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        export CXX=g++-5 CC=gcc-5;
         # manually install python on osx
         pip install -r requirements.txt --upgrade
     fi

@@ -1,3 +1,6 @@
+numpy
 pytest
 pybind11
+setuptools
 sphinx-astropy
+

@@ -104,7 +104,7 @@ setup(
     name='VBBinaryLensing',
     version=__version__,
     author='Valerio Bozza, Fran Bartolic, Etienne Bachelet',
-    author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, ebachelet@lco.global',
+    author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, etibachelet@gmail.com',
     url='https://github.com/valboz/VBBinaryLensing',
     description='Python wrapper of the VBBinaryLensing code for \
             computing microlensing light curves.',

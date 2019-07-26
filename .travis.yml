@@ -6,47 +6,47 @@ matrix:
   include:
     - os: linux
       compiler: gcc
-      addons: &gcc49
+      addons: &gcc47
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-9', 'gcc-9']
+          packages: ['g++-7', 'gcc-7']
       env:
-        - CXX='g++-9'
-        - CC='gcc-9'
+        - CXX='g++-7'
+        - CC='gcc-7'
       python: 2.7
     - os: linux
       compiler: gcc
-      addons: &gcc49
+      addons: &gcc47
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-9', 'gcc-9']
+          packages: ['g++-7', 'gcc-7']
       env:
-        - CXX='g++-9'
-        - CC='gcc-9'
+        - CXX='g++-7'
+        - CC='gcc-7'
       python: 3.5
     - os: linux
       compiler: gcc
-      addons: &gcc49
+      addons: &gcc47
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-9', 'gcc-9']
+          packages: ['g++-7', 'gcc-7']
       env:
-        - CXX='g++-9'
-        - CC='gcc-9'
+        - CXX='g++-7'
+        - CC='gcc-7'
       python: 3.6
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="brew install gcc9 && CC=gcc-9 && CXX=g++-9"
+        - MATRIX_EVAL="brew install gcc7 && CC=gcc-7 && CXX=g++-7"
         - TOXENV=py32
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="brew install gcc9 && CC=gcc-9 && CXX=g++-9"
+        - MATRIX_EVAL="brew install gcc7 && CC=gcc-7 && CXX=g++-7"
         - TOXENV=py36
 
 
@@ -61,7 +61,7 @@ install:
         fi
     fi
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        export CXX=g++-9 CC=gcc-9;
+        export CXX=g++-7 CC=gcc-7;
         # manually install python on osx
         pip install -r requirements.txt --upgrade
     fi

@@ -39,14 +39,14 @@ matrix:
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
         - TOXENV=py32
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
         - TOXENV=py36
 
 

@@ -45,12 +45,12 @@ matrix:
       language: generic
       env:
         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-        - TOXENV=py32
-      python: 3.6
+        - TOXENV=py36
+
 
 before_install:
     - eval "${MATRIX_EVAL}"
-    - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update          ; fi
+
 
 install:
   - |

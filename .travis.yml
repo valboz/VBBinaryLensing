@@ -9,44 +9,44 @@ matrix:
       addons: &gcc49
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'gcc-5']
+          packages: ['g++-9', 'gcc-9']
       env:
-        - CXX='g++-5'
-        - CC='gcc-5'
+        - CXX='g++-9'
+        - CC='gcc-9'
       python: 2.7
     - os: linux
       compiler: gcc
       addons: &gcc49
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'gcc-5']
+          packages: ['g++-9', 'gcc-9']
       env:
-        - CXX='g++-5'
-        - CC='gcc-5'
+        - CXX='g++-9'
+        - CC='gcc-9'
       python: 3.5
     - os: linux
       compiler: gcc
       addons: &gcc49
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'gcc-5']
+          packages: ['g++-9', 'gcc-9']
       env:
-        - CXX='g++-5'
-        - CC='gcc-5'
+        - CXX='g++-9'
+        - CC='gcc-9'
       python: 3.6
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL="brew install gcc9 && CC=gcc-9 && CXX=g++-9"
         - TOXENV=py32
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="brew install gcc5 && CC=gcc-5 && CXX=g++-5"
+        - MATRIX_EVAL="brew install gcc9 && CC=gcc-9 && CXX=g++-9"
         - TOXENV=py36
 
 
@@ -61,7 +61,7 @@ install:
         fi
     fi
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        export CXX=g++-5 CC=gcc-5;
+        export CXX=g++-9 CC=gcc-9;
         # manually install python on osx
         pip install -r requirements.txt --upgrade
     fi

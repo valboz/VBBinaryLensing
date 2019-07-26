@@ -24,6 +24,7 @@ matrix:
         - CXX='g++-4.9'
         - CC='gcc-4.9'
       python: 3.5
+
     - os: linux
       compiler: gcc
       addons: &gcc49
@@ -56,9 +57,9 @@ before_install:
 install:
   - |
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-        if [ "$PY" = "3" ]; then
-          brew update && brew upgrade python
-        fi
+       
+        brew update && brew upgrade python
+        
     fi
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
         export CXX=g++-4.9 CC=gcc-4.9;

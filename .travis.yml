@@ -1,63 +1,34 @@
 language: python
+group: travis_latest
 
-sudo: false
+git:
+  depth: 25
+  quiet: true
+
+python:
+- 3.7
+- 3.6
 
 matrix:
   include:
-    - os: linux
-      compiler: gcc
-      addons: &gcc49
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'gcc-5']
-      env:
-        - CXX='g++-5'
-        - CC='gcc-5'
-      python: 2.7
-    - os: linux
-      compiler: gcc
-      addons: &gcc49
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'gcc-5']
-      env:
-        - CXX='g++-5'
-        - CC='gcc-5'
-      python: 3.5
-    - os: linux
-      compiler: gcc
-      addons: &gcc49
-        apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'gcc-5']
-      env:
-        - CXX='g++-5'
-        - CC='gcc-5'
-      python: 3.6
+  - os: linux
+    python: 3.7
 
-    - os: osx
-      osx_image: xcode11
-      language: generic
-      env:
-        - PYTHON=3.2.1
+   
+  - os: osx
+    language: minimal
 
-    - os: osx
-      osx_image: xcode11
-      language: generic
-      env:
-        - PYTHON=3.6.8
-
-
-before_install:
-    - eval "${MATRIX_EVAL}"
-
-install:
-  - pip install -r requirements.txt --upgrade
-  - python --version
+  
+install:  pip install -r requirements.txt --upgrade
 
 script:
   - python setup.py install
   - py.test
 
+
 notifications:
   email: false 
+
+
+
+

@@ -19,7 +19,7 @@ matrix:
     language: minimal
 
   
-install:  pip install -r requirements.txt --upgrade
+install:  pip install -r requirements.txt --upgrade --user
 
 script:
   - python setup.py install

@@ -39,31 +39,19 @@ matrix:
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="brew install gcc5"
         - PYTHON=3.2
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - MATRIX_EVAL="brew install gcc5"
-        - PYTHON=3.2
+        - PYTHON=3.6
 
 
 before_install:
     - eval "${MATRIX_EVAL}"
 
 install:
-  - |
-    if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-        if [ "$PY" = "3" ]; then
-          brew update && brew upgrade python
-        fi
-    fi
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        # manually install python on osx
-        pip install -r requirements.txt --upgrade
-    fi
   - pip install -r requirements.txt --upgrade
   - python --version
 

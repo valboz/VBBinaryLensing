@@ -40,14 +40,14 @@ matrix:
       language: generic
       env:
         - MATRIX_EVAL="brew install gcc5"
-        - TOXENV=py32
+        - PYTHON=3.2
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
         - MATRIX_EVAL="brew install gcc5"
-        - TOXENV=py36
+        - PYTHON=3.2
 
 
 before_install:

@@ -39,13 +39,13 @@ matrix:
       osx_image: xcode11
       language: generic
       env:
-        - PYTHON=3.2
+        - PYTHON=3.2.1
 
     - os: osx
       osx_image: xcode11
       language: generic
       env:
-        - PYTHON=3.6
+        - PYTHON=3.6.8
 
 
 before_install:

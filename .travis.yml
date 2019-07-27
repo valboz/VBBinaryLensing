@@ -16,8 +16,11 @@ matrix:
   - os: osx
     language: minimal
     python: 3.6
-  
-install:  python -m pip install -r requirements.txt --upgrade 
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update          ; fi
+
+install:  pip install -r requirements.txt --upgrade 
 
 script:
   - python setup.py install

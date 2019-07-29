@@ -11,25 +11,18 @@ matrix:
   include:
   - os: linux
     python: 3.6
-    install: 
-	- pip install -e .[tests]
-	- pip install -r requirements.txt --upgrade 
+   
    
   - os: linux
     python: 3.6
     compiler: clang
-    install: 
-	- pip install -e .[tests]
-	- pip install -r requirements.txt --upgrade 
-  - os: osx
-    language: minimal
-    install: 
-	- pip3 install -e .[tests]
-	- pip3 install -r requirements.txt --upgrade 
 
 before_install:
 
   - eval "${MATRIX_EVAL}"
+
+install: 
+  - pip install -r requirements.txt --upgrade 
 
 script:
 

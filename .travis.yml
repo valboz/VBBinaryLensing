@@ -18,8 +18,10 @@ matrix:
     python: 3.6
 
 before_install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update          ; fi
-
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then 
+	python -m pip install --upgrade setuptools
+	python -m pip install --upgrade pip
+    ; fi
 install:  pip install -r requirements.txt --upgrade --user
 
 script:

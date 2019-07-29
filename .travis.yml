@@ -11,8 +11,8 @@ matrix:
 
    
   - os: osx
-    language: minimal
-    python: '3.6'
+    osx_image: xcode9
+    env: PYTHON=3.6 CPP=14 CLANG DEBUG=1
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade setuptools ; fi

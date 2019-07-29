@@ -24,9 +24,8 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install: 
-  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        export CXX=clang-6.0 CC=clang-6.0;
-    fi 
+
+  - export CXX=clang-6.0 CC=clang-6.0     
   - pip install -r requirements.txt --upgrade 
 script:
   - python --version

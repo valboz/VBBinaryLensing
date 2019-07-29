@@ -15,9 +15,11 @@ matrix:
    
   - os: osx
     language: minimal
+    python: 3.6
     env: PYTHON=3.6.8
 
 before_install:
+
   - eval "${MATRIX_EVAL}"
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade setuptools ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade pip ; fi

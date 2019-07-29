@@ -26,7 +26,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade pip ; fi
 
 install:  
-- |
+  - |
     if [ "$TRAVIS_OS_NAME" = "osx" ]; then
         brew upgrade python
     fi

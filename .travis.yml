@@ -21,8 +21,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade setuptools ; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade pip ; fi
 
-install:  pip install -r requirements.txt --upgrade --user
-
+install:  pip install -r requirements.txt --upgrade 
 script:
   - python setup.py install
   - py.test

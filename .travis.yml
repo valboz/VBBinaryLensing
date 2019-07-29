@@ -20,7 +20,7 @@ matrix:
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update          ; fi
 
-install:  pip install -r requirements.txt --upgrade 
+install:  pip install -r requirements.txt --upgrade --user
 
 script:
   - python setup.py install

@@ -14,9 +14,9 @@ matrix:
 
    
   - os: osx
-    language: minimal
+    language: generic
     python: 3.6
-    env: PYTHON=3.6.8
+    env: TOXENV=py36
 
 before_install:
 

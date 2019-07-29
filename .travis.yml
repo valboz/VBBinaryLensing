@@ -18,9 +18,10 @@ matrix:
     compiler: clang
 
   - os: osx
-    osx_image: xcode8.3
+    osx_image: xcode8
+    language: generic
     python: 3.6
-
+    compiler: clang
     
 before_install:
 
@@ -30,19 +31,12 @@ install:
   - pip install -r requirements.txt --upgrade 
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-	
-	- python3 --version
-	- python3 setup.py install
-	- py.test
-    fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-	
-	- python --version
-	- python setup.py install
-	- py.test
-    fi
-  
+
+  - python --version
+  - python setup.py install
+  - py.test
+
+
 notifications:
   email: false 
 

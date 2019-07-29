@@ -1,21 +1,18 @@
 language: python
 group: travis_latest
 
-git:
-  depth: 25
-  quiet: true
 
 
 
 matrix:
   include:
   - os: linux
-    python: 3.6
+    python: '3.6'
 
    
   - os: osx
     language: minimal
-    python: 3.6
+    python: '3.6'
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then python -m pip install --upgrade setuptools ; fi

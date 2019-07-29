@@ -16,20 +16,33 @@ matrix:
   - os: linux
     python: 3.6
     compiler: clang
+
+  - os: osx
+    osx_image: xcode8.3
+    python: 3.6
+
     
 before_install:
 
   - eval "${MATRIX_EVAL}"
 
 install: 
-
   - pip install -r requirements.txt --upgrade 
+
 script:
-  - python --version
-  - python setup.py install
-  - py.test
-
-
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+	
+	- python3 --version
+	- python3 setup.py install
+	- py.test
+    fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+	
+	- python --version
+	- python setup.py install
+	- py.test
+    fi
+  
 notifications:
   email: false 
 

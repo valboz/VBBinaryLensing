@@ -16,6 +16,8 @@ matrix:
   - os: linux
     python: 3.6
     compiler: clang
+    env:
+    - MATRIX_EVAL="CC=clang-6.0 && CXX=clang-6.0"
 
 before_install:
 

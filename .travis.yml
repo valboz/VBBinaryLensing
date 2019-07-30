@@ -11,16 +11,16 @@ matrix:
   include:
   - os: linux
     python: 3.6
-    env: RUN_CONDA = 0
+    env: RUN_CONDA=0
    
   - os: linux
     python: 3.6
     compiler: clang
-    env: RUN_CONDA = 0
+    env: RUN_CONDA=0
 
   - os: linux
     python: 3.6
-    env: RUN_CONDA = 1
+    env: RUN_CONDA=1
 
 before_install:
 
@@ -35,7 +35,7 @@ before_install:
       conda info -a;
       conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION ;
       source activate test-environment;
-      python setup.py install
+      python setup.py install;
     fi
       
 install: 

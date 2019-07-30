@@ -13,6 +13,10 @@ VBBL.a1 = a1
 # Load ESPL table
 VBBL.LoadESPLTable("VBBinaryLensing/data/ESPL.tbl")
 
+#Set cooridnates
+VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
+                              "VBBinaryLensing/data/satellite1.txt")
+
 def test_BinSourceLightCurve():
 
     mag = VBBL.BinSourceLightCurve([1,np.log10(0.8),0.1,0.025,10,15],[10.25,2,69],[0.018],[0.0035])
@@ -24,8 +28,7 @@ def test_BinSourceLightCurve():
 
 #def test_BinSourceLightCurveParallax():
     #import pdb; pdb.set_trace()
-#    VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
-#                              "VBBinaryLensing/data/satellite1.txt")
+#    
 #    mag = VBBL.BinSourceLightCurveParallax([1,np.log10(0.5),0.01,0.025,10,15,0.1,-0.1],
 #                                           [10.25,2,69],[0.018],[0.0035])
      

@@ -20,7 +20,7 @@ def test_BinSourceLightCurve():
     assert np.allclose(mag,[4.403129953719895, 1.0110018902397573, 1.000010732694136])
 
 def test_BinSourceLightCurveParallax():
-
+    import pdb; pdb.set_trace()
     VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
                               "VBBinaryLensing/data/satellite1.txt")
     mag = VBBL.BinSourceLightCurveParallax([1,np.log10(0.5),0.01,0.025,10,15,0.1,-0.1],

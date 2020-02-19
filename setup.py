@@ -1,4 +1,4 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 import sys
 import setuptools
@@ -114,4 +114,9 @@ setup(
     setup_requires=['pybind11>=2.3'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
+    data_files=[('data', ['VBBinaryLensing/data/ESPL.tbl']),
+                ('data', ['VBBinaryLensing/data/OB151212coords.txt']),
+                ('data', ['VBBinaryLensing/data/satellite1.txt']),
+                ('data', ['VBBinaryLensing/data/satellite2.txt'])],
+    
 )

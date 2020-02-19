@@ -4,7 +4,7 @@ import sys
 import setuptools
 import os
 
-__version__ = '2.0.5'
+__version__ = '2.0.8'
 
 
 class get_pybind_include(object):
@@ -114,9 +114,9 @@ setup(
     setup_requires=['pybind11>=2.3'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
-    data_files=[('data', ['VBBinaryLensing/data/ESPL.tbl']),
-                ('data', ['VBBinaryLensing/data/OB151212coords.txt']),
-                ('data', ['VBBinaryLensing/data/satellite1.txt']),
-                ('data', ['VBBinaryLensing/data/satellite2.txt'])],
+    include_package_data=True,
+    packages=['VBBinaryLensing.data'],
+    package_data={'VBBinaryLensing.data': ['data/*',]},
+               
     
 )

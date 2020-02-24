@@ -1,4 +1,4 @@
-// VBBinaryLensing v2.0.2 (2018)
+// VBBinaryLensing v2.0.4 (2018)
 //
 // This code has been developed by Valerio Bozza, University of Salerno.
 // Any use of this code for scientific publications should be acknowledged by a citation to
@@ -1036,11 +1036,11 @@ double VBBinaryLensing::ESPLMag2(double u, double rho) {
 	//if (u2 < Tol1_4) {
 	//	rho2 = rho*rho;
 	//	if (u3Tol > rho2*(1 + Tol1_4*rho)) {
-	
+	//	Mag0 = 0;
+
 	u2 = u*u;
 	rho2Tol = rho*rho/Tol;
 	u6 = u2*u2*u2;
-
 	if (u6*(1+0.003*rho2Tol) > 0.027680640625*rho2Tol*rho2Tol) {
 		Mag = (u2+2)/(u*sqrt(u2+4));
 	}
@@ -1064,15 +1064,15 @@ double VBBinaryLensing::ESPLMagDark(double u, double RSv, double a1) {
 		first = new annulus;
 		first->bin = 0.;
 		first->cum = 0.;
-		if (Mag0 > 0.5) {
-			first->Mag = Mag0;
-			first->nim = nim0;
-		}
-		else {
+		//if (Mag0 > 0.5) {
+		//	first->Mag = Mag0;
+		//	first->nim = nim0;
+		//}
+		//else {
 			u2 = u*u;
 			first->Mag = Mag0 = (u2+2)/(u*sqrt(u2+4));
 			first->nim = 2;
-		}
+		//}
 		first->f = 3 / (3 - a1);
 		first->err = 0;
 		first->prev = 0;
@@ -1182,8 +1182,7 @@ double VBBinaryLensing::ESPLMagDark(double u, double RSv, double a1) {
 //////////////////////////////
 //////////////////////////////
 
-void VBBinaryLensing::PSPLLightCurve(double* pr, double* ts,
-        double* mags, double* y1s, double* y2s, int np) {
+void VBBinaryLensing::PSPLLightCurve(double *pr, double *ts, double *mags, double *y1s, double *y2s, int np) {
 	double u0=exp(pr[0]), t0=pr[2],tE_inv=exp(-pr[1]),tn,u;
 
 	for (int i = 0; i < np; i++) {
@@ -1581,6 +1580,8 @@ double VBBinaryLensing::BinaryLightCurveParallax(double *pr, double t) {
 }
 
 
+
+
 double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11];
 	double salpha = sin(pr[3]), calpha = cos(pr[3]);
@@ -1602,6 +1603,7 @@ double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 		inc = 0.;
 		phi0 = 0.;
 	}
+
 	Cphi0 = cos(phi0);
 	Sphi0 = sin(phi0);
 	Cinc = cos(inc);
@@ -1624,7 +1626,6 @@ double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 	y_1 = (Cphi*(u*SOm - tn*COm) + Cinc*Sphi*(u*COm + tn*SOm)) / den;
 	y_2 = (-Cphi*(u*COm + tn*SOm) - Cinc*Sphi*(tn*COm - u*SOm)) / den;
 	return BinaryMag2(av, q, y_1, y_2, rho);
-
 }
 
 

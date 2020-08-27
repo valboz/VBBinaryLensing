@@ -2,6 +2,10 @@
 #include <pybind11/stl.h>
 #include "VBBinaryLensingLibrary.h"
 #include <string>
+#include <pybind11/functional.h>
+
+
+
 
 namespace py = pybind11;
 
@@ -684,11 +688,20 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             )mydelimiter");
 
         // Limb darkening
+         
         vbb.def("SetLDprofile", 
             &VBBinaryLensing::SetLDprofile,
             "User choice of LD profile");
-            
-   
+  
+         //vbb.def("SetUserLDprofile", 
+         //  []( VBBinaryLensing &self, py::function f) {
+         //   self.SetUserLDprofile(f,1000);
+         //   });
+
+     
+       
+        
+        
     //LDlinear, LDquadratic, LDsquareroot, LDlog, LDuser
     py::enum_<VBBinaryLensing::LDprofiles>(vbb, "LDprofiles")
         .value("LDlinear", VBBinaryLensing::LDprofiles::LDlinear)
@@ -697,7 +710,9 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
         .value("LDlog", VBBinaryLensing::LDprofiles::LDlog)
         .value("LDuser", VBBinaryLensing::LDprofiles::LDuser)
         .export_values();
-                       
+   
+
+
     py::class_<_theta>(m, "_theta")
         .def(py::init<double>()); //constructor 
 

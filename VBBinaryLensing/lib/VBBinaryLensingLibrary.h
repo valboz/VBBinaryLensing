@@ -1,8 +1,10 @@
-// VBBinaryLensing v2.0.2 (2018)
+// VBBinaryLensing v3.0 (2020)
 //
-// This code has been developed by Valerio Bozza, University of Salerno.
-// Any use of this code for scientific publications should be acknowledged by a citation to
+// This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
+// Any use of this code for scientific publications should be acknowledged by a citation to:
 // V. Bozza, E. Bachelet, F. Bartolic, T.M. Heintz, A.R. Hoag, M. Hundertmark, MNRAS 479 (2018) 5157
+// If you use astrometry, user-defined limb darkening or Keplerian orbital motion, please cite
+// V. Bozza and E. Khalouei (2020, in preparation)
 // The original methods present in v1.0 are described in
 // V. Bozza, MNRAS 408 (2010) 2188
 // Check the repository at http://www.fisica.unisa.it/GravitationAstrophysics/VBBinaryLensing.htm
@@ -22,8 +24,8 @@
 #define __binlens
 #define __unmanaged
 
-#define _l1 x1-((x1+a/2.0)/((x1+a/2.0)*(x1+a/2.0)+x2*x2)+q*(x1-a/2.0)/((x1-a/2.0)*(x1-a/2.0)+x2*x2))/(1.0+q) // Used in PlotCrits
-#define _l2 x2-(x2/((x1+a/2.0)*(x1+a/2.0)+x2*x2)+q*x2/((x1-a/2.0)*(x1-a/2.0)+x2*x2))/(1.0+q)
+#define _L1 x1-((x1+a/2.0)/((x1+a/2.0)*(x1+a/2.0)+x2*x2)+q*(x1-a/2.0)/((x1-a/2.0)*(x1-a/2.0)+x2*x2))/(1.0+q) // Used in PlotCrits
+#define _L2 x2-(x2/((x1+a/2.0)*(x1+a/2.0)+x2*x2)+q*x2/((x1-a/2.0)*(x1-a/2.0)+x2*x2))/(1.0+q)
 #define _LL (y-z)+coefs[21]/(zc-coefs[20])+coefs[22]/zc //Lens equation test
 #define _J1c coefs[21]/((zc-coefs[20])*(zc-coefs[20]))+coefs[22]/(zc*zc) //#define _J1 m1/((zc-0.5*a)*(zc-0.5*a))+m2/((zc+0.5*a)*(zc+0.5*a))
 #define _J2 -2.0*(coefs[21]/((z-coefs[20])*(z-coefs[20])*(z-coefs[20]))+coefs[22]/(z*z*z))
@@ -34,8 +36,6 @@
 #define _sign(x) ((x>0)? +1 : -1)
 
 #include<stdio.h>
-#include<vector>
-
 
 class _curve;
 class _sols;
@@ -58,14 +58,18 @@ namespace VBBinaryLensingLibrary {
 		double e,phi,phip,phi0,Om,inc,t0,d3,v3,GM,flagits;
 		double Obj[3],rad[3],tang[3],t0old;
 		double Eq2000[3],Quad2000[3],North2000[3]; 
-		double ESPLout[101][101], ESPLin[101][101];
+		double ESPLout[101][101], ESPLin[101][101],ESPLoutastro[101][101], ESPLinastro[101][101];
+		double *LDtab,*rCLDtab,*CLDtab;
+		double scr2, sscr2;
+		int npLD;
 		bool ESPLoff, multidark;
 		annulus *annlist;
 
 		void ComputeParallax(double, double, double *);
+		double LDprofile(double r);
+		double rCLDprofile(double tc,annulus *,annulus *);
 		_curve *NewImages(complex,complex  *,_theta *);
 		void OrderImages(_sols *,_curve *);
-		void cmplx_roots_gen(complex *, complex *, int, bool, bool);
 		void cmplx_laguerre(complex *, int, complex *, int &, bool &);
 		void cmplx_newton_spec(complex *, int, complex *, int &, bool &);
 		void cmplx_laguerre2newton(complex *, int, complex *, int &, bool &, int);
@@ -74,13 +78,17 @@ namespace VBBinaryLensingLibrary {
 
 	public: 
 
-		double Tol,RelTol,a1,t0_par;
+		double Tol, RelTol, a1,a2, t0_par; 
+		bool astrometry;
 		int satellite,parallaxsystem,t0_par_fixed,nsat;
 		int minannuli,nannuli,NPS;
-		double y_1,y_2,av, therr;
+		double y_1,y_2,av, therr,astrox1,astrox2;
 
+	// Critical curves and caustic calculation
 		_sols *PlotCrit(double a,double q);
 		void PrintCau(double a,double q);
+
+	// Initialization for calculations including parallax
 		void SetObjectCoordinates(char *Coordinates_file, char *Directory_for_satellite_tables);
 
 	// Magnification calculation functions.
@@ -93,6 +101,12 @@ namespace VBBinaryLensingLibrary {
 		double BinaryMagDark(double s, double q, double y1, double y2, double rho, double a1,double accuracy);
 		void BinaryMagMultiDark(double s, double q, double y1, double y2, double rho, double *a1_list, int n_filters, double *mag_list, double accuracy);
 
+	// Limb Darkening control
+		enum LDprofiles { LDlinear, LDquadratic, LDsquareroot, LDlog, LDuser};
+	    void SetUserLDprofile(double(*UserLDprofile)(double), int tablesampling);
+		void SetLDprofile(LDprofiles);
+
+	// ESPL functions
 		void LoadESPLTable(char *tablefilename);
 		double ESPLMag(double u, double rho);
 		double ESPLMag2(double u, double rho);
@@ -101,8 +115,7 @@ namespace VBBinaryLensingLibrary {
 
 	// New (v2) light curve functions, operating on arrays
 
-		void PSPLLightCurve(double* parameters, double* t_array, 
-               double* mag_array, double* y1_array, double* y2_array, int np);
+		void PSPLLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void PSPLLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void ESPLLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void ESPLLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
@@ -111,6 +124,7 @@ namespace VBBinaryLensingLibrary {
 		void BinaryLightCurveW(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinaryLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinaryLightCurveOrbital(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, double *sep_array, int np);
+		void BinaryLightCurveKepler(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, double *sep_array, int np);
 
 		void BinSourceLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinSourceLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
@@ -126,16 +140,22 @@ namespace VBBinaryLensingLibrary {
 		double BinaryLightCurveW(double *parameters, double t);
 		double BinaryLightCurveParallax(double *parameters, double t);
 		double BinaryLightCurveOrbital(double *parameters, double t);
+		double BinaryLightCurveKepler(double *parameters, double t);
 
 		double BinSourceLightCurve(double *parameters, double t);
 		double BinSourceLightCurveParallax(double *parameters, double t);
 		double BinSourceLightCurveXallarap(double *parameters, double t);
+
+	// Skowron & Gould root calculator
+		void cmplx_roots_gen(complex *, complex *, int, bool, bool);
 
 	// Constructor and destructor
 
 		VBBinaryLensing();
 		~VBBinaryLensing();
 
+		private:
+			LDprofiles curLDprofile;
 	};
 
 	struct annulus{
@@ -145,6 +165,7 @@ namespace VBBinaryLensingLibrary {
 		double err;
 		double f;
 		int nim;
+        double LDastrox1,LDastrox2;
 		annulus *prev,*next;
 	};
 
@@ -156,7 +177,7 @@ namespace VBBinaryLensingLibrary {
 
 class _theta{
 public: 
-	double th,maxerr,Mag,errworst;
+	double th,maxerr,Mag,errworst,astrox1,astrox2;
 	_theta *prev,*next;
 
 	_theta(double);
@@ -188,7 +209,7 @@ class _point{
 public:
 	double x1;
 	double x2;
-	double parab,ds,dJ;
+	double parab,ds,dJ,parabastrox1,parabastrox2;
 	complex d,J2;
 	_theta *theta;
 	_point(double ,double,_theta *);
@@ -202,7 +223,7 @@ public:
 	_point *first,*last;
 	_curve *next,*prev;
 	_curve *partneratstart,*partneratend;
-	double parabstart;
+	double parabstart,parabastrox1,parabastrox2;
 
 	_curve(_point *);
 	_curve(void);

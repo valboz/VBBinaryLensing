@@ -245,8 +245,8 @@ def test_amplification_FSBL():
     a1 = 0.2
 
 
-    magnification = VBBL.BinaryMagDark(s, q, y1, y2, rho, a1, 0.001)
-    assert magnification == 143.96471353081841
+    magnification = VBBL.BinaryMagDark(s, q, y1, y2, rho, a1, tol)
+    assert np.allclose(magnification, 143.96471353081841, rtol=rel_tol, atol=tol)
 def test_amplification_PSBL():
     s = 1.
     q = 0.02

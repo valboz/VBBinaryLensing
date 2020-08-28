@@ -1,5 +1,6 @@
 import numpy as np
 import VBBinaryLensing 
+import os
 
 VBBL = VBBinaryLensing.VBBinaryLensing()
 tol = 0.005
@@ -11,11 +12,13 @@ VBBL.RelTol = rel_tol
 VBBL.a1 = a1
 
 # Load ESPL table
-VBBL.LoadESPLTable("VBBinaryLensing/data/ESPL.tbl")
+
+VBBL.LoadESPLTable(os.path.dirname(VBBinaryLensing.__file__)+'/VBBinaryLensing/data/ESPL.tbl')
+
 
 #Set cooridnates
-VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
-                              "VBBinaryLensing/data/satellite1.txt")
+VBBL.SetObjectCoordinates(os.path.dirname(VBBinaryLensing.__file__)+"/VBBinaryLensing/data/OB151212coords.txt",
+                              os.path.dirname(VBBinaryLensing.__file__)+"/VBBinaryLensing/data/satellite1.txt")
 
 def test_BinSourceLightCurve():
 
@@ -50,8 +53,8 @@ def test_BinaryLightCurve():
     assert np.allclose(mag,[14.989374837435403, 1.0842731547424023, 1.0], rtol=rel_tol, atol=tol)
 
 def test_BinaryLightCurveOrbital():
-    VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
-                              "VBBinaryLensing/data/satellite1.txt")
+    #VBBL.SetObjectCoordinates("VBBinaryLensing/data/OB151212coords.txt",
+     #                         "VBBinaryLensing/data/satellite1.txt")
 
     mag =  VBBL.BinaryLightCurveOrbital([np.log10(0.97),
                                          -1.5,0.01,0.1,-2.5,1.5,10,-0.25,0.36,0.1,0.056,0.03],
@@ -241,9 +244,9 @@ def test_amplification_FSBL():
     rho = 0.0033
     a1 = 0.2
 
-    magnification = VBBL.BinaryMagDark(s, q, y1, y2, rho, a1, 0.1)
-    assert magnification == 144.38155079136942
 
+    magnification = VBBL.BinaryMagDark(s, q, y1, y2, rho, a1, 0.001)
+    assert magnification == 143.96471353081841
 def test_amplification_PSBL():
     s = 1.
     q = 0.02

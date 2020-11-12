@@ -1,10 +1,10 @@
-// VBBinaryLensing v3.0 (2020)
+// VBBinaryLensing v3.0.1 (2020)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
 // V. Bozza, E. Bachelet, F. Bartolic, T.M. Heintz, A.R. Hoag, M. Hundertmark, MNRAS 479 (2018) 5157
 // If you use astrometry, user-defined limb darkening or Keplerian orbital motion, please cite
-// V. Bozza and E. Khalouei (2020, in preparation)
+// V. Bozza, E. Khalouei and E. Bachelet (arXiv:2011.04780)
 // The original methods present in v1.0 are described in
 // V. Bozza, MNRAS 408 (2010) 2188
 // Check the repository at http://www.fisica.unisa.it/GravitationAstrophysics/VBBinaryLensing.htm
@@ -766,6 +766,7 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 		astrox2 /= (Mag);
     }
 	Mag /= (M_PI*RSv*RSv);
+	therr = currerr / (M_PI*RSv*RSv);
 ///////////////////////////
  
 	delete Thetas;
@@ -1149,7 +1150,7 @@ double VBBinaryLensing::rCLDprofile(double tc,annulus *left,annulus *right) {
 	return cb;
 }
 
-void VBBinaryLensing::SetUserLDprofile(double (*UserLDprofile)(double),int newnpLD) {
+void VBBinaryLensing::SetLDprofile(double (*UserLDprofile)(double),int newnpLD) {
 	int ic,ir;
 	if (npLD > 0) {
 		free(LDtab);
@@ -2608,22 +2609,22 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #ifdef _selectimage
 		if (_selectionimage)
 #endif
-		        pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
-			theta->prev->Mag += ((scan->dJ>0) ? -1 : 1)*(pref+ scan->parab);
-                       if(astrometry){
-		               dx2=scan2->x2 - scan->x2;
-		               avgx1=scan->x1 + scan2->x1;
-		       	       avg2x1=avgx1*avgx1;
-		               avgx2=scan->x2 + scan2->x2;
-				theta->prev->astrox1 -= ((scan->dJ>0) ? -1 : 1)*(avg2x1*dx2*0.125+scan->parabastrox1);
-				theta->prev->astrox2 += ((scan->dJ>0) ? -1 : 1)*(pref*avgx2*0.25+scan->parabastrox2);
-                       }
+		pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
+		theta->prev->Mag += ((scan->dJ>0) ? -1 : 1)*(pref+ scan->parab);
+		if(astrometry){
+			dx2=scan2->x2 - scan->x2;
+			avgx1=scan->x1 + scan2->x1;
+			avg2x1=avgx1*avgx1;
+			avgx2=scan->x2 + scan2->x2;
+			theta->prev->astrox1 -= ((scan->dJ>0) ? -1 : 1)*(avg2x1*dx2*0.125+scan->parabastrox1);
+			theta->prev->astrox2 += ((scan->dJ>0) ? -1 : 1)*(pref*avgx2*0.25+scan->parabastrox2);
+		}
 		theta->prev->maxerr += mi;
 		scan2->parab = -scan->parab;
-                if(astrometry){
-		        scan2->parabastrox2 =-scan->parabastrox2;
-		        scan2->parabastrox1 =-scan->parabastrox1;
-                }
+        if(astrometry){
+			scan2->parabastrox2 =-scan->parabastrox2;
+			scan2->parabastrox1 =-scan->parabastrox1;
+		}
 
  
 		nprec -= 2;
@@ -2641,7 +2642,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		cpres[i] = cprec[i];
 		scan = Newpts->first;
 		for (int j = 0; j<nprec; j++) {
-			A[i][j] = *(cprec[i]->last) - *scan;
+			A[i][j] = (signbit(cprec[i]->last->dJ) == signbit(scan->dJ))? *(cprec[i]->last) - *scan : 100;
 			if (A[i][j]<mi) {
 				mi = A[i][j];
 				issoc[0] = i;
@@ -2663,16 +2664,16 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		mi = cmp_2*cmp *0.0416666666666667;  ////// (1/24 cube(delta Teta))
 		scan->parab = (scan->ds + scan2->ds)*mi; // Correzione parabolica
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: ordinary image:
-                if(astrometry){
-		        avgwedgex1=(scan->x1*scan->ds + scan2->x1*scan2->ds)*mi;
-		        avgwedgex2=(scan->x2*scan->ds + scan2->x2*scan2->ds)*mi;
+        if(astrometry){
+			avgwedgex1=(scan->x1*scan->ds + scan2->x1*scan2->ds)*mi;
+		    avgwedgex2=(scan->x2*scan->ds + scan2->x2*scan2->ds)*mi;
 			dx2=scan->d.im+scan2->d.im;
-		        d2x2=dx2*dx2;
-		        dx1=scan->d.re+scan2->d.re;
-		        d2x1=dx1*dx1; 
-		        scan->parabastrox1 =-0.125*d2x1*dx2*mi-avgwedgex1;
-		        scan->parabastrox2 =-0.125*d2x2*dx1*mi+avgwedgex2;
-                }
+			d2x2=dx2*dx2;
+			dx1=scan->d.re+scan2->d.re;
+			d2x1=dx1*dx1; 
+			scan->parabastrox1 =-0.125*d2x1*dx2*mi-avgwedgex1;
+			scan->parabastrox2 =-0.125*d2x2*dx1*mi+avgwedgex2;
+		}
 #ifdef _PRINT_ERRORS
 		printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, scan->parab, (scan->ds - scan2->ds)*mi / 2, fabs(scan->parab)*(cmp2) / 10, fabs(scan->parab)*(1.5*fabs(cmp2 / (cmp*cmp) - 1)));
 #endif
@@ -2685,16 +2686,16 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #ifdef _selectimage
 		if (_selectionimage)
 #endif
-                pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
-                theta->prev->Mag += ((scan->dJ>0) ? -1 : 1)*( pref+ scan->parab);
-                if(astrometry){
-		        dx2=scan2->x2 - scan->x2;
-		        avgx1=scan->x1 + scan2->x1;
-		        avg2x1=avgx1*avgx1;
-		        avgx2=scan->x2 + scan2->x2;
-		        theta->prev->astrox1 -= ((scan->dJ>0) ? -1 : 1)*(avg2x1*dx2*0.125+scan->parabastrox1);
-		        theta->prev->astrox2 += ((scan->dJ>0) ? -1 : 1)*(pref*avgx2*0.25+scan->parabastrox2);
-                }
+		pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
+		theta->prev->Mag += ((scan->dJ>0) ? -1 : 1)*( pref+ scan->parab);
+        if(astrometry){
+			dx2=scan2->x2 - scan->x2;
+			avgx1=scan->x1 + scan2->x1;
+			avg2x1=avgx1*avgx1;
+			avgx2=scan->x2 + scan2->x2;
+			theta->prev->astrox1 -= ((scan->dJ>0) ? -1 : 1)*(avg2x1*dx2*0.125+scan->parabastrox1);
+			theta->prev->astrox2 += ((scan->dJ>0) ? -1 : 1)*(pref*avgx2*0.25+scan->parabastrox2);
+        }
 		theta->prev->maxerr += mi;
                  
 
@@ -2891,7 +2892,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		mi = 1.e100;
 		for (int i = 0; i<npres; i++) {
 			for (int j = 0; j<npres; j++) {
-				A[i][j] = *(cpres[i]->last) - *(cfoll[j]->first);
+				A[i][j] = signbit(cpres[i]->last->dJ) == signbit(cfoll[j]->first->dJ)? *(cpres[i]->last) - *(cfoll[j]->first) : 100;
 				if (A[i][j]<mi) {
 					mi = A[i][j];
 					issoc[0] = i;

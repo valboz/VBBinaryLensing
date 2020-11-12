@@ -1,10 +1,10 @@
-// VBBinaryLensing v3.0 (2020)
+// VBBinaryLensing v3.0.1 (2020)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
 // V. Bozza, E. Bachelet, F. Bartolic, T.M. Heintz, A.R. Hoag, M. Hundertmark, MNRAS 479 (2018) 5157
 // If you use astrometry, user-defined limb darkening or Keplerian orbital motion, please cite
-// V. Bozza and E. Khalouei (2020, in preparation)
+// V. Bozza, E. Khalouei and E. Bachelet (arXiv:2011.04780)
 // The original methods present in v1.0 are described in
 // V. Bozza, MNRAS 408 (2010) 2188
 // Check the repository at http://www.fisica.unisa.it/GravitationAstrophysics/VBBinaryLensing.htm

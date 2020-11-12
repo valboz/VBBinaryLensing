@@ -19,7 +19,11 @@ and translated to C++ by Tyler M. Heintz and Ava R. Hoag.
 The new Python wrapper has been created by Fran Bartolić in collaboration with Etienne Bachelet and Markus Hundertmark.
 
 ## Attribution
-Any use of this code for scientific publications should be acknowledged by citations to: [V. Bozza, MNRAS 408 (2010) 2188](https://academic.oup.com/mnras/article/408/4/2188/1420048). 
+Any use of this code for scientific publications should be acknowledged by citations to the works relevant to your study:
+- [V. Bozza, MNRAS 408 (2010) 2188](https://academic.oup.com/mnras/article/408/4/2188/1420048): general algorithm for binary lensing;
+- [V. Bozza et al., MNRAS 479 (2018) 5157](https://academic.oup.com/mnras/article-abstract/479/4/5157/5050380): BinaryMag2 function, Extended-Source-Point-Lens methods; 
+- [V. Bozza, E. Khalouei and E. Bachelet, arXiv:2011.04780](https://arxiv.org/abs/2011.04780): astrometry, generalized limb darkening, Keplerian orbital motion. 
+
 If specifically relevant to your work, please also cite
 [J. Skowron and A. Gould, arXiv:1203.1034](https://arxiv.org/abs/1203.1034).
  

@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.0.1 (2020)
+// VBBinaryLensing v3.1 (2021)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -189,11 +189,11 @@ void VBBinaryLensing::PrintCau(double a, double q) {
 	f = fopen("outcurves.causticdata", "w");
 	ncc = CriticalCurves->length / 2;
 	scancurve = CriticalCurves->first;
-	for (int i = 0; i<ncc; i++) {
-		scancurve = scancurve->next;
-	}
+	for (int i = 0; i<2*ncc; i++) {
+	//	scancurve = scancurve->next;
+	//}
 
-	for (int i = 0; i<ncc; i++) {
+	//for (int i = 0; i<ncc; i++) {
 		fprintf(f, "Curve: %d\n", i + 1);
 		for (scanpoint = scancurve->first; scanpoint; scanpoint = scanpoint->next) {
 			fprintf(f, "%lf %lf\n", scanpoint->x1, scanpoint->x2);
@@ -660,12 +660,22 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 #ifdef _PRINT_TIMES
 	tim0 = Environment::TickCount;
 #endif
-	Prov = NewImages(y, coefs, stheta);
+	flag = 0;
+	while (flag == 0) {
+		Prov = NewImages(y, coefs, stheta);
+		if (Prov->length > 0) {
+			flag = 1;
+		}
+		else {
+			stheta->th += 0.01;
+			delete Prov;
+		}
+	}
 #ifdef _PRINT_TIMES
 	tim1 = Environment::TickCount;
 	GM += tim1 - tim0;
 #endif
-	stheta = Thetas->insert(2.0*M_PI + thoff);
+	stheta = Thetas->insert(2.0*M_PI + Thetas->first->th);
 	stheta->maxerr = 0.;
 	stheta->Mag = 0.;
         stheta->astrox1 = 0.;
@@ -699,14 +709,24 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 		tim1 = Environment::TickCount;
 		GM += tim1 - tim0;
 #endif
-		OrderImages((*Images), Prov);
-		if (stheta->th - stheta->prev->th<1.e-8) {
-			stheta->maxerr = 0;
+		if (Prov->length > 0) {
+			OrderImages((*Images), Prov);
+			if (stheta->th - stheta->prev->th < 1.e-8) {
+				stheta->maxerr = 0;
+				stheta->prev->maxerr = 0;
+			}
+		}
+		else {
 			stheta->prev->maxerr = 0;
+			stheta->prev->next = stheta->next;
+			stheta->next->prev = stheta->prev;
+			delete stheta;
+			delete Prov;
+			NPS--;
 		}
 		maxerr = currerr = Mag = 0.;
  
-                astrox1=astrox2=0.;
+        astrox1=astrox2=0.;
 		stheta = Thetas->first;
 
 		while (stheta->next) {
@@ -1626,39 +1646,64 @@ void VBBinaryLensing::BinaryLightCurveKepler(double *pr, double *ts, double *mag
 	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13];
 	double Et[2];
 	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
-	double wt2, smix, e, h, co1e, co1nu, co2nu, co1EE0, co2EE0, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
-	double x[3], y[3];
+	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0,cosE,sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
+	double arm1, arm2;
+	double X[3], Y[3], Z[3],r[2],x[2];
 	t0old = 0;
 
-	wt2 = w1 * w1 + w2 * w2 + w3 * w3;
 	smix = 1 + szs * szs;
+	sqsmix = sqrt(smix);
 	w22 = w2 * w2;
 	w11 = w1 * w1;
-
 	w33 = w3 * w3;
 	w12 = w11 + w22;
 	w23 = w22 + w33;
+	wt2 = w12 + w33;
+
 	szs2 = szs * szs;
 	ar2 = ar * ar;
-	n = sqrt(wt2) / (ar*sqrt(-1 + 2 * ar)*sqrt(smix));
-	h = sqrt((smix)*w22 + (szs*w1 - w3)*(szs*w1 - w3));
-	co1e = (1 - ar)*(1 - ar) + ar2 * szs2 + (-1 + 2 * ar)*(w11*(1 - szs2) - szs2 * w22 + 2 * szs*w1*w3) / wt2;
-	coe2 = ar2 * (smix);
-	e = sqrt(co1e) / sqrt(coe2);
-	co1nu = (-1 + 2 * ar)*sqrt(smix)*(w1 + szs * w3)*(szs2*(w12)-2 * szs*w1*w3 + w23);
-	co2nu = ar * e*h*(smix)*sqrt((smix))*wt2;
-	nu = asin(co1nu / co2nu);
-	conu = cos(nu);
+	arm1 = ar - 1;
+	arm2 = 2 * ar - 1;
+//	n = sqrt(wt2) / (ar*sqrt(-1 + 2 * ar)*sqrt(smix));
+	n = sqrt(wt2 / arm2 / smix) / ar;
+	Z[0] = -szs * w2;
+	Z[1] = szs * w1 - w3;
+	Z[2] = w2;
+	h = sqrt(Z[0] * Z[0] + Z[1] * Z[1] + Z[2] * Z[2]);
+	for (int i = 0; i < 3; i++) Z[i] /= h;
+	X[0] = -ar * w11 + arm1 * w22 - arm2 * szs*w1*w3 + arm1 * w33;
+	X[1] = -arm2  *w2*(w1 + szs * w3);
+	X[2] = arm1 * szs*w12 - arm2 * w1*w3 - ar * szs*w33;
+	e = sqrt(X[0] * X[0] + X[1] * X[1] + X[2] * X[2]);
+	for (int i = 0; i < 3; i++) X[i] /= e;
+	e /= ar * sqsmix*wt2;
+	Y[0] = Z[1] * X[2] - Z[2] * X[1];
+	Y[1] = Z[2] * X[0] - Z[0] * X[2];
+	Y[2] = Z[0] * X[1] - Z[1] * X[0];
+
+//	h = sqrt((smix)*w22 + (szs*w1 - w3)*(szs*w1 - w3));
+//	co1e = (1 - ar)*(1 - ar) + ar2 * szs2 + (-1 + 2 * ar)*(w11*(1 - szs2) - szs2 * w22 + 2 * szs*w1*w3) / wt2;
+//	co1nu = ar2 * szs2 + arm2 * (w11*(1 - szs2) - szs2 * w22 + 2 * szs*w1*w3) / wt2;
+//	co1e = arm1*arm1 + co1nu;
+//	coe2 = ar2 * smix;
+//	e = sqrt(co1e/coe2);
+//	co1nu = (-1 + 2 * ar)*sqrt(smix)*(w1 + szs * w3)*(szs2*(w12)-2 * szs*w1*w3 + w23);
+//	co2nu = ar * e*h*(smix)*sqrt((smix))*wt2;
+	conu = (X[0] + X[2] * szs) / sqsmix;
 	co1EE0 = conu + e;
 	co2EE0 = 1 + e * conu;
-	EE0 = acos(co1EE0 / co2EE0);
-	co1tperi = e * sin(EE0);
+	cosE = co1EE0 / co2EE0;
+	EE0 = acos(cosE);
+	snu = (Y[0] + Y[2] * szs);
+	EE0 *= (snu > 0) ? 1 : -1;
+	sinE = sqrt(1 - cosE * cosE)*((snu > 0) ? 1 : -1);
+	co1tperi = e * sinE;
 	tperi = t0_par - (EE0 - co1tperi) / n;
-	coX = ar * e*sqrt(smix)*wt2;
-	coX1 = -ar * w11 + (-1 + ar)*w22 + (1 - 2 * ar)*szs*w1*w3 + (-1 + ar)*w33;
-	coX2 = (-1 + 2 * ar)*w1*w23 + szs2 * w1*((-1 + ar)*w12 - ar * w33) + szs * w3*((2 - 3 * ar)*w11 + ar * w23);
-	coY1 = -(-1 + 2 * ar)*w2*(w1 + szs * w3);
-	coY2 = w2 * (-szs2 * w12 + 2 * szs*w1*w3 - w23 + ar * (-4 * szs*w1*w3 + szs2 * (w12 - w33) + (-w11 + w23)));
+//	coX = ar * e*sqrt(smix)*wt2;
+	//coX1 = -ar * w11 + (-1 + ar)*w22 + (1 - 2 * ar)*szs*w1*w3 + (-1 + ar)*w33;
+	//coX2 = (-1 + 2 * ar)*w1*w23 + szs2 * w1*((-1 + ar)*w12 - ar * w33) + szs * w3*((2 - 3 * ar)*w11 + ar * w23);
+	//coY1 = -(-1 + 2 * ar)*w2*(w1 + szs * w3);
+	//coY2 = w2 * (-szs2 * w12 + 2 * szs*w1*w3 - w23 + ar * (-4 * szs*w1*w3 + szs2 * (w12 - w33) + (-w11 + w23)));
 	for (int i = 0; i < np; i++) {
 		ComputeParallax(ts[i], t0, Et);
 		M = n * (ts[i] - tperi);
@@ -1672,12 +1717,12 @@ void VBBinaryLensing::BinaryLightCurveKepler(double *pr, double *ts, double *mag
 
 		a = ar * s*sqrt(smix);
 
-		x[1] = a * (cos(EE) - e);
-		y[1] = a * sqrt(1 - e * e)*sin(EE);
-		x[2] = (coX1*x[1] + coX2 * y[1] / h) / coX;
-		y[2] = (coY1*x[1] + y[1] * coY2 / h) / coX;
-		St = sqrt(x[2] * x[2] + y[2] * y[2]);
-		psi = atan2(y[2], x[2]);
+		r[0] = a * (cos(EE) - e);
+		r[1] = a * sqrt(1 - e * e)*sin(EE);
+		x[0] = r[0] * X[0] + r[1] * Y[0];  // (coX1*x[1] + coX2 * y[1] / h) / coX;
+		x[1] = r[0] * X[1] + r[1] * Y[1];   //(coY1*x[1] + y[1] * coY2 / h) / coX;
+		St = sqrt(x[0] * x[0] + x[1] * x[1]);
+		psi = atan2(x[1], x[0]);// +((ar > 1) ? 0 : M_PI);
 		u = u0 + pai1 * Et[1] - pai2 * Et[0];
 		tn = (ts[i] - t0) * tE_inv + pai1 * Et[0] + pai2 * Et[1];
 		y1s[i] = -tn * cos(alpha - psi) + u * sin(alpha - psi);
@@ -1962,45 +2007,55 @@ double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 	return BinaryMag2(av, q, y_1, y_2, rho);
 }
 
-
 double VBBinaryLensing::BinaryLightCurveKepler(double *pr, double t) {
 	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13];
 	double Et[2];
 	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
-	double wt2, smix, e, h, co1e, co1nu, co2nu, co1EE0, co2EE0, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
-	double x[3], y[3];
+	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0, cosE, sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
+	double arm1, arm2;
+	double X[3], Y[3], Z[3], r[2], x[2];
 	t0old = 0;
 
-	wt2 = w1 * w1 + w2 * w2 + w3 * w3;
 	smix = 1 + szs * szs;
+	sqsmix = sqrt(smix);
 	w22 = w2 * w2;
 	w11 = w1 * w1;
-
 	w33 = w3 * w3;
 	w12 = w11 + w22;
 	w23 = w22 + w33;
+	wt2 = w12 + w33;
+
 	szs2 = szs * szs;
 	ar2 = ar * ar;
-	n = sqrt(wt2) / (ar*sqrt(-1 + 2 * ar)*sqrt(smix));
-	h = sqrt((smix)*w22 + (szs*w1 - w3)*(szs*w1 - w3));
-	co1e = (1 - ar)*(1 - ar) + ar2 * szs2 + (-1 + 2 * ar)*(w11*(1 - szs2) - szs2 * w22 + 2 * szs*w1*w3) / wt2;
-	coe2 = ar2 * (smix);
-	e = sqrt(co1e) / sqrt(coe2);
-	co1nu = (-1 + 2 * ar)*sqrt(smix)*(w1 + szs * w3)*(szs2*(w12)-2 * szs*w1*w3 + w23);
-	co2nu = ar * e*h*(smix)*sqrt((smix))*wt2;
-	nu = asin(co1nu / co2nu);
-	conu = cos(nu);
+	arm1 = ar - 1;
+	arm2 = 2 * ar - 1;
+	n = sqrt(wt2 / arm2 / smix) / ar;
+	Z[0] = -szs * w2;
+	Z[1] = szs * w1 - w3;
+	Z[2] = w2;
+	h = sqrt(Z[0] * Z[0] + Z[1] * Z[1] + Z[2] * Z[2]);
+	for (int i = 0; i < 3; i++) Z[i] /= h;
+	X[0] = -ar * w11 + arm1 * w22 - arm2 * szs*w1*w3 + arm1 * w33;
+	X[1] = -arm2 * w2*(w1 + szs * w3);
+	X[2] = arm1 * szs*w12 - arm2 * w1*w3 - ar * szs*w33;
+	e = sqrt(X[0] * X[0] + X[1] * X[1] + X[2] * X[2]);
+	for (int i = 0; i < 3; i++) X[i] /= e;
+	e /= ar * sqsmix*wt2;
+	Y[0] = Z[1] * X[2] - Z[2] * X[1];
+	Y[1] = Z[2] * X[0] - Z[0] * X[2];
+	Y[2] = Z[0] * X[1] - Z[1] * X[0];
+
+	conu = (X[0] + X[2] * szs) / sqsmix;
 	co1EE0 = conu + e;
 	co2EE0 = 1 + e * conu;
-	EE0 = acos(co1EE0 / co2EE0);
-	co1tperi = e * sin(EE0);
+	cosE = co1EE0 / co2EE0;
+	EE0 = acos(cosE);
+	snu = (Y[0] + Y[2] * szs);
+	EE0 *= (snu > 0) ? 1 : -1;
+	sinE = sqrt(1 - cosE * cosE)*((snu > 0) ? 1 : -1);
+	co1tperi = e * sinE;
 	tperi = t0_par - (EE0 - co1tperi) / n;
-	coX = ar * e*sqrt(smix)*wt2;
-	coX1 = -ar * w11 + (-1 + ar)*w22 + (1 - 2 * ar)*szs*w1*w3 + (-1 + ar)*w33;
-	coX2 = (-1 + 2 * ar)*w1*w23 + szs2 * w1*((-1 + ar)*w12 - ar * w33) + szs * w3*((2 - 3 * ar)*w11 + ar * w23);
-	coY1 = -(-1 + 2 * ar)*w2*(w1 + szs * w3);
-	coY2 = w2 * (-szs2 * w12 + 2 * szs*w1*w3 - w23 + ar * (-4 * szs*w1*w3 + szs2 * (w12 - w33) + (-w11 + w23)));
-	
+
 	ComputeParallax(t, t0, Et);
 	M = n * (t - tperi);
 	EE = M + e * sin(M);
@@ -2010,23 +2065,89 @@ double VBBinaryLensing::BinaryLightCurveKepler(double *pr, double t) {
 		dE = dM / (1 - e * cos(EE));
 		EE += dE;
 	}
-
+	
 	a = ar * s*sqrt(smix);
 
-	x[1] = a * (cos(EE) - e);
-	y[1] = a * sqrt(1 - e * e)*sin(EE);
-	x[2] = (coX1*x[1] + coX2 * y[1] / h) / coX;
-	y[2] = (coY1*x[1] + y[1] * coY2 / h) / coX;
-	St = sqrt(x[2] * x[2] + y[2] * y[2]);
-	psi = atan2(y[2], x[2]);
+	r[0] = a * (cos(EE) - e);
+	r[1] = a * sqrt(1 - e * e)*sin(EE);
+	x[0] = r[0] * X[0] + r[1] * Y[0];  // (coX1*x[1] + coX2 * y[1] / h) / coX;
+	x[1] = r[0] * X[1] + r[1] * Y[1];   //(coY1*x[1] + y[1] * coY2 / h) / coX;
+	St = sqrt(x[0] * x[0] + x[1] * x[1]);
+	psi = atan2(x[1], x[0]);// +((ar > 1) ? 0 : M_PI);
+
 	u = u0 + pai1 * Et[1] - pai2 * Et[0];
 	tn = (t - t0) * tE_inv + pai1 * Et[0] + pai2 * Et[1];
-	y_1 = -tn * cos(alpha - psi) + u * sin(alpha - psi);
-	y_2 = -u * cos(alpha - psi) - tn * sin(alpha - psi);
-
+	y_1 = -tn * cos(alpha + psi) + u * sin(alpha + psi);
+	y_2 = -u * cos(alpha + psi) - tn * sin(alpha + psi);
+	
 	return BinaryMag2(St, q, y_1, y_2, rho);
-
+	
 }
+
+//double VBBinaryLensing::BinaryLightCurveKepler(double *pr, double t) {
+//	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13];
+//	double Et[2];
+//	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
+//	double wt2, smix, e, h, co1e, co1nu, co2nu, co1EE0, co2EE0, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
+//	double x[3], y[3];
+//	t0old = 0;
+//
+//	wt2 = w1 * w1 + w2 * w2 + w3 * w3;
+//	smix = 1 + szs * szs;
+//	w22 = w2 * w2;
+//	w11 = w1 * w1;
+//
+//	w33 = w3 * w3;
+//	w12 = w11 + w22;
+//	w23 = w22 + w33;
+//	szs2 = szs * szs;
+//	ar2 = ar * ar;
+//	n = sqrt(wt2) / (ar*sqrt(-1 + 2 * ar)*sqrt(smix));
+//	h = sqrt((smix)*w22 + (szs*w1 - w3)*(szs*w1 - w3));
+//	co1e = (1 - ar)*(1 - ar) + ar2 * szs2 + (-1 + 2 * ar)*(w11*(1 - szs2) - szs2 * w22 + 2 * szs*w1*w3) / wt2;
+//	coe2 = ar2 * (smix);
+//	e = sqrt(co1e) / sqrt(coe2);
+//	co1nu = (-1 + 2 * ar)*sqrt(smix)*(w1 + szs * w3)*(szs2*(w12)-2 * szs*w1*w3 + w23);
+//	co2nu = ar * e*h*(smix)*sqrt((smix))*wt2; 
+//	nu = asin(co1nu / co2nu);
+//	conu = cos(nu);
+//	co1EE0 = conu + e;
+//	co2EE0 = 1 + e * conu;
+//	EE0 = acos(co1EE0 / co2EE0);
+//	co1tperi = e * sin(EE0);
+//	tperi = t0_par - (EE0 - co1tperi) / n;
+//	coX = ar * e*sqrt(smix)*wt2;
+//	coX1 = -ar * w11 + (-1 + ar)*w22 + (1 - 2 * ar)*szs*w1*w3 + (-1 + ar)*w33;
+//	coX2 = (-1 + 2 * ar)*w1*w23 + szs2 * w1*((-1 + ar)*w12 - ar * w33) + szs * w3*((2 - 3 * ar)*w11 + ar * w23);
+//	coY1 = -(-1 + 2 * ar)*w2*(w1 + szs * w3);
+//	coY2 = w2 * (-szs2 * w12 + 2 * szs*w1*w3 - w23 + ar * (-4 * szs*w1*w3 + szs2 * (w12 - w33) + (-w11 + w23)));
+//	
+//	ComputeParallax(t, t0, Et);
+//	M = n * (t - tperi);
+//	EE = M + e * sin(M);
+//	dE = 1;
+//	while (fabs(dE) > 1.e-8) {
+//		dM = M - (EE - e * sin(EE));
+//		dE = dM / (1 - e * cos(EE));
+//		EE += dE;
+//	}
+//
+//	a = ar * s*sqrt(smix);
+//
+//	x[1] = a * (cos(EE) - e);
+//	y[1] = a * sqrt(1 - e * e)*sin(EE);
+//	x[2] = (coX1*x[1] + coX2 * y[1] / h) / coX;
+//	y[2] = (coY1*x[1] + y[1] * coY2 / h) / coX;
+//	St = sqrt(x[2] * x[2] + y[2] * y[2]);
+//	psi = atan2(y[2], x[2])+ ((ar>1)? 0 : M_PI);
+//	u = u0 + pai1 * Et[1] - pai2 * Et[0];
+//	tn = (t - t0) * tE_inv + pai1 * Et[0] + pai2 * Et[1];
+//	y_1 = -tn * cos(alpha + psi) + u * sin(alpha + psi);
+//	y_2 = -u * cos(alpha + psi) - tn * sin(alpha + psi);
+//
+//	return BinaryMag2(St, q, y_1, y_2, rho);
+//
+//}
 
 double VBBinaryLensing::BinSourceLightCurve(double *pr, double t) {
 	double u1 = pr[2], u2 = pr[3], t01 = pr[4], t02 = pr[5], tE_inv = exp(-pr[0]), FR = exp(pr[1]), tn, u,mag;
@@ -2193,7 +2314,7 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 	static complex  y, yc, z, zc, J1, J1c, dy, dz, dJ,J2,J3,dza,za2,zb2,zaltc,Jalt,Jaltc,JJalt2;
 	static complex zr[5] = { 0.,0.,0.,0.,0. };
 	static double dzmax, dlmax = 1.0e-6, good[5], dJ2,ob2,cq;
-	static int worst1, worst2, worst3, bad, f1;
+	static int worst1, worst2, worst3, bad, f1,checkJac;
 	static double av = 0.0, m1v = 0.0, disim, disisso;
 	static _curve *Prov;
 	static _point *scan, *prin, *fifth, *left, *right, *center;
@@ -2293,6 +2414,7 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 		}
 	}
 	Prov = new _curve;
+	checkJac = 0;
 	if (good[worst1]>dlmax) {
 		for (int i = 0; i<5; i++) {
 			if ((i != worst1) && (i != worst2)) {
@@ -2308,7 +2430,7 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 					_Jacobians3
 					corrquad += cq;
 				}
-
+				checkJac += _sign(Prov->last->dJ);
 				Prov->last->theta = theta;
 
 			}
@@ -2346,7 +2468,7 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 				_Jacobians3
 				corrquad += cq;
 			}
-
+			checkJac += _sign(Prov->last->dJ);
 			Prov->last->theta = theta;
 
 			if (fabs(dJ.re)<1.e-5) f1 = 1;
@@ -2397,6 +2519,13 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 			if (left->dJ>0) left->dJ = -left->dJ;
 			if (center->dJ<0) center->dJ = -center->dJ;
 			if (right->dJ>0) right->dJ = -right->dJ;
+		}
+	}
+	if (checkJac != -1) {
+		_point *scan2;
+		for (scan = Prov->first; scan; scan = scan2) {
+			scan2 = scan->next;
+			Prov->drop(scan);
 		}
 	}
 	return Prov;

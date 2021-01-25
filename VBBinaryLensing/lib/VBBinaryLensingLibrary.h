@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.0.1 (2020)
+// VBBinaryLensing v3.1 (2021)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -103,7 +103,7 @@ namespace VBBinaryLensingLibrary {
 
 	// Limb Darkening control
 		enum LDprofiles { LDlinear, LDquadratic, LDsquareroot, LDlog, LDuser};
-	    void SetUserLDprofile(double(*UserLDprofile)(double), int tablesampling);
+		void SetLDprofile(double(*UserLDprofile)(double), int tablesampling);
 		void SetLDprofile(LDprofiles);
 
 	// ESPL functions

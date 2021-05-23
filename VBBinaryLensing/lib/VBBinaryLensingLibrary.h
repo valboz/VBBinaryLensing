@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.1 (2021)
+// VBBinaryLensing v3.2 (2021)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -68,6 +68,7 @@ namespace VBBinaryLensingLibrary {
 		void ComputeParallax(double, double, double *);
 		double LDprofile(double r);
 		double rCLDprofile(double tc,annulus *,annulus *);
+		double BinaryMagSafe(double s, double q, double y1, double y2, double rho, _sols **images);
 		_curve *NewImages(complex,complex  *,_theta *);
 		void OrderImages(_sols *,_curve *);
 		void cmplx_laguerre(complex *, int, complex *, int &, bool &);
@@ -129,7 +130,9 @@ namespace VBBinaryLensingLibrary {
 		void BinSourceLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinSourceLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinSourceLightCurveXallarap(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, double *sep_array, int np);
-		
+		void BinSourceSingleLensXallarap(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, double *y1_array2, double *y2_array2, int np);
+		void BinSourceBinLensXallarap(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
+
 	// Old (v1) light curve functions, for a single calculation
 		double PSPLLightCurve(double *parameters, double t);
 		double PSPLLightCurveParallax(double *parameters, double t);
@@ -145,6 +148,8 @@ namespace VBBinaryLensingLibrary {
 		double BinSourceLightCurve(double *parameters, double t);
 		double BinSourceLightCurveParallax(double *parameters, double t);
 		double BinSourceLightCurveXallarap(double *parameters, double t);
+		double BinSourceBinLensXallarap(double *parameters, double t);
+		double BinSourceSingleLensXallarap(double *parameters, double t);
 
 	// Skowron & Gould root calculator
 		void cmplx_roots_gen(complex *, complex *, int, bool, bool);

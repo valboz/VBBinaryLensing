@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.1 (2021)
+// VBBinaryLensing v3.2 (2021)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -576,6 +576,7 @@ double VBBinaryLensing::BinaryMag0(double a1, double q1, double y1v, double y2v,
 		astrox1 -=coefs[11].re;
 		astrox2 /= (Mag);
     }
+	NPS = 1;
 	return Mag;
 
 }
@@ -586,6 +587,53 @@ double VBBinaryLensing::BinaryMag0(double a1, double q1, double y1v, double y2v)
 	mag = BinaryMag0(a1, q1, y1v, y2v, &images);
 	delete images;
 	return mag;
+}
+
+double VBBinaryLensing::BinaryMagSafe(double s, double q, double y1v, double y2v, double RS, _sols **images) {
+	static double Mag, mag1, mag2, RSi, RSo, delta1,delta2;
+	static int NPSsafe;
+	Mag = BinaryMag(s, q, y1v, y2v, RS,Tol,images);
+	RSi = RS;
+	RSo = RS;
+	NPSsafe = NPS;
+	if (Mag < 0) {
+		mag1 = -1;
+		delta1 = 3.33333333e-8;
+		while (mag1 < 0) {
+			delete *images;
+			delta1 *= 3.;
+			printf("\n-safe1");
+			RSi = RS - delta1;
+			mag1 = (RSi > 0) ? BinaryMag(s, q, y1v, y2v, RSi, Tol, images) : BinaryMag0(s,q,y1v,y2v,images);
+			NPSsafe += NPS;
+		}
+		mag2 = -1;
+		delta2 = 3.33333333e-8;
+		while (mag2 < 0) {
+			delta2 *= 3.;
+			printf("\n-safe2");
+			RSo = RS + delta2;
+			delete *images;
+			mag2 = BinaryMag(s, q, y1v, y2v, RSo, Tol, images);
+			NPSsafe += NPS;
+		}
+		Mag = (mag1*delta2 + mag2*delta1)/(delta1+delta2);
+	}
+	NPS = NPSsafe;
+	//while (Mag < 0) {
+	//	delete *images;
+	//	delta *= 3.;
+	//	printf("\n-safe");
+	//	RSi = RS - delta;
+	//	RSo = RS + delta;
+	//	mag1 = BinaryMag(s, q, y1v, y2v, RSi, Tol, images);
+	//	if (mag1 < 0) continue;
+	//	delete *images;
+	//	mag2 = BinaryMag(s, q, y1v, y2v, RSo, Tol, images);
+	//	if (mag2 < 0) continue;
+	//	Mag = 0.5*(mag1 + mag2);
+	//}
+	return Mag;
 }
 
 double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, double RSv, double Tol, _sols **Images) {
@@ -668,6 +716,7 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 		}
 		else {
 			stheta->th += 0.01;
+			y = y0 + complex(RSv*cos(stheta->th), RSv*sin(stheta->th));
 			delete Prov;
 		}
 	}
@@ -717,12 +766,15 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 			}
 		}
 		else {
-			stheta->prev->maxerr = 0;
-			stheta->prev->next = stheta->next;
-			stheta->next->prev = stheta->prev;
-			delete stheta;
 			delete Prov;
-			NPS--;
+			delete Thetas;
+			return -1;
+			//stheta->prev->maxerr = 0;
+			//stheta->prev->next = stheta->next;
+			//stheta->next->prev = stheta->prev;
+			//delete stheta;
+			//delete Prov;
+			//NPS--;
 		}
 		maxerr = currerr = Mag = 0.;
  
@@ -777,6 +829,9 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 			}
 		}
 #endif
+		if (NPS == 41) {
+			NPS = NPS;
+		}
 #ifdef _PRINT_ERRORS2
 		printf("\nNPS= %d Mag = %lf maxerr= %lg currerr =%lg th = %lf", NPS, Mag / (M_PI*RSv*RSv), maxerr / (M_PI*RSv*RSv), currerr / (M_PI*RSv*RSv), th);
 #endif
@@ -791,7 +846,6 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
  
 	delete Thetas;
 
-
 	return Mag;
        
 }
@@ -805,15 +859,28 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 }
 
 double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, double rho) {
-	double Mag, sms, tn,rho2;
+	double Mag, tn, tn2, rho2, y2a;//, sms , dy1, dy2;
 	int c = 0;
 	_sols *Images;
 
-	sms = s + 1 / s;
-	tn = y1v*y1v + y2v*y2v - sms*sms;
-
-	if (tn<0 || tn*tn*Tol < 2) {
-		Mag0 = BinaryMag0(s, q, y1v, y2v, &Images);
+	//dy2 = y2v * y2v;
+	//sms = (s-1 / s) / (1 + q);
+	//dy1 = y1v - sms;
+	//tn = dy1*dy1 + dy2;
+	//dy1 = y1v + sms*q;
+	//tn2 = (dy1 * dy1 + dy2)/q;
+	//if (!astrometry) {
+	//	tn *= tn;
+	//	tn2 *= tn2;
+	//}
+	//else {
+	//	//tn = sqrt(tn);
+	//	//tn2 = sqrt(tn2);
+	//}
+	y2a = fabs(y2v);
+	tn = 0;
+	if (tn*Tol<2 || tn2*Tol < 2) {
+		Mag0 = BinaryMag0(s, q, y1v, y2a, &Images);
 		delete Images;
 		rho2 = rho*rho;
 		corrquad *= 6 * (rho2 + 1.e-4*Tol);
@@ -822,12 +889,14 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 			Mag = Mag0;
 		}
 		else {
-			Mag = BinaryMagDark(s, q, y1v, y2v, rho, a1, Tol);
+			Mag = BinaryMagDark(s, q, y1v, y2a, rho, a1, Tol);
 		}
 		Mag0 = 0;
 	}
 	else {
 		Mag = 1;
+		astrox1 = y1v;
+		astrox2 = y2v;
 	}
 	return Mag;
 }
@@ -875,7 +944,7 @@ double VBBinaryLensing::BinaryMagDark(double a, double q, double y1, double y2, 
 		scan->next = 0;
 		scan->bin = 1.;
 		scan->cum = 1.;
-		scan->Mag = BinaryMag(a, q, y_1, y_2, RSv, Tolv, &Images);
+		scan->Mag = BinaryMagSafe(a, q, y_1, y_2, RSv, &Images);
 		if(astrometry){
 			scan->LDastrox1 = astrox1*scan->Mag;
 			scan->LDastrox2 = astrox2*scan->Mag;
@@ -932,7 +1001,7 @@ double VBBinaryLensing::BinaryMagDark(double a, double q, double y1, double y2, 
 			scan->prev->bin = cb;
 			scan->prev->cum = tc;
 			scan->prev->f = LDprofile(cb);
-			scan->prev->Mag = BinaryMag(a, q, y_1, y_2, RSv*cb, Tolv, &Images);
+			scan->prev->Mag = BinaryMagSafe(a, q, y_1, y_2, RSv*cb, &Images);
 			if(astrometry){
 				scan->prev->LDastrox1=astrox1*scan->prev->Mag;
 				scan->prev->LDastrox2=astrox2*scan->prev->Mag;
@@ -1851,6 +1920,100 @@ void VBBinaryLensing::BinSourceLightCurveXallarap(double *pr, double *ts, double
 }
 
 
+void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* mags, double* y1s, double* y2s, int np) {
+	double s = exp(pr[0]), q = exp(pr[1]), rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), u0;
+	double salpha = sin(pr[3]), calpha = cos(pr[3]), xi1 = pr[7], xi2 = pr[8], omega = pr[9], inc = pr[10], phi = pr[11], qs = exp(pr[12]);
+
+	double Xal[2], phit, disp[2], Xal2[2], disp2[2];
+	double Mag, Mag2, u02, rho2, tn2, y1s2, y2s2, qs4;
+
+
+
+	if (t0_par_fixed == 0) t0_par = pr[6];
+
+
+	for (int i = 0; i < np; i++) {
+
+		phit = omega * (ts[i] - t0_par);
+
+		disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+
+		disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
+
+		Xal[0] = xi1 * disp[0] + xi2 * disp[1];
+		Xal[1] = xi2 * disp[0] - xi1 * disp[1];
+		tn = (ts[i] - pr[6]) * tE_inv + Xal[0];
+		u0 = pr[2] + Xal[1];
+		y1s[i] = u0 * salpha - tn * calpha;
+		y2s[i] = -u0 * calpha - tn * salpha;
+		Mag = BinaryMag2(s, q, y1s[i], y2s[i], rho);
+
+		disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+
+		disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
+
+		Xal2[0] = xi1 * disp2[0] - xi2 * disp2[1];
+		Xal2[1] = xi2 * disp2[0] + xi1 * disp2[1];
+		tn2 = (ts[i] - pr[6]) * tE_inv + Xal2[0];
+		u02 = pr[2] + Xal2[1];
+		y1s2 = u02 * salpha - tn2 * calpha;
+		y2s2 = -u02 * calpha - tn2 * salpha;
+		rho2 = rho * pow(qs, 0.89);
+		Mag2 = BinaryMag2(s, q, y1s2, y2s2, rho2);
+		qs4 = pow(qs, 4.0);
+		mags[i] = (Mag + qs4 * Mag2) / (1 + qs4);
+	}
+}
+
+void VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double* ts, double* mags, double* y1s, double* y2s, double* y1s2, double* y2s2, int np) {
+	double  t0 = pr[1], rho = exp(pr[3]), tn, tE_inv = exp(-pr[2]), u0;
+	double  xi1 = pr[4], xi2 = pr[5], omega = pr[6], inc = pr[7], phi = pr[8], qs = exp(pr[9]);
+
+	double Xal[2], phit, disp[2], Xal2[2], disp2[2];
+	double Mag, Mag2, u02, rho2, tn2, qs4, u, u2;
+
+
+
+	if (t0_par_fixed == 0) t0_par = pr[1];
+
+
+	for (int i = 0; i < np; i++) {
+
+		phit = omega * (ts[i] - t0_par);
+
+		disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+
+		disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
+
+		Xal[0] = xi1 * disp[0] + xi2 * disp[1];
+		Xal[1] = xi2 * disp[0] - xi1 * disp[1];
+		tn = (ts[i] - pr[1]) * tE_inv + Xal[0];
+		u0 = pr[0] + Xal[1];
+		u = sqrt(tn * tn + u0 * u0);
+
+		y1s[i] = -tn;
+		y2s[i] = -u0;
+		Mag = ESPLMag2(u, rho);  /*If you want only the second source put =0, otherwise replace ESPLMag2(u, rho);*/
+
+
+		disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+
+		disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
+
+		Xal2[0] = xi1 * disp2[0] - xi2 * disp2[1];
+		Xal2[1] = xi2 * disp2[0] + xi1 * disp2[1];
+		tn2 = (ts[i] - pr[1]) * tE_inv + Xal2[0];
+		u02 = pr[0] + Xal2[1];
+		u2 = sqrt(tn2 * tn2 + u02 * u02);
+		y1s2[i] = -tn2;
+		y2s2[i] = -u02;
+		rho2 = rho * pow(qs, 0.89);
+		Mag2 = ESPLMag2(u2, rho2);  /*If you want only the second source put =0, otherwise replace ESPLMag2(u2, rho2);*/
+		qs4 = pow(qs, 4.0);
+		mags[i] = (Mag + qs4 * Mag2) / (1 + qs4);
+	}
+}
+
 //////////////////////////////
 //////////////////////////////
 ////////Old (v1) light curve functions
@@ -2263,6 +2426,102 @@ double VBBinaryLensing::BinSourceLightCurveXallarap(double *pr, double t) {
 }
 
 
+double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
+
+	double s = exp(pr[0]), q = exp(pr[1]), rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), u0;
+	double salpha = sin(pr[3]), calpha = cos(pr[3]), xi1 = pr[7], xi2 = pr[8], omega = pr[9], inc = pr[10], phi = pr[11], qs = exp(pr[12]);
+
+	double Xal[2], phit, disp[2], Xal2[2], disp2[2], disp3[2];
+	double Mag, Mag2, u02, rho2, tn2, y1s2, y2s2, y1s, y2s, mags, qs4;
+
+
+
+	if (t0_par_fixed == 0) t0_par = pr[6];
+
+
+
+
+	phit = omega * (t - t0_par);
+
+	disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+
+	disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
+
+	Xal[0] = xi1 * disp[0] + xi2 * disp[1];
+	Xal[1] = xi2 * disp[0] - xi1 * disp[1];
+	tn = (t - pr[6]) * tE_inv + Xal[0];
+	u0 = pr[2] + Xal[1];
+	y1s = u0 * salpha - tn * calpha;
+	y2s = -u0 * calpha - tn * salpha;
+	Mag = BinaryMag2(s, q, y1s, y2s, rho);
+
+	disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+
+	disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
+
+	Xal2[0] = xi1 * disp2[0] - xi2 * disp2[1];
+	Xal2[1] = xi2 * disp2[0] + xi1 * disp2[1];
+	tn2 = (t - pr[6]) * tE_inv + Xal2[0];
+	u02 = pr[2] + Xal2[1];
+	y1s2 = u02 * salpha - tn2 * calpha;
+	y2s2 = -u02 * calpha - tn2 * salpha;
+	rho2 = rho * pow(qs, 0.89);
+	Mag2 = BinaryMag2(s, q, y1s2, y2s2, rho2);
+	qs4 = pow(qs, 4.0);
+	mags = (Mag + Mag2) / (1 + qs4);
+
+	return mags;
+
+
+}
+
+double VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double t) {
+
+	double  t0 = pr[1], rho = exp(pr[3]), tn, tE_inv = exp(-pr[2]), u0;
+	double  xi1 = pr[4], xi2 = pr[5], omega = pr[6], inc = pr[7], phi = pr[8], qs = exp(pr[9]);
+
+	double Xal[2], phit, disp[2], Xal2[2], disp2[2];
+	double Mag, Mag2, u02, rho2, tn2, y1s2, y2s2, qs4, u, y1s, y2s, mags, u2;
+
+
+
+	if (t0_par_fixed == 0) t0_par = pr[1];
+
+	phit = omega * (t - t0_par);
+
+	disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+
+	disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
+
+	Xal[0] = xi1 * disp[0] + xi2 * disp[1];
+	Xal[1] = xi2 * disp[0] - xi1 * disp[1];
+	tn = (t - pr[1]) * tE_inv + Xal[0];
+	u0 = pr[0] + Xal[1];
+	u = sqrt(tn * tn + u0 * u0);
+
+	y1s = -tn;
+	y2s = -u0;
+	Mag = ESPLMag2(u, rho); /*If you want only the second source put =0, otherwise replace ESPLMag2(u, rho);*/
+
+
+	disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+
+	disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
+
+	Xal2[0] = xi1 * disp2[0] - xi2 * disp2[1];
+	Xal2[1] = xi2 * disp2[0] + xi1 * disp2[1];
+	tn2 = (t - pr[1]) * tE_inv + Xal2[0];
+	u02 = pr[0] + Xal2[1];
+	u2 = sqrt(tn2 * tn2 + u02 * u02);
+	y1s2 = -tn2;
+	y2s2 = -u02;
+	rho2 = rho * pow(qs, 0.89);
+	Mag2 = ESPLMag2(u2, rho2); /*If you want only the second source put =0, otherwise replace ESPLMag2(u2, rho2);*/
+	qs4 = pow(qs, 4.0);
+	mags = (Mag + qs4 * Mag2) / (1 + qs4);
+	return mags;
+}
+
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 ////////// Internal private functions
@@ -2430,7 +2689,7 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 					_Jacobians3
 					corrquad += cq;
 				}
-				checkJac += _sign(Prov->last->dJ);
+				checkJac += (fabs(Prov->last->dJ)>1.e-7)? _sign(Prov->last->dJ) : 10;
 				Prov->last->theta = theta;
 
 			}
@@ -2468,7 +2727,7 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 				_Jacobians3
 				corrquad += cq;
 			}
-			checkJac += _sign(Prov->last->dJ);
+			checkJac += (fabs(Prov->last->dJ) > 1.e-7) ? _sign(Prov->last->dJ) : 10;
 			Prov->last->theta = theta;
 
 			if (fabs(dJ.re)<1.e-5) f1 = 1;
@@ -2522,10 +2781,12 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 		}
 	}
 	if (checkJac != -1) {
+//		printf("\ncheckJac!");
 		_point *scan2;
 		for (scan = Prov->first; scan; scan = scan2) {
 			scan2 = scan->next;
 			Prov->drop(scan);
+			delete scan;
 		}
 	}
 	return Prov;

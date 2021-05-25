@@ -898,6 +898,7 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 		astrox1 = y1v;
 		astrox2 = y2v;
 	}
+	y_2=y2v;
 	return Mag;
 }
 

@@ -602,7 +602,7 @@ double VBBinaryLensing::BinaryMagSafe(double s, double q, double y1v, double y2v
 		while (mag1 < 0) {
 			delete *images;
 			delta1 *= 3.;
-			printf("\n-safe1");
+		//	printf("\n-safe1");
 			RSi = RS - delta1;
 			mag1 = (RSi > 0) ? BinaryMag(s, q, y1v, y2v, RSi, Tol, images) : BinaryMag0(s,q,y1v,y2v,images);
 			NPSsafe += NPS;
@@ -611,7 +611,7 @@ double VBBinaryLensing::BinaryMagSafe(double s, double q, double y1v, double y2v
 		delta2 = 3.33333333e-8;
 		while (mag2 < 0) {
 			delta2 *= 3.;
-			printf("\n-safe2");
+		//	printf("\n-safe2");
 			RSo = RS + delta2;
 			delete *images;
 			mag2 = BinaryMag(s, q, y1v, y2v, RSo, Tol, images);

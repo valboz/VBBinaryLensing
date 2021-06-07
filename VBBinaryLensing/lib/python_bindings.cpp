@@ -689,9 +689,9 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
 
         // Limb darkening
          
-        vbb.def("SetLDprofile", 
-            &VBBinaryLensing::SetLDprofile,
-            "User choice of LD profile");
+        //vbb.def("SetLDprofile", 
+        //    &VBBinaryLensing::SetLDprofile,
+        //    "User choice of LD profile");
   
          //vbb.def("SetUserLDprofile", 
          //  []( VBBinaryLensing &self, py::function f) {

@@ -829,9 +829,9 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 			}
 		}
 #endif
-		if (NPS == 41) {
-			NPS = NPS;
-		}
+	//	if (NPS == 41) {
+	//		NPS = NPS;
+	//	}
 #ifdef _PRINT_ERRORS2
 		printf("\nNPS= %d Mag = %lf maxerr= %lg currerr =%lg th = %lf", NPS, Mag / (M_PI*RSv*RSv), maxerr / (M_PI*RSv*RSv), currerr / (M_PI*RSv*RSv), th);
 #endif

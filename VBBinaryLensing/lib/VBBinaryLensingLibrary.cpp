@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.2 (2021)
+// VBBinaryLensing v3.3 (2022)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -602,7 +602,7 @@ double VBBinaryLensing::BinaryMagSafe(double s, double q, double y1v, double y2v
 		while (mag1 < 0) {
 			delete *images;
 			delta1 *= 3.;
-		//	printf("\n-safe1");
+//			printf("\n-safe1");
 			RSi = RS - delta1;
 			mag1 = (RSi > 0) ? BinaryMag(s, q, y1v, y2v, RSi, Tol, images) : BinaryMag0(s,q,y1v,y2v,images);
 			NPSsafe += NPS;
@@ -611,7 +611,7 @@ double VBBinaryLensing::BinaryMagSafe(double s, double q, double y1v, double y2v
 		delta2 = 3.33333333e-8;
 		while (mag2 < 0) {
 			delta2 *= 3.;
-		//	printf("\n-safe2");
+//			printf("\n-safe2");
 			RSo = RS + delta2;
 			delete *images;
 			mag2 = BinaryMag(s, q, y1v, y2v, RSo, Tol, images);
@@ -829,9 +829,9 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 			}
 		}
 #endif
-	//	if (NPS == 41) {
-	//		NPS = NPS;
-	//	}
+		//if (NPS == 41) {
+		//	NPS = NPS;
+		//}
 #ifdef _PRINT_ERRORS2
 		printf("\nNPS= %d Mag = %lf maxerr= %lg currerr =%lg th = %lf", NPS, Mag / (M_PI*RSv*RSv), maxerr / (M_PI*RSv*RSv), currerr / (M_PI*RSv*RSv), th);
 #endif
@@ -845,7 +845,7 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 ///////////////////////////
  
 	delete Thetas;
-
+//f	if ((*Images)->length >= 14) return -1;
 	return Mag;
        
 }
@@ -898,7 +898,10 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 		astrox1 = y1v;
 		astrox2 = y2v;
 	}
-	y_2=y2v;
+	if (y2v < 0) {
+		y_2 = y2v;
+		astrox2 = -astrox2;
+	}
 	return Mag;
 }
 
@@ -1388,6 +1391,9 @@ double VBBinaryLensing::ESPLMag2(double u, double rho) {
 
 	if (u6*(1+0.003*rho2Tol) > 0.027680640625*rho2Tol*rho2Tol) {
 		Mag = (u2+2)/(u*sqrt(u2+4));
+		if (astrometry) {
+			astrox1 = u * (1 + 1 / (u2 + 2));
+		}
 	}
 	else {
 		Mag = ESPLMagDark(u, rho, a1);
@@ -2664,8 +2670,8 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 				}
 				else {
 					dzmax /= 10;
-					f1++;
 				}
+				f1++;
 			}
 			else {
 				disim = good[worst3];
@@ -2675,7 +2681,8 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 	}
 	Prov = new _curve;
 	checkJac = 0;
-	if (good[worst1]>dlmax) {
+//	printf("%le %le %le %d\n", good[worst1], good[worst2], good[worst3],f1);
+	if (good[worst1]>dlmax /*|| f1>2*/ ) {
 		for (int i = 0; i<5; i++) {
 			if ((i != worst1) && (i != worst2)) {
 				//if((i==worst3)&&(good[i]>dlmax)&&(good[worst2]>1.e2*good[worst3])){
@@ -2902,7 +2909,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		scan2 = isso[1];
 
 		cmp2 = fabs(scan->d.re*scan2->d.re + scan->d.im*scan2->d.im);
-		cmp = sqrt(mi / cmp2);
+		cmp = sqrt(mi / cmp2);   // Delta theta tilde
  
 		cmp_2 = cmp*cmp;
 		mi = cmp_2*cmp*0.04166666667;
@@ -2932,7 +2939,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		if (_selectionimage)
 #endif
 		pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
-                theta->prev->Mag -= ((scan->dJ>0) ? -1 : 1)*(pref + scurve->parabstart);
+        theta->prev->Mag -= ((scan->dJ>0) ? -1 : 1)*(pref + scurve->parabstart);
 		theta->prev->maxerr += mi;
 
 		scurve2->parabstart = -scurve->parabstart;

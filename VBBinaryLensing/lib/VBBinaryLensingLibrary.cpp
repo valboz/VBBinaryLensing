@@ -1719,7 +1719,7 @@ void VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double *ts, double *ma
 
 
 void VBBinaryLensing::BinaryLightCurveKepler(double *pr, double *ts, double *mags, double *y1s, double *y2s, double *seps, int np) {
-	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13];
+	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13] + 1.e-8;
 	double Et[2];
 	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
 	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0,cosE,sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
@@ -1801,8 +1801,8 @@ void VBBinaryLensing::BinaryLightCurveKepler(double *pr, double *ts, double *mag
 		psi = atan2(x[1], x[0]);// +((ar > 1) ? 0 : M_PI);
 		u = u0 + pai1 * Et[1] - pai2 * Et[0];
 		tn = (ts[i] - t0) * tE_inv + pai1 * Et[0] + pai2 * Et[1];
-		y1s[i] = -tn * cos(alpha - psi) + u * sin(alpha - psi);
-		y2s[i] = -u * cos(alpha - psi) - tn * sin(alpha - psi);
+		y1s[i] = -tn * cos(alpha + psi) + u * sin(alpha + psi);
+		y2s[i] = -u * cos(alpha + psi) - tn * sin(alpha + psi);
 		seps[i] = St;
 
 		mags[i] = BinaryMag2(seps[i], q, y1s[i], y2s[i], rho);
@@ -2178,7 +2178,7 @@ double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 }
 
 double VBBinaryLensing::BinaryLightCurveKepler(double *pr, double t) {
-	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13];
+	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13] + 1.e-8;
 	double Et[2];
 	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
 	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0, cosE, sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;

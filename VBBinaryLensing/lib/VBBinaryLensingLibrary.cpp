@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.3 (2022)
+// VBBinaryLensing v3.4 (2022)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -1311,19 +1311,20 @@ void VBBinaryLensing::SetLDprofile(LDprofiles LDval) {
 
 void VBBinaryLensing::LoadESPLTable(char *filename){
 	FILE *f;
-	const int rsize = 101, zsize = 101;
 
 	if((f = fopen(filename, "rb"))!=0){
-		fread(ESPLin, sizeof(double), rsize * zsize, f);
-		fread(ESPLout, sizeof(double), rsize * zsize, f);
-        fread(ESPLinastro, sizeof(double), rsize * zsize, f);
-		fread(ESPLoutastro, sizeof(double), rsize * zsize, f);
+		fread(ESPLin, sizeof(double), __rsize * __zsize, f);
+		fread(ESPLout, sizeof(double), __rsize * __zsize, f);
+        fread(ESPLinastro, sizeof(double), __rsize * __zsize, f);
+		fread(ESPLoutastro, sizeof(double), __rsize * __zsize, f);
 		fclose(f);
 		ESPLoff=false;
 	}else{
 		printf("\nESPL table not found !");
 	}
 }
+
+
 double VBBinaryLensing::ESPLMag(double u, double RSv) {
 	double mag,z,fr,cz,cr,u2;
 	int iz, ir;
@@ -1333,8 +1334,8 @@ double VBBinaryLensing::ESPLMag(double u, double RSv) {
 		return 0;
 	}
          
-	fr = -10.857362047581296* log(0.1* RSv);
-	if (fr > 100) fr = 99.99999;
+	fr = -10.857362047581296* log(0.01* RSv);
+	if (fr > __rsize - 1) fr = __rsize -1.000001;
 	if (fr < 0) printf("Source too large!");
 	ir = (int) floor(fr);
 	fr -= ir;
@@ -1343,7 +1344,7 @@ double VBBinaryLensing::ESPLMag(double u, double RSv) {
 	z = u / RSv;
 
 	if (z < 1) {
-		z *= 100;
+		z *= __zsize -1;
 		iz = (int) floor(z);
 		z -= iz;
 		cz = 1 - z;
@@ -1356,7 +1357,7 @@ double VBBinaryLensing::ESPLMag(double u, double RSv) {
 	}
 	else {
 		z = 0.99999999999999 / z;
-		z *= 100;
+		z *= __zsize - 1;
 		iz = (int)floor(z);
 		z -= iz;
 		cz = 1 - z;
@@ -1719,7 +1720,7 @@ void VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double *ts, double *ma
 
 
 void VBBinaryLensing::BinaryLightCurveKepler(double *pr, double *ts, double *mags, double *y1s, double *y2s, double *seps, int np) {
-	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13] + 1.e-8;
+	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13]+1.e-8;
 	double Et[2];
 	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
 	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0,cosE,sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
@@ -2178,7 +2179,7 @@ double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 }
 
 double VBBinaryLensing::BinaryLightCurveKepler(double *pr, double t) {
-	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13] + 1.e-8;
+	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13]+1.e-8;
 	double Et[2];
 	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
 	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0, cosE, sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;

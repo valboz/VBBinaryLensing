@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.3 (2022)
+// VBBinaryLensing v3.4 (2022)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -32,6 +32,8 @@
 #define _J3 6.0*(coefs[21]/((z-coefs[20])*(z-coefs[20])*(z-coefs[20])*(z-coefs[20]))+coefs[22]/(z*z*z*z))
 #define _skew(p1,p2,q1,q2) p1*q2-p2*q1
 #define _NP 200.0
+#define __rsize 151
+#define __zsize 101
 
 #define _sign(x) ((x>0)? +1 : -1)
 
@@ -57,8 +59,8 @@ namespace VBBinaryLensingLibrary {
 		int nim0;
 		double e,phi,phip,phi0,Om,inc,t0,d3,v3,GM,flagits;
 		double Obj[3],rad[3],tang[3],t0old;
-		double Eq2000[3],Quad2000[3],North2000[3]; 
-		double ESPLout[101][101], ESPLin[101][101],ESPLoutastro[101][101], ESPLinastro[101][101];
+		double Eq2000[3],Quad2000[3],North2000[3];
+		double ESPLout[__rsize][__zsize], ESPLin[__rsize][__zsize],ESPLoutastro[__rsize][__zsize], ESPLinastro[__rsize][__zsize];
 		double *LDtab,*rCLDtab,*CLDtab;
 		double scr2, sscr2;
 		int npLD;

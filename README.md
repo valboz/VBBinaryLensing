@@ -84,7 +84,7 @@ For now, the vast majority of functions are documented with Python
 docstrings which can be accessed as, for example, `?VBBL.BinaryMag2()` in
 a Jupyter notebook.
 
-# WARNING
+## WARNING
 
 The python wrapper does not support the user-defined limbd-darkening law.
 

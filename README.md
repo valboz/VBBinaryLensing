@@ -1,10 +1,6 @@
 [![Build Status](https://travis-ci.org/valboz/VBBinaryLensing.svg?branch=master)](https://travis-ci.org/valboz/VBBinaryLensing)
 [![Join the chat at https://gitter.im/VBBinaryLensing/Lobby](https://badges.gitter.im/VBBinaryLensing/Lobby.svg)](https://gitter.im/VBBinaryLensing/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-# WARNING
-
-The python wrapper does not support the user-defined limbd-darkening law.
-
 # VBBinaryLensing
 `VBBinaryLensing` is a tool for forward modelling of gravitational 
 microlensing events using the advanced contour integration method 
@@ -87,6 +83,10 @@ We are still working on getting the documentation working online.
 For now, the vast majority of functions are documented with Python
 docstrings which can be accessed as, for example, `?VBBL.BinaryMag2()` in
 a Jupyter notebook.
+
+# WARNING
+
+The python wrapper does not support the user-defined limbd-darkening law.
 
 ## License
 VBBinaryLensing is freely available to the community under the 

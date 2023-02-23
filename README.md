@@ -39,7 +39,7 @@ library files `VBBinaryLensingLibrary.cpp` and
 `VBBinaryLensing.h` are located in in `VBBinaryLensing/lib`. 
 An example usage
 of the C++ code is provided in `examples/cpp_examples` together with
-a sample `Makefile` for compiling the lia brary.
+a sample `Makefile` for compiling the library.
 
 The package also contains the following files:
 - `examples/cpp_examples/instructions.cpp` - Contains working examples and specific instructions for all functions.
@@ -54,10 +54,10 @@ The python package requires `pybind11` which can be installed with
 ```
 pip install pybind11
 ```
-The package requires a C++ compiler supporting C++11.
+The package requires a C++ compiler supporting C++.
 
 ## Example usage
-To check the installation, try :
+To check the installation, try:
 ```python
 >>>import VBBinaryLensing
 

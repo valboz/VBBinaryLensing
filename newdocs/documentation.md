@@ -28,7 +28,7 @@ int main()
 
 After that, you are ready to use all methods inside VBBinaryLensing.
 
-## Quick start for Magnification by Binary Lenses
+## Quick start for Binary Lensing
 
 Here is a simple code that calculates the magnification for a binary lens with some parameters.
 

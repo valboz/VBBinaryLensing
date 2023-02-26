@@ -33,15 +33,35 @@ int main()
 
 In this example we have declared an instance to the ```VBBinaryLensing``` class, assigned values to some parameters and then performed a computation of magnification by a binary lens with these parameters. 
 
-## Sections
-
 In the following pages, we will describe all functionalities of VBBinaryLensing
 
-Single lenses
-Binary lenses
-Limb darkening
-Accuracy control
-Light curve calculation
+## Single lenses
+
+
+
+
+	VBBL.LoadESPLTable("ESPL.tbl"); // Load the pre-calculated table (you only have to do this once and for all)
+
+	double u = 0.1; // Source-lens separation in Einstein radii.
+	Mag = VBBL.ESPLMag2(u, Rs); // Call to the ESPLMag2 function with these parameters
+	printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output should be 10.049.....
+
+	// Astrometry: the one-dimensional centroid shift is stored in VBBL.astrox1.
+	// (remember that there is only radial shift and no tangential shift in the single-lens case).
+
+	// Implementation notes:
+	// ESPLMag2 works the same way as BinaryMag2. It checks whether we are far enough to use the point-source approximation.
+	// If necessary, it goes for the full computation by calling ESPLMagDark(double u, double rho, double a1);
+	// ESPLMagDark divides the source disk in annuli. 
+	// Each annulus is calculated by a call to ESPLMag(double u, double rho), which uses a pre-calculated table (extremely fast).
+	// The current range for the pre-calculated table is 1.e-4 < Rs < 1.e+2
+	// Default limb darkening is linear law.
+	// You may change the profile using SetLDprofile as explained above.
+
+
+## Binary lenses
+
+## Limb darkening
 
 ## Accuracy control
 
@@ -75,3 +95,5 @@ If you do not want to use relative precision, just set ```VBBL.RelTol = 0;``` wh
 
 In general, the calculation stops when the first of the two goals is reached, either absolute accuracy or relative precision.
   
+## Light curve calculation
+

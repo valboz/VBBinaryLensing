@@ -2,37 +2,19 @@
 
 In this document we will describe all use cases of the VBBinaryLensing library and provide ready-to-use examples that you can copy/paste to your code. 
 
-All functions of VBBinaryLensing are collected in a ```VBBinaryLensing``` class, which contains practically all properties and methods that the user needs for any microlensing computations. In general, you will have to declare one and only instance to VBBinaryLensing and work with this instance all along your code.
+## Quick start
 
-## Declaration of VBBinaryLensing
-
-In a typical C++ code, you will include the VBBinaryLensingLibrary.h in your project and then declare an instance to VBBinaryLensing in your program:
+In a typical C++ code, you will include the VBBinaryLensingLibrary.h in your project and then declare an instance to the ```VBBinaryLensing``` class in your program. The ```VBBinaryLensing``` class contains all properties and methods that the user needs for any microlensing computations. In general, you will have to declare one instance to VBBinaryLensing and work with this instance all along your code. Here is a basic start up example:
 
 ```
 #include <stdio.h>
-#include <math.h>
 #include "VBBinaryLensingLibrary.h"
-
 
 int main()
 {
-
   // Declaration of an instance to VBBinaryLensing class.
   VBBinaryLensing VBBL;
   
-  // ... All your code
-  
-  return 0;
-}
-```
-
-After that, you are ready to use all methods inside VBBinaryLensing.
-
-## Quick start for Binary Lensing
-
-Here is a simple code that calculates the magnification for a binary lens with some parameters.
-
-```
   double Mag, s, q, y1, y2, Rs;
   s = 0.8; //separation between the two lenses
   q = 0.1; // mass ratio: mass of the lens on the right divided by mass of the lens on the left
@@ -44,9 +26,22 @@ Here is a simple code that calculates the magnification for a binary lens with s
   
   Mag = VBBL.BinaryMag2(s, q, y1, y2, Rs); // Call to the BinaryMag2 function with these parameters
   printf("Binary lens Magnification = %lf\n", Mag); // Output should be 18.28....
+  
+  return 0;
+}
 ```
 
-The ```BinaryMag2``` function performs the calculation of the magnification for a binary lens with given separation and mass ratio and for a source at some position with some radius. We will say more about its internal implementation later. 
+In this example we have declared an instance to the ```VBBinaryLensing``` class, assigned values to some parameters and then performed a computation of magnification by a binary lens with these parameters. 
+
+## Sections
+
+In the following pages, we will describe all functionalities of VBBinaryLensing
+
+Single lenses
+Binary lenses
+Limb darkening
+Accuracy control
+Light curve calculation
 
 ## Accuracy control
 

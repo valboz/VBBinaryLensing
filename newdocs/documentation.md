@@ -135,7 +135,7 @@ printf("Magnification of a point-source = %lf\n", Mag);  // Output should be 18.
 
 ### Binary lensing with extended sources
 
-For extended sources, the correct function is `BinaryMag2`, as shown in the quick start section. This also depends on the source radius `rho`:
+For extended sources, the correct function is `BinaryMag2`, as shown in the quick start section. This also depends on the source radius $\rho$:
 
 ```
 double Mag, s, q, y1, y2,rho;

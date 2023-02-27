@@ -33,7 +33,7 @@ int main()
 
 In this example we have declared an instance to the ```VBBinaryLensing``` class, assigned values to some parameters and then performed a computation of magnification by a binary lens with these parameters. 
 
-In the following pages, we will describe all functionalities of VBBinaryLensing
+In the following pages, we will describe all functionalities of VBBinaryLensing in detail.
 
 ## Single lenses
 
@@ -41,7 +41,7 @@ The lens equation for a single lens is
 
 $$ u=x-\frac{1}{x}$$
 
-For a given lens-source angular separation $u$ there are two images $x$. All units are in terms of the Einstein angle $\theta_E$. 
+For a given lens-source angular separation $u$ there are two images $x$ solving this equation. We note that all angular distances are in units of the Einstein angle $\theta_E$. 
 
 ### Point-Source-Point-Lens
 
@@ -49,7 +49,7 @@ If the source is point-like, the magnification is given by the famous Paczynski 
 
 $$ \mu = \frac{u^2+2}{u\sqrt{u^2+4}}$$
 
-We can obtain it through the function ```PSPLMag``` as follows:
+In VBBinarylensing, this formula is obtained through the function ```PSPLMag``` as follows:
 
 ```
 VBBinaryLensing VBBL;
@@ -76,7 +76,7 @@ printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output
 
 The current range for the pre-calculated table is 1.e-4 < rho < 1.e+2. Sources smaller than the minimum are considered equal to the minimum. Sources larger than the maximum generate an error message. 
 
-By default, VBBinaryLensing works with uniform sources. We will come to Limb Darkening later on: all possible Limb Darkening laws can be implemented in VBBinaryLensing.
+By default, VBBinaryLensing works with uniform sources. We will come to Limb Darkening later on: arbitrary Limb Darkening laws can be implemented in VBBinaryLensing.
 
 ### Astrometry
 

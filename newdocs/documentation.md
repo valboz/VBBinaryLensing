@@ -62,7 +62,7 @@ printf("PSPL Magnification = %lf", Mag); \\ Output should be 10.037...
 
 ### Extended-Source-Point-Lens
 
-For extended sources, the magnification depends on $\rho$, the source radius normalized to the Einstein angle, and can be calculated through elliptic integrals. In order to make VBBinaryLensing as fast as possible, we provide pre-calculated tables in the file "ESPL.tbl". This file should be loaded before any calculations involving Extended-Source-Point-Lenses (ESPL).
+For extended sources, the magnification depends on $\rho$, the **source radius** normalized to the Einstein angle, and can be calculated through elliptic integrals. In order to make VBBinaryLensing as fast as possible, we provide **pre-calculated tables** in the file "ESPL.tbl". This file should be loaded before any calculations involving Extended-Source-Point-Lenses (ESPL).
 
 ```
 VBBL.LoadESPLTable("ESPL.tbl"); // Load the pre-calculated table (you only have to do this once)
@@ -76,7 +76,7 @@ printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output
 
 The current range for the pre-calculated table is 1.e-4 < rho < 1.e+2. Sources smaller than the minimum are considered equal to the minimum. Sources larger than the maximum generate an error message. 
 
-By default, VBBinaryLensing works with uniform sources. We will come to Limb Darkening later on: arbitrary Limb Darkening laws can be implemented in VBBinaryLensing.
+By default, VBBinaryLensing works with **uniform sources**. We will come to **Limb Darkening** later on: arbitrary Limb Darkening laws can be implemented in VBBinaryLensing.
 
 ### Astrometry
 

@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.4 (2022)
+// VBBinaryLensing v3.5 (2023)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -18,6 +18,8 @@
 //
 // GNU Lesser General Public License applies to all parts of this code.
 // Please read the separate LICENSE.txt file for more details.
+//#define _PRINT_ERRORS2
+//#define _ERRORS_ANALYTIC
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -72,6 +74,7 @@ VBBinaryLensing::VBBinaryLensing() {
 	npLD = 0;
 	LDtab = rCLDtab = CLDtab=0;
 	Mag0 = 0;
+	NPcrit = 200;
 	ESPLoff = true;
 	multidark = false;
     astrometry=false;
@@ -104,7 +107,6 @@ VBBinaryLensing::~VBBinaryLensing() {
 
 _sols *VBBinaryLensing::PlotCrit(double a1, double q1) {
 	complex  a, q, ej, zr[4], x1, x2;
-	int NPS = 200;
 	_sols *CriticalCurves;
 	_curve *Prov, *Prov2, *isso;
 	_point *pisso;
@@ -120,8 +122,8 @@ _sols *VBBinaryLensing::PlotCrit(double a1, double q1) {
 		CriticalCurves->append(Prov);
 	}
 
-	for (int j = 0; j<NPS; j++) {
-		ej = complex(cos(2 * j*M_PI / NPS), -sin(2 * j*M_PI / NPS));
+	for (int j = 0; j<NPcrit; j++) {
+		ej = complex(cos(2 * j*M_PI / NPcrit), -sin(2 * j*M_PI / NPcrit));
 		complex  coefs[5] = { a*a / 16.0*(4.0 - a*a*ej)*(1.0 + q),a*(q - 1.0),(q + 1.0)*(1.0 + a*a*ej / 2.0),0.0,-(1.0 + q)*ej };
 		cmplx_roots_gen(zr, coefs, 4, true, true);
 		if (j > 0) {
@@ -148,6 +150,7 @@ _sols *VBBinaryLensing::PlotCrit(double a1, double q1) {
 	while (Prov->next) {
 		SD = *(Prov->first) - *(Prov->last);
 		MD = 1.e100;
+		isso = 0;
 		for (Prov2 = Prov->next; Prov2; Prov2 = Prov2->next) {
 			CD = *(Prov2->first) - *(Prov->last);
 			if (CD<MD) {
@@ -178,7 +181,7 @@ _sols *VBBinaryLensing::PlotCrit(double a1, double q1) {
 	return CriticalCurves;
 }
 
-void VBBinaryLensing::PrintCau(double a, double q) {
+void VBBinaryLensing::PrintCau(double a, double q, double y1, double y2, double rho) {
 	_sols *CriticalCurves;
 	_curve *scancurve;
 	_point *scanpoint;
@@ -187,6 +190,7 @@ void VBBinaryLensing::PrintCau(double a, double q) {
 
 	CriticalCurves = PlotCrit(a, q);
 	f = fopen("outcurves.causticdata", "w");
+	fprintf(f, "%.16lf %.16lf %.16lf\n", y1,y2,rho);
 	ncc = CriticalCurves->length / 2;
 	scancurve = CriticalCurves->first;
 	for (int i = 0; i<2*ncc; i++) {
@@ -196,7 +200,7 @@ void VBBinaryLensing::PrintCau(double a, double q) {
 	//for (int i = 0; i<ncc; i++) {
 		fprintf(f, "Curve: %d\n", i + 1);
 		for (scanpoint = scancurve->first; scanpoint; scanpoint = scanpoint->next) {
-			fprintf(f, "%lf %lf\n", scanpoint->x1, scanpoint->x2);
+			fprintf(f, "%.16lf %.16lf\n", scanpoint->x1, scanpoint->x2);
 		}
 		scancurve = scancurve->next;
 	}
@@ -501,14 +505,15 @@ void VBBinaryLensing::ComputeParallax(double t, double t0, double *Et) {
 
 double VBBinaryLensing::BinaryMag0(double a1, double q1, double y1v, double y2v, _sols **Images) {
 	static complex a, q, m1, m2, y;
-	static double av = -1.0, qv = -1.0,cq;
+	static double av = -1.0, qv = -1.0;
 	static complex  coefs[24], d1, d2, dy, dJ, dz;
-	double Mag = -1.0;
-        double Ai=-1.0;
-	_theta *stheta;
-	_curve *Prov, *Prov2;
-	_point *scan1, *scan2;
+	static double Mag, Ai;
+    
+	static _theta *stheta;
+	static _curve *Prov, *Prov2;
+	static _point *scan1, *scan2;
 
+	Mag = Ai = -1.0;
 	stheta = new _theta(-1.);
 	if ((a1 != av) || (q1 != qv)) {
 		av = a1;
@@ -541,6 +546,11 @@ double VBBinaryLensing::BinaryMag0(double a1, double q1, double y1v, double y2v,
 	corrquad = corrquad2 = 0;
 	safedist = 10;
 	Prov = NewImages(y, coefs, stheta);
+	if (Prov->length == 0) {
+		delete Prov;
+		delete stheta;
+		return -1;
+	}
 	if (q.re < 0.01) {
 		safedist = y1v + coefs[11].re-1/a.re;
 		safedist *= safedist;
@@ -582,8 +592,8 @@ double VBBinaryLensing::BinaryMag0(double a1, double q1, double y1v, double y2v,
 }
 
 double VBBinaryLensing::BinaryMag0(double a1, double q1, double y1v, double y2v) {
-	_sols *images;
-	double mag;
+	static _sols *images;
+	static double mag;
 	mag = BinaryMag0(a1, q1, y1v, y2v, &images);
 	delete images;
 	return mag;
@@ -599,40 +609,29 @@ double VBBinaryLensing::BinaryMagSafe(double s, double q, double y1v, double y2v
 	if (Mag < 0) {
 		mag1 = -1;
 		delta1 = 3.33333333e-8;
-		while (mag1 < 0) {
+		while (mag1 < 0.1 && RSi>=0) {
 			delete *images;
 			delta1 *= 3.;
-//			printf("\n-safe1");
 			RSi = RS - delta1;
 			mag1 = (RSi > 0) ? BinaryMag(s, q, y1v, y2v, RSi, Tol, images) : BinaryMag0(s,q,y1v,y2v,images);
+//			printf("\n-safe1 %lf %lf %d", RSi, mag1, NPS);
 			NPSsafe += NPS;
 		}
+		if(mag1<0) mag1=1.0;
 		mag2 = -1;
 		delta2 = 3.33333333e-8;
-		while (mag2 < 0) {
+		while (mag2 < 0.1) {
 			delta2 *= 3.;
-//			printf("\n-safe2");
 			RSo = RS + delta2;
 			delete *images;
 			mag2 = BinaryMag(s, q, y1v, y2v, RSo, Tol, images);
+//			printf("\n-safe2 %lf %lf %d", RSo,mag2,NPS);
 			NPSsafe += NPS;
 		}
 		Mag = (mag1*delta2 + mag2*delta1)/(delta1+delta2);
 	}
 	NPS = NPSsafe;
-	//while (Mag < 0) {
-	//	delete *images;
-	//	delta *= 3.;
-	//	printf("\n-safe");
-	//	RSi = RS - delta;
-	//	RSo = RS + delta;
-	//	mag1 = BinaryMag(s, q, y1v, y2v, RSi, Tol, images);
-	//	if (mag1 < 0) continue;
-	//	delete *images;
-	//	mag2 = BinaryMag(s, q, y1v, y2v, RSo, Tol, images);
-	//	if (mag2 < 0) continue;
-	//	Mag = 0.5*(mag1 + mag2);
-	//}
+
 	return Mag;
 }
 
@@ -640,11 +639,11 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 	static complex a, q, m1, m2, y0, y, yc, z, zc;
 	static double av = -1.0, qv = -1.0;
 	static complex coefs[24], d1, d2, dy, dJ, dz;
-	static double thoff = 0.01020304;
-	static double Mag = -1.0, th;
+	static double thoff = 0.01020304,errbuff;
+	static double Mag, th;
 ////////////////////////////  
 	static double errimage, maxerr, currerr, Magold;
-	static int NPSmax, flag, NPSold;
+	static int NPSmax, flag, NPSold,flagbad,flagbadmax=3;
 	static _curve *Prov, *Prov2;
 	static _point *scan1, *scan2;
 	static _thetas *Thetas;
@@ -653,7 +652,6 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 #ifdef _PRINT_TIMES
 	static double tim0, tim1;
 #endif
-
 
 	// Initialization of the equation coefficients
 
@@ -680,7 +678,7 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 		coefs[9] = coefs[6] * coefs[8];
 		coefs[10] = a*m2;
 		coefs[11] = a*m1;
-
+		
 	}
 	coefs[23] = RSv;
 
@@ -692,8 +690,9 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 	}
 	else {
 		errimage = Tol*M_PI*RSv*RSv;
-		NPSmax =32000;
+		NPSmax =10000; // era 32000
 	}
+	errbuff = 0;
 
 	// Calculation of the images
 
@@ -709,15 +708,20 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 	tim0 = Environment::TickCount;
 #endif
 	flag = 0;
+	flagbad = 0;
 	while (flag == 0) {
 		Prov = NewImages(y, coefs, stheta);
 		if (Prov->length > 0) {
 			flag = 1;
 		}
 		else {
-			stheta->th += 0.01;
-			y = y0 + complex(RSv*cos(stheta->th), RSv*sin(stheta->th));
 			delete Prov;
+			stheta->th += 0.01;
+			if (stheta->th > 2.0 * M_PI) {
+				delete Thetas;
+				return -1;
+			}
+			y = y0 + complex(RSv*cos(stheta->th), RSv*sin(stheta->th));
 		}
 	}
 #ifdef _PRINT_TIMES
@@ -727,8 +731,8 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 	stheta = Thetas->insert(2.0*M_PI + Thetas->first->th);
 	stheta->maxerr = 0.;
 	stheta->Mag = 0.;
-        stheta->astrox1 = 0.;
-        stheta->astrox2 = 0.;
+    stheta->astrox1 = 0.;
+    stheta->astrox2 = 0.;
 	stheta->errworst = Thetas->first->errworst;
 	for (scan1 = Prov->first; scan1; scan1 = scan2) {
 		scan2 = scan1->next;
@@ -743,161 +747,156 @@ double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, 
 	Prov->length = 0;
 	delete Prov;
 
-	th = M_PI + thoff;
+	th = M_PI + Thetas->first->th;
 	flag = 0;
 	Magold = -1.;
 	NPSold = 2;
+	currerr = 1.e100;
 	do {
 		stheta = Thetas->insert(th);
 		y = y0 + complex(RSv*cos(th), RSv*sin(th));
 #ifdef _PRINT_TIMES
 		tim0 = Environment::TickCount;
 #endif
+		//if (NPS == 422) {
+		//	NPS = NPS;
+		//}
+
 		Prov = NewImages(y, coefs, stheta);
 #ifdef _PRINT_TIMES
 		tim1 = Environment::TickCount;
 		GM += tim1 - tim0;
 #endif
 		if (Prov->length > 0) {
+			flagbad = 0;
 			OrderImages((*Images), Prov);
-			if (stheta->th - stheta->prev->th < 1.e-8) {
+			if ((stheta->th - stheta->prev->th)*RSv < 1.e-11/* || stheta->maxerr > jumperrfactor * currerr || stheta->prev->maxerr > jumperrfactor * currerr*/) {
+				errbuff += stheta->maxerr + stheta->prev->maxerr;
 				stheta->maxerr = 0;
 				stheta->prev->maxerr = 0;
 			}
-		}
-		else {
+		} else {
 			delete Prov;
-			delete Thetas;
-			return -1;
-			//stheta->prev->maxerr = 0;
-			//stheta->prev->next = stheta->next;
-			//stheta->next->prev = stheta->prev;
-			//delete stheta;
-			//delete Prov;
-			//NPS--;
-		}
-		maxerr = currerr = Mag = 0.;
- 
-        astrox1=astrox2=0.;
-		stheta = Thetas->first;
-
-		while (stheta->next) {
-			currerr += stheta->maxerr;
-			Mag += stheta->Mag;
- 
-			if(astrometry){
-				astrox1 += stheta->astrox1;
-				astrox2 += stheta->astrox2;
+			flagbad++;
+			if (flagbad == flagbadmax) {
+				if (NPS < 16) {
+					delete Thetas;
+					return -1;
+				}
+				errbuff += stheta->prev->maxerr;
+				stheta->prev->maxerr = 0;
+				NPS--;
+				NPSmax--;
 			}
+			else {
+				th = (th - stheta->prev->th >= stheta->next->th - th) ? (th + flagbad * stheta->prev->th) / (1 + flagbad) : (th + flagbad * stheta->next->th) / (1 + flagbad);
+			}
+			Thetas->remove(stheta);
+		}
+
+		if (flagbad == 0 || flagbad == flagbadmax) {
+			maxerr = currerr = Mag = 0.;
+
+			astrox1 = astrox2 = 0.;
+			stheta = Thetas->first;
+
+			while (stheta->next) {
+				currerr += stheta->maxerr;
+				Mag += stheta->Mag;
+
+				if (astrometry) {
+					astrox1 += stheta->astrox1;
+					astrox2 += stheta->astrox2;
+				}
 #ifndef _uniform
-			if (stheta->maxerr>maxerr) {
-				maxerr = stheta->maxerr;
+				if (stheta->maxerr > maxerr) {
+					maxerr = stheta->maxerr;
 #else
-			if (stheta->next->th*0.99999 - stheta->th>maxerr) {
-				maxerr = stheta->next->th - stheta->th;
+				if (stheta->next->th * 0.99999 - stheta->th > maxerr) {
+					maxerr = stheta->next->th - stheta->th;
 #endif
-				itheta = stheta;
+					itheta = stheta;
+				}
+				stheta = stheta->next;
+#ifdef _selectimage
+				if ((NPS == NPSmax - 1) && (fabs(floor(stheta->th / M_PI * _npoints / 2 + 0.5) - stheta->th / M_PI * _npoints / 2) < 1.e-8)) {
+					printf("%d %.15le\n", (int)floor(stheta->th / M_PI * _npoints / 2 + 0.5), Mag);
+				}
+#endif
 			}
 			th = (itheta->th + itheta->next->th) / 2;
-			stheta = stheta->next;
-#ifdef _selectimage
-			if ((NPS == NPSmax - 1) && (fabs(floor(stheta->th / M_PI*_npoints / 2 + 0.5) - stheta->th / M_PI*_npoints / 2)<1.e-8)) {
-				printf("%d %.15le\n", (int)floor(stheta->th / M_PI*_npoints / 2 + 0.5), Mag);
-			}
-#endif
-		}
-		NPS++;
+			NPS++;
 #ifndef _uniform
-		if (fabs(Magold - Mag) * 2<errimage) {
-			flag++;
-		}
-		else {
-			flag = 0;
-			Magold = Mag;
-			NPSold = NPS + 1;
-		}
-#else
-		currerr = 2 * errimage;
-		if (NPS == 2 * NPSold) {
-			if (fabs(Magold - Mag) * 2<errimage) {
-				flag = NPSold;
+			if (fabs(Magold - Mag) * 2 < errimage) {
+				flag++;
 			}
 			else {
 				flag = 0;
-				NPSold = NPS;
 				Magold = Mag;
+				NPSold = NPS + 8;
 			}
-		}
+#else
+			currerr = 2 * errimage;
+			if (NPS == 2 * NPSold) {
+				if (fabs(Magold - Mag) * 2 < errimage) {
+					flag = NPSold;
+				}
+				else {
+					flag = 0;
+					NPSold = NPS;
+					Magold = Mag;
+				}
+			}
 #endif
-		//if (NPS == 41) {
-		//	NPS = NPS;
-		//}
 #ifdef _PRINT_ERRORS2
-		printf("\nNPS= %d Mag = %lf maxerr= %lg currerr =%lg th = %lf", NPS, Mag / (M_PI*RSv*RSv), maxerr / (M_PI*RSv*RSv), currerr / (M_PI*RSv*RSv), th);
+			printf("\nNPS= %d Mag = %lf maxerr= %lg currerr =%lg th = %lf", NPS, Mag / (M_PI * RSv * RSv), maxerr / (M_PI * RSv * RSv), currerr / (M_PI * RSv * RSv), th);
 #endif
-	} while ((currerr > errimage) && (currerr > RelTol*Mag) && (NPS < NPSmax) && ((flag < NPSold)/* || NPS<8 ||(currerr>10*errimage)*/)/*&&(flagits)*/);
+		}
+	} while ((currerr > errimage) && (currerr > RelTol * Mag) && (NPS < NPSmax) && ((flag < NPSold)/* || NPS<8 ||(currerr>10*errimage)*/)/*&&(flagits)*/);
     if(astrometry){
 		astrox1 /= (Mag);
 		astrox2 /= (Mag);
     }
 	Mag /= (M_PI*RSv*RSv);
-	therr = currerr / (M_PI*RSv*RSv);
-///////////////////////////
+	therr = (currerr+errbuff) / (M_PI*RSv*RSv);
  
 	delete Thetas;
-//f	if ((*Images)->length >= 14) return -1;
+//	if (NPS == NPSmax) return 1.e100*Tol; // Only for testing
 	return Mag;
        
 }
 
 double VBBinaryLensing::BinaryMag(double a1, double q1, double y1v, double y2v, double RSv, double Tol) {
-	_sols *images;
-	double mag;
+	static _sols *images;
+	static double mag;
 	mag = BinaryMag(a1, q1, y1v, y2v, RSv, Tol, &images);
 	delete images;
 	return mag;
 }
 
 double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, double rho) {
-	double Mag, tn, tn2, rho2, y2a;//, sms , dy1, dy2;
-	int c = 0;
-	_sols *Images;
+	static double Mag, rho2, y2a;//, sms , dy1, dy2;
+	static int c;
+	static _sols *Images;
 
-	//dy2 = y2v * y2v;
-	//sms = (s-1 / s) / (1 + q);
-	//dy1 = y1v - sms;
-	//tn = dy1*dy1 + dy2;
-	//dy1 = y1v + sms*q;
-	//tn2 = (dy1 * dy1 + dy2)/q;
-	//if (!astrometry) {
-	//	tn *= tn;
-	//	tn2 *= tn2;
-	//}
-	//else {
-	//	//tn = sqrt(tn);
-	//	//tn2 = sqrt(tn2);
-	//}
+	c = 0;
+
+
 	y2a = fabs(y2v);
-	tn = 0;
-	if (tn*Tol<2 || tn2*Tol < 2) {
-		Mag0 = BinaryMag0(s, q, y1v, y2a, &Images);
-		delete Images;
-		rho2 = rho*rho;
-		corrquad *= 6 * (rho2 + 1.e-4*Tol);
-		corrquad2 *= (rho+1.e-3);
-		if (corrquad<Tol && corrquad2<1 && (rho2*s*s<q || safedist>4*rho2)) {
-			Mag = Mag0;
-		}
-		else {
-			Mag = BinaryMagDark(s, q, y1v, y2a, rho, a1, Tol);
-		}
-		Mag0 = 0;
+
+	Mag0 = BinaryMag0(s, q, y1v, y2a, &Images);
+	delete Images;
+	rho2 = rho*rho;
+	corrquad *= 6 * (rho2 + 1.e-4*Tol);
+	corrquad2 *= (rho+1.e-3);
+	if (corrquad<Tol && corrquad2<1 && (/*rho2 * s * s<q || */ safedist>4 * rho2)) {
+		Mag = Mag0;
 	}
 	else {
-		Mag = 1;
-		astrox1 = y1v;
-		astrox2 = y2v;
+		Mag = BinaryMagDark(s, q, y1v, y2a, rho, a1, Tol);
 	}
+	Mag0 = 0;
+
 	if (y2v < 0) {
 		y_2 = y2v;
 		astrox2 = -astrox2;
@@ -906,16 +905,24 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 }
 
 
-double VBBinaryLensing::BinaryMagDark(double a, double q, double y1, double y2, double RSv, double a1, double Tol) {
-	double Mag = -1.0, Magold = 0., Tolv = Tol;
-    double LDastrox1=0.0,LDastrox2=0.0;
-	double tc, lc, rc, cb,rb;
-	int c = 0, flag;
-	double currerr, maxerr;
-	annulus *first, *scan, *scan2;
-	int nannold, totNPS = 1;
-	_sols *Images;
+double VBBinaryLensing::BinaryMagDark(double a, double q, double y1, double y2, double RSv, double a1, double Tolnew) {
+	static double Mag, Magold, Tolv;
+    static double LDastrox1,LDastrox2;
+	static double tc, lc, rc, cb,rb;
+	static int c, flag;
+	static double currerr, maxerr;
+	static annulus *first, *scan, *scan2;
+	static int nannold, totNPS;
+	static _sols *Images;
 
+	Mag = -1.0;
+	Magold = 0.;
+	Tolv = Tol;
+	LDastrox1 = LDastrox2 = 0.0;
+	c = 0;
+	totNPS = 1;
+
+	Tol = Tolnew;
 	y_1 = y1;
 	y_2 = y2;
 	while ((Mag<0.9) && (c<3)) {
@@ -1325,6 +1332,17 @@ void VBBinaryLensing::LoadESPLTable(char *filename){
 }
 
 
+double VBBinaryLensing::PSPLMag(double u) {
+	static double u2,u22;
+	u2 = u * u;
+	u22 = u2 + 2;
+	if (astrometry) {
+		astrox1 = u+u/u22;
+	}
+	return  u22 / sqrt(u2 * (u2 + 4));
+}
+
+
 double VBBinaryLensing::ESPLMag(double u, double RSv) {
 	double mag,z,fr,cz,cr,u2;
 	int iz, ir;
@@ -1722,8 +1740,8 @@ void VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double *ts, double *ma
 void VBBinaryLensing::BinaryLightCurveKepler(double *pr, double *ts, double *mags, double *y1s, double *y2s, double *seps, int np) {
 	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13]+1.e-8;
 	double Et[2];
-	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
-	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0,cosE,sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
+	double u, w22, w11, w33, w12, w23, szs2, ar2, EE, dE;
+	double wt2, smix, sqsmix, e, h, snu, co1EE0, co2EE0,cosE,sinE, co1tperi, tperi, EE0, M, a, St, psi, dM, conu, n;
 	double arm1, arm2;
 	double X[3], Y[3], Z[3],r[2],x[2];
 	t0old = 0;
@@ -2181,8 +2199,8 @@ double VBBinaryLensing::BinaryLightCurveOrbital(double *pr, double t) {
 double VBBinaryLensing::BinaryLightCurveKepler(double *pr, double t) {
 	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], alpha = pr[3], rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), t0 = pr[6], pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11], szs = pr[12], ar = pr[13]+1.e-8;
 	double Et[2];
-	double u, w22, w11, w33, w12, w23, szs2, ar2, coe2, coX, coX1, coX2, coY1, coY2, EE, dE;
-	double wt2, smix, sqsmix, e, h, co1e, co1nu, snu, co1EE0, co2EE0, cosE, sinE, co1tperi, tperi, EE0, nu, M, a, St, psi, dM, conu, n;
+	double u, w22, w11, w33, w12, w23, szs2, ar2, EE, dE;
+	double wt2, smix, sqsmix, e, h, snu, co1EE0, co2EE0, cosE, sinE, co1tperi, tperi, EE0, M, a, St, psi, dM, conu, n;
 	double arm1, arm2;
 	double X[3], Y[3], Z[3], r[2], x[2];
 	t0old = 0;
@@ -2439,7 +2457,7 @@ double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
 	double s = exp(pr[0]), q = exp(pr[1]), rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), u0;
 	double salpha = sin(pr[3]), calpha = cos(pr[3]), xi1 = pr[7], xi2 = pr[8], omega = pr[9], inc = pr[10], phi = pr[11], qs = exp(pr[12]);
 
-	double Xal[2], phit, disp[2], Xal2[2], disp2[2], disp3[2];
+	double Xal[2], phit, disp[2], Xal2[2], disp2[2];
 	double Mag, Mag2, u02, rho2, tn2, y1s2, y2s2, y1s, y2s, mags, qs4;
 
 
@@ -2476,7 +2494,7 @@ double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
 	rho2 = rho * pow(qs, 0.89);
 	Mag2 = BinaryMag2(s, q, y1s2, y2s2, rho2);
 	qs4 = pow(qs, 4.0);
-	mags = (Mag + Mag2) / (1 + qs4);
+	mags = (Mag + qs4*Mag2) / (1 + qs4);
 
 	return mags;
 
@@ -2530,6 +2548,90 @@ double VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double t) {
 	return mags;
 }
 
+double VBBinaryLensing::BinSourceBinLensPOX(double* pr, double t) {
+	double s = exp(pr[0]), q = exp(pr[1]), u0 = pr[2], rho = exp(pr[4]), tE_inv = exp(-pr[5]), t0 = pr[6];
+	double pai1 = pr[7], pai2 = pr[8], w1 = pr[9], w2 = pr[10], w3 = pr[11];
+	double salpha = sin(pr[3]), calpha = cos(pr[3]);
+	double Et[2];
+	double tn, w, phi0, phil, incl, Cinc, Sinc, Cphi, Sphi, Cphi0, Sphi0, COm, SOm, s_true;
+	double w13, w123, den, den0, u;
+
+	double xi1 = pr[12], xi2 = pr[13], omega = pr[14], inc = pr[15], phi = pr[16], qs = exp(pr[17]);
+	double Xal[2], phit, disp[2], Xal2[2], disp2[2];
+	double Mag, Mag2, u01, u02, rho2, tn1, tn2, mags, qs4;
+
+	w13 = w1 * w1 + w3 * w3;
+	w123 = sqrt(w13 + w2 * w2);
+	w13 = sqrt(w13);
+	if (w13 > 1.e-8) {
+		w3 = (w3 > 1.e-8) ? w3 : 1.e-8;
+		w = w3 * w123 / w13;
+		incl = acos(w2 * w3 / w13 / w123);
+		phi0 = atan2(-w1 * w123, w3 * w13);
+	}
+	else {
+		w = w2;
+		incl = 0.;
+		phi0 = 0.;
+	}
+
+	Cphi0 = cos(phi0);
+	Sphi0 = sin(phi0);
+	Cinc = cos(incl);
+	Sinc = sin(incl);
+	den0 = sqrt(Cphi0 * Cphi0 + Cinc * Cinc * Sphi0 * Sphi0);
+	s_true = s / den0;
+	COm = (Cphi0 * calpha + Cinc * salpha * Sphi0) / den0;
+	SOm = (Cphi0 * salpha - Cinc * calpha * Sphi0) / den0;
+
+	ComputeParallax(t, t0, Et);
+
+	phil = (t - t0_par) * w + phi0;
+	Cphi = cos(phil);
+	Sphi = sin(phil);
+	den = sqrt(Cphi * Cphi + Cinc * Cinc * Sphi * Sphi);
+	av = s_true * den;
+	u = u0 + pai1 * Et[1] - pai2 * Et[0];
+	tn = (t-t0)*tE_inv + pai1 * Et[0] + pai2 * Et[1];
+
+	phit = omega * (t - t0_par);
+
+	disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+	disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
+	disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+	disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
+
+	Xal[0] = xi1 * disp[0] + xi2 * disp[1];
+	Xal[1] = xi2 * disp[0] - xi1 * disp[1];
+	Xal2[0] = xi1 * disp2[0] - xi2 * disp2[1];
+	Xal2[1] = xi2 * disp2[0] + xi1 * disp2[1];
+
+	tn1 = tn + Xal[0];
+	u01 = u + Xal[1];
+	tn2 = tn + Xal2[0];
+	u02 = u + Xal2[1];
+	rho2 = rho * pow(qs, 0.89);
+	qs4 = pow(qs, 4.0);
+
+
+/*	y1s = u01 * salpha - tn1 * calpha;
+	y2s = -u01 * calpha - tn1 * salpha;
+	y1s2 = u02 * salpha - tn2 * calpha;
+	y2s2 = -u02 * calpha - tn2 * salpha;*/
+
+	y_1 = (Cphi * (u02 * SOm - tn2 * COm) + Cinc * Sphi * (u02 * COm + tn2 * SOm)) / den;
+	y_2 = (-Cphi * (u02 * COm + tn2 * SOm) - Cinc * Sphi * (tn2 * COm - u02 * SOm)) / den;
+	Mag2 = BinaryMag2(av, q, y_1, y_2, rho2);
+
+	y_1 = (Cphi * (u01 * SOm - tn1 * COm) + Cinc * Sphi * (u01 * COm + tn1 * SOm)) / den;
+	y_2 = (-Cphi * (u01 * COm + tn1 * SOm) - Cinc * Sphi * (tn1 * COm - u01 * SOm)) / den;
+	Mag = BinaryMag2(av, q, y_1, y_2, rho);
+
+	mags = (Mag + qs4 * Mag2) / (1 + qs4);
+
+	return mags;
+}
+
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 ////////// Internal private functions
@@ -2577,14 +2679,14 @@ double VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double t) {
 	cq=(J3.re*J3.re+J3.im*J3.im);
 	
 
-_curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
-	static complex  y, yc, z, zc, J1, J1c, dy, dz, dJ,J2,J3,dza,za2,zb2,zaltc,Jalt,Jaltc,JJalt2;
+_curve* VBBinaryLensing::NewImages(complex yi, complex* coefs, _theta* theta) {
+	static complex  y, yc, z, zc, J1, J1c, dy, dz, dJ, J2, J3, dza, za2, zb2, zaltc, Jalt, Jaltc, JJalt2;
 	static complex zr[5] = { 0.,0.,0.,0.,0. };
-	static double dzmax, dlmax = 1.0e-6, good[5], dJ2,ob2,cq;
-	static int worst1, worst2, worst3, bad, f1,checkJac;
+	static double dlmin = 1.0e-4, dlmax = 1.0e-3, good[5], dJ2, ob2, cq;
+	static int worst1, worst2, worst3, bad, f1, checkJac;
 	static double av = 0.0, m1v = 0.0, disim, disisso;
-	static _curve *Prov;
-	static _point *scan, *prin, *fifth, *left, *right, *center;
+	static _curve* Prov;
+	static _point* scan, * prin, * fifth, * left, * right, * center;
 
 #ifdef _PRINT_TIMES
 	static double tim0, tim1;
@@ -2596,109 +2698,91 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 	// coefs[6]=a*a; coefs[7]=a*a*a; coefs[8]=m2*m2; coefs[9]=a*a*m2*m2; coefs[10]=a*m2; coefs[11]=a*m1; coefs[20]=a; coefs[21]=m1; coefs[22]=m2;
 
 	coefs[0] = coefs[9] * y;
-	coefs[1] = coefs[10] * (coefs[20] * (coefs[21] + y*(2 * yc - coefs[20])) - 2 * y);
-	coefs[2] = y*(1 - coefs[7] * yc) - coefs[20] * (coefs[21] + 2 * y*yc*(1 + coefs[22])) + coefs[6] * (yc*(coefs[21] - coefs[22]) + y*(1 + coefs[22] + yc*yc));
-	coefs[3] = 2 * y*yc + coefs[7] * yc + coefs[6] * (yc*(2 * y - yc) - coefs[21]) - coefs[20] * (y + 2 * yc*(yc*y - coefs[22]));
-	coefs[4] = yc*(2 * coefs[20] + y);
-	coefs[4] = yc*(coefs[4] - 1) - coefs[20] * (coefs[4] - coefs[21]);
-	coefs[5] = yc*(coefs[20] - yc);
+	coefs[1] = coefs[10] * (coefs[20] * (coefs[21] + y * (2 * yc - coefs[20])) - 2 * y);
+	coefs[2] = y * (1 - coefs[7] * yc) - coefs[20] * (coefs[21] + 2 * y * yc * (1 + coefs[22])) + coefs[6] * (yc * (coefs[21] - coefs[22]) + y * (1 + coefs[22] + yc * yc));
+	coefs[3] = 2 * y * yc + coefs[7] * yc + coefs[6] * (yc * (2 * y - yc) - coefs[21]) - coefs[20] * (y + 2 * yc * (yc * y - coefs[22]));
+	coefs[4] = yc * (2 * coefs[20] + y);
+	coefs[4] = yc * (coefs[4] - 1) - coefs[20] * (coefs[4] - coefs[21]);
+	coefs[5] = yc * (coefs[20] - yc);
 
 	bad = 1;
-	dzmax = 1.0e-12;
 	disim = -1.;
 	f1 = 0;
-	while (bad) {
 
 #ifdef _PRINT_TIMES
-		tim0 = Environment::TickCount;
+	tim0 = Environment::TickCount;
 #endif
-		cmplx_roots_gen(zr, coefs, 5, true, true);
+	cmplx_roots_gen(zr, coefs, 5, true, true);
 
 #ifdef _PRINT_TIMES
-		tim1 = Environment::TickCount;
-		inc += tim1 - tim0;
+	tim1 = Environment::TickCount;
+	inc += tim1 - tim0;
 #endif
-		// apply lens equation to check if it is really solved
-		for (int i = 0; i<5; i++) {
-			z = zr[i];
-			zc = conj(z);
-			good[i] = abs(_LL); // Lens equation check
-			switch (i) {
-			case 0:
+	// apply lens equation to check if it is really solved
+	for (int i = 0; i < 5; i++) {
+		z = zr[i];
+		zc = conj(z);
+		good[i] = abs(_LL); // Lens equation check
+		switch (i) {
+		case 0:
+			worst1 = i;
+			break;
+		case 1:
+			if (good[i] > good[worst1]) {
+				worst2 = worst1;
 				worst1 = i;
-				break;
-			case 1:
-				if (good[i]>good[worst1]) {
-					worst2 = worst1;
-					worst1 = i;
-				}
-				else worst2 = i;
-				break;
-			case 2:
-				if (good[i]>good[worst1]) {
-					worst3 = worst2;
-					worst2 = worst1;
-					worst1 = i;
-				}
-				else if (good[i]>good[worst2]) {
-					worst3 = worst2;
-					worst2 = i;
-				}
-				else worst3 = i;
-				break;
-			default:
-				if (good[i]>good[worst1]) {
-					worst3 = worst2;
-					worst2 = worst1;
-					worst1 = i;
-				}
-				else if (good[i]>good[worst2]) {
-					worst3 = worst2;
-					worst2 = i;
-				}
-				else if (good[i]>good[worst3]) {
-					worst3 = i;
-				}
 			}
-		}
-		if ((good[worst3]<dlmax) && ((good[worst1]<dlmax) || (good[worst2]>1.e2*good[worst3]))) {
-			bad = 0;
-		}
-		else {
-			if ((disim>0) && (good[worst3] / disim>0.99)) {
-				if (f1>1) {
-					bad = 0;
-				}
-				else {
-					dzmax /= 10;
-				}
-				f1++;
+			else worst2 = i;
+			break;
+		case 2:
+			if (good[i] > good[worst1]) {
+				worst3 = worst2;
+				worst2 = worst1;
+				worst1 = i;
 			}
-			else {
-				disim = good[worst3];
-				dzmax /= 10;
+			else if (good[i] > good[worst2]) {
+				worst3 = worst2;
+				worst2 = i;
+			}
+			else worst3 = i;
+			break;
+		default:
+			if (good[i] > good[worst1]) {
+				worst3 = worst2;
+				worst2 = worst1;
+				worst1 = i;
+			}
+			else if (good[i] > good[worst2]) {
+				worst3 = worst2;
+				worst2 = i;
+			}
+			else if (good[i] > good[worst3]) {
+				worst3 = i;
 			}
 		}
 	}
 	Prov = new _curve;
 	checkJac = 0;
-//	printf("%le %le %le %d\n", good[worst1], good[worst2], good[worst3],f1);
-	if (good[worst1]>dlmax /*|| f1>2*/ ) {
-		for (int i = 0; i<5; i++) {
+	//	if (!((good[worst3] < dlmin) && ((good[worst1] < dlmin) || (good[worst2] > dlmax)))) {  // old check for unacceptable roots
+
+	// 3 good roots
+	if (good[worst2] * dlmin > good[worst3]+1.e-12 ) {
+		for (int i = 0; i < 5; i++) {
 			if ((i != worst1) && (i != worst2)) {
 				//if((i==worst3)&&(good[i]>dlmax)&&(good[worst2]>1.e2*good[worst3])){
 				//	zr[i]=(coefs[21].re<coefs[22].re)? 0.5*coefs[20]+coefs[21]/(0.5*coefs[20]-yc-coefs[22]/coefs[20]) : -0.5*coefs[20]+coefs[22]/(-0.5*coefs[20]-yc+coefs[21]/coefs[20]);
 				//}
 				Prov->append(zr[i].re, zr[i].im);
 
-				_Jacobians1				
-				if (theta->th >= 0){
-					_Jacobians2
-				}else {
-					_Jacobians3
-					corrquad += cq;
-				}
-				checkJac += (fabs(Prov->last->dJ)>1.e-7)? _sign(Prov->last->dJ) : 10;
+				_Jacobians1
+					if (theta->th >= 0) {
+						_Jacobians2
+					}
+					else {
+						_Jacobians3
+							corrquad += cq;
+					}
+				checkJac += (fabs(Prov->last->dJ) > 1.e-7) ? _sign(Prov->last->dJ) : 10;
 				Prov->last->theta = theta;
 
 			}
@@ -2708,13 +2792,13 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 
 			int i = worst1;
 			_Jacobians1
-			_Jacobians4
-			corrquad2 = cq;
+				_Jacobians4
+				corrquad2 = cq;
 
 			i = worst2;
 			_Jacobians1
-			_Jacobians4
-			if(cq<corrquad2) corrquad2= cq;
+				_Jacobians4
+				if (cq > corrquad2) corrquad2 = cq;
 			//_Jacobians3
 			//corrquad2 +=  1/cq;
 
@@ -2723,70 +2807,76 @@ _curve *VBBinaryLensing::NewImages(complex yi, complex  *coefs, _theta *theta) {
 			theta->errworst = abs(zr[worst1] - zr[worst2]);
 		}
 
-	}
-	else {
-		f1 = 0;
-		for (int i = 0; i<5; i++) {
-			Prov->append(zr[i].re, zr[i].im);
-
-			_Jacobians1
-			if (theta->th >= 0) {
-				_Jacobians2
-			}else {
-				_Jacobians3
-				corrquad += cq;
-			}
-			checkJac += (fabs(Prov->last->dJ) > 1.e-7) ? _sign(Prov->last->dJ) : 10;
-			Prov->last->theta = theta;
-
-			if (fabs(dJ.re)<1.e-5) f1 = 1;
+	} 
+	else { 
+		if (good[worst2]*dlmax > good[worst3] + 1.e-12) { // Dubious cases. Better exclude them
+			return Prov;
 		}
-		theta->errworst = -1.e100;
-		// check Jacobians in ambiguous cases
-		if (f1) {
-			left = right = center = fifth = 0;
-			dJ.re = 0;
-			for (scan = Prov->first; scan; scan = scan->next) {
-				if (_sign(scan->x2) == _sign(y.im)) {
-					prin = scan;
-				}
-				else {
-					dz.re = fabs(scan->dJ);
-					if (dz.re>dJ.re) {
-						fifth = scan;
-						dJ.re = dz.re;
-					}
-				}
-			}
-			for (scan = Prov->first; scan; scan = scan->next) {
-				if ((scan != prin) && (scan != fifth)) {
-					if (left) {
-						if (scan->x1<left->x1) {
-							if (left != right) {
-								center = left;
-							}
-							left = scan;
-						}
-						else {
-							if (scan->x1>right->x1) {
-								if (left != right) {
-									center = right;
-								}
-								right = scan;
-							}
-							else {
-								center = scan;
-							}
-						}
+		else {		// 5 good roots
+			f1 = 0;
+			for (int i = 0; i < 5; i++) {
+				Prov->append(zr[i].re, zr[i].im);
+
+				_Jacobians1
+					if (theta->th >= 0) {
+						_Jacobians2
 					}
 					else {
-						left = right = center = scan;
+						_Jacobians3
+							corrquad += cq;
+					}
+				checkJac += (fabs(Prov->last->dJ) > 1.e-7) ? _sign(Prov->last->dJ) : 10;
+				Prov->last->theta = theta;
+
+				if (fabs(dJ.re) < 1.e-5) f1 = 1;
+			}
+			theta->errworst = -1.e100;
+			// check Jacobians in ambiguous cases
+			if (f1) {
+				left = right = center = fifth = 0;
+				dJ.re = 0;
+				for (scan = Prov->first; scan; scan = scan->next) {
+					if (_sign(scan->x2) == _sign(y.im)) {
+						prin = scan;
+					}
+					else {
+						dz.re = fabs(scan->dJ);
+						if (dz.re > dJ.re) {
+							fifth = scan;
+							dJ.re = dz.re;
+						}
 					}
 				}
+				for (scan = Prov->first; scan; scan = scan->next) {
+					if ((scan != prin) && (scan != fifth)) {
+						if (left) {
+							if (scan->x1 < left->x1) {
+								if (left != right) {
+									center = left;
+								}
+								left = scan;
+							}
+							else {
+								if (scan->x1 > right->x1) {
+									if (left != right) {
+										center = right;
+									}
+									right = scan;
+								}
+								else {
+									center = scan;
+								}
+							}
+						}
+						else {
+							left = right = center = scan;
+						}
+					}
+				}
+				if (left->dJ > 0) left->dJ = -left->dJ;
+				if (center->dJ < 0) center->dJ = -center->dJ;
+				if (right->dJ > 0) right->dJ = -right->dJ;
 			}
-			if (left->dJ>0) left->dJ = -left->dJ;
-			if (center->dJ<0) center->dJ = -center->dJ;
-			if (right->dJ>0) right->dJ = -right->dJ;
 		}
 	}
 	if (checkJac != -1) {
@@ -2810,7 +2900,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 	static _curve *scurve, *scurve2;
 
 	_theta *theta;
-	double th, mi, cmp, cmp2,cmp_2,dx2,avgx2,avgx1,avg2x1,pref,d2x2,dx1,d2x1,avgwedgex1,avgwedgex2;
+	static double th, mi, cmp, cmp2,cmp_2,dx2,avgx2,avgx1,avg2x1,pref,d2x2,dx1,d2x1,avgwedgex1,avgwedgex2,parab1,parab2;
         
 	int nprec = 0, npres, nfoll = 0, issoc[2], ij;
 
@@ -2914,7 +3004,9 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
  
 		cmp_2 = cmp*cmp;
 		mi = cmp_2*cmp*0.04166666667;
-		scurve->parabstart = -(-scan->ds + scan2->ds)*mi; 
+		parab1 = -(-scan->ds + scan2->ds)*mi; 
+		parab2=-0.0833333333 * ((scan2->x1 - scan->x1) * (scan2->d.im + scan->d.im) - (scan2->x2 - scan->x2) * (scan2->d.re + scan->d.re)) * cmp;
+		scurve->parabstart = 0.5 * (parab1 + parab2);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: created image:
         if(astrometry){
 			avgwedgex1=-(-scan->x1*scan->ds + scan2->x1*scan2->ds)*mi;
@@ -2930,7 +3022,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, scurve->parabstart, (scan->ds + scan2->ds)*mi / 2, fabs(scurve->parabstart)*(cmp*cmp) / 10, 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) - 2 * cmp*cmp2)*cmp);
 #endif
 
-		mi = fabs((scan->ds + scan2->ds)*mi *0.5) + fabs(scurve->parabstart)*(cmp_2 *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) - 2 * cmp*cmp2)*cmp;
+		mi = fabs((parab1-parab2)*0.5) + fabs(scurve->parabstart)*(cmp_2 *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) - 2 * cmp*cmp2)*cmp;
 #ifdef _noparab
 		mi = fabs(scurve->parabstart) * 2 + 0 * fabs((scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2 * cmp*cmp / 6);
 		scurve->parabstart = 0.;
@@ -2943,6 +3035,13 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
         theta->prev->Mag -= ((scan->dJ>0) ? -1 : 1)*(pref + scurve->parabstart);
 		theta->prev->maxerr += mi;
 
+#ifdef _ERRORS_ANALYTIC
+		char filnam[32];
+		sprintf(filnam, "%02dprev.txt", NPS);
+		FILE* f = fopen(filnam, "a+");
+		fprintf(f, "%.15le %.15le %.15le\n", -((scan->dJ > 0) ? -1 : 1)* (pref), -((scan->dJ > 0) ? -1 : 1)* (scurve->parabstart), mi);
+		fclose(f);
+#endif
 		scurve2->parabstart = -scurve->parabstart;
                
                 if(astrometry){
@@ -2983,7 +3082,9 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		cmp = sqrt(mi / cmp2);
 		cmp_2 = cmp*cmp;
 		mi = cmp_2*cmp *0.04166666666667;
-		scan->parab = -(scan->ds - scan2->ds)*mi;
+		parab1 = -(scan->ds - scan2->ds)*mi;
+		parab2 = 0.0833333333 * ((scan2->x1 - scan->x1) * (scan2->d.im + scan->d.im) - (scan2->x2 - scan->x2) * (scan2->d.re + scan->d.re)) * cmp;
+		scan->parab = 0.5 * (parab1 + parab2);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: destructed image:
                 if(astrometry){
 		        avgwedgex1=-(scan->x1*scan->ds - scan2->x1*scan2->ds)*mi;
@@ -3000,7 +3101,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, scan->parab, (scan->ds + scan2->ds)*mi / 2, fabs(scan->parab)*(cmp*cmp) / 10, 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) + 2 * cmp*cmp2)*cmp);
 #endif
 
-		mi = fabs((scan->ds + scan2->ds)*mi *0.5) + fabs(scan->parab)*(cmp*cmp *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) + 2.0 * cmp*cmp2)*cmp;
+		mi = fabs((parab1-parab2)*0.5) + fabs(scan->parab)*(cmp*cmp *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) + 2.0 * cmp*cmp2)*cmp;
 #ifdef _noparab
 		mi = fabs(scan->parab) * 2 + 0 * fabs((scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2 * cmp*cmp / 6);
 		scan->parab = 0.;
@@ -3010,6 +3111,13 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #endif
 		pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
 		theta->prev->Mag += ((scan->dJ>0) ? -1 : 1)*(pref+ scan->parab);
+#ifdef _ERRORS_ANALYTIC
+		char filnam[32];
+		sprintf(filnam, "%02dprev.txt", NPS);
+		FILE* f = fopen(filnam, "a+");
+		fprintf(f, "%.15le %.15le %.15le\n", ((scan->dJ > 0) ? -1 : 1)* (pref), ((scan->dJ > 0) ? -1 : 1)* (scan->parab), mi);
+		fclose(f);
+#endif
 		if(astrometry){
 			dx2=scan2->x2 - scan->x2;
 			avgx1=scan->x1 + scan2->x1;
@@ -3061,8 +3169,11 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		cmp = (scan->theta->th - scan2->theta->th);
 		cmp_2 = cmp*cmp;
 		mi = cmp_2*cmp *0.0416666666666667;  ////// (1/24 cube(delta Teta))
-		scan->parab = (scan->ds + scan2->ds)*mi; // Correzione parabolica
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: ordinary image:
+		parab1 = (scan->ds + scan2->ds)*mi; // Vecchia Correzione parabolica
+		// Nuova correzione parabolica
+		parab2 = 0.0833333333 * ((scan2->x1 - scan->x1) * (scan2->d.im - scan->d.im) - (scan2->x2 - scan->x2) * (scan2->d.re - scan->d.re)) * cmp;
+		scan->parab = 0.5*(parab1+parab2);
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: ordinary image:
         if(astrometry){
 			avgwedgex1=(scan->x1*scan->ds + scan2->x1*scan2->ds)*mi;
 		    avgwedgex2=(scan->x2*scan->ds + scan2->x2*scan2->ds)*mi;
@@ -3077,7 +3188,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, scan->parab, (scan->ds - scan2->ds)*mi / 2, fabs(scan->parab)*(cmp2) / 10, fabs(scan->parab)*(1.5*fabs(cmp2 / (cmp*cmp) - 1)));
 #endif
 
-		mi = fabs((scan->ds - scan2->ds)*mi *0.5) + fabs(scan->parab*(cmp2 *0.1 + 1.5*fabs(cmp2 / (cmp_2) - 1)));
+		mi = fabs((parab1 - parab2) *0.5) + fabs(scan->parab*(cmp2 *0.1 + 1.5*fabs(cmp2 / (cmp_2) - 1)));
 #ifdef _noparab
 		mi = fabs(scan->parab) * 2 + 0 * fabs((scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2 * cmp*cmp / 6);
 		scan->parab = 0.;
@@ -3087,7 +3198,14 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #endif
 		pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
 		theta->prev->Mag += ((scan->dJ>0) ? -1 : 1)*( pref+ scan->parab);
-        if(astrometry){
+#ifdef _ERRORS_ANALYTIC
+				char filnam[32];
+				sprintf(filnam, "%02dprev.txt", NPS);
+				FILE* f = fopen(filnam, "a+");
+				fprintf(f, "%.15le %.15le %.15le\n", ((scan->dJ > 0) ? -1 : 1)* (pref), ((scan->dJ > 0) ? -1 : 1)* (scan->parab),mi);
+				fclose(f);
+#endif
+		if(astrometry){
 			dx2=scan2->x2 - scan->x2;
 			avgx1=scan->x1 + scan2->x1;
 			avg2x1=avgx1*avgx1;
@@ -3161,7 +3279,9 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 			cmp = sqrt(mi / cmp2);
 			cmp_2 = cmp*cmp;
 			mi = cmp_2*cmp *0.04166666666666667;
-			cfoll[issoc[0]]->parabstart = (scan->ds - scan2->ds)*mi;
+			parab1 = (scan->ds - scan2->ds)*mi;
+			parab2 = -0.0833333333 * ((scan2->x1 - scan->x1) * (scan2->d.im + scan->d.im) - (scan2->x2 - scan->x2) * (scan2->d.re + scan->d.re)) * cmp;
+			cfoll[issoc[0]]->parabstart = 0.5 * (parab1 + parab2);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: created image:
                 if(astrometry){
 		        avgwedgex1=(scan->x1*scan->ds - scan2->x1*scan2->ds)*mi;
@@ -3176,7 +3296,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #ifdef _PRINT_ERRORS
 			printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, cfoll[issoc[0]]->parabstart, (scan->ds + scan2->ds)*mi / 2, fabs(cfoll[issoc[0]]->parabstart)*(cmp*cmp) / 10, 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) - 2 * cmp*cmp2)*cmp);
 #endif
-			mi = fabs((scan->ds + scan2->ds)*mi *0.5) + fabs(cfoll[issoc[0]]->parabstart)*(cmp*cmp *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) - 2.0 * cmp*cmp2)*cmp;
+			mi = fabs((parab1-parab2) *0.5) + fabs(cfoll[issoc[0]]->parabstart)*(cmp*cmp *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) - 2.0 * cmp*cmp2)*cmp;
 #ifdef _noparab
 			mi = fabs(cfoll[issoc[0]]->parabstart) * 2 + 0 * fabs((scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2 * cmp*cmp / 6);
 			cfoll[issoc[0]]->parabstart = 0.;
@@ -3186,6 +3306,13 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #endif
 			pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
 			theta->Mag -= ((scan->dJ>0) ? -1 : 1)*(pref + cfoll[issoc[0]]->parabstart);
+#ifdef _ERRORS_ANALYTIC
+			char filnam[32];
+			sprintf(filnam, "%02dfoll.txt", NPS);
+			FILE* f = fopen(filnam, "a+");
+			fprintf(f, "%.15le %.15le %.15le\n", -((scan->dJ > 0) ? -1 : 1)* (pref), -((scan->dJ > 0) ? -1 : 1)* (cfoll[issoc[0]]->parabstart), mi);
+			fclose(f);
+#endif
             if(astrometry){
 				dx2=scan2->x2 - scan->x2;
 		      	avgx1=scan->x1 + scan2->x1;
@@ -3236,7 +3363,9 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 			cmp = sqrt(mi / cmp2);
 			cmp_2 = cmp*cmp;
 			mi = cmp_2*cmp *0.0416666666667;
-			scan->parab = -(scan->ds - scan2->ds)*mi;
+			parab1 = -(scan->ds - scan2->ds)*mi;
+			parab2 = 0.0833333333 * ((scan2->x1 - scan->x1) * (scan2->d.im + scan->d.im) - (scan2->x2 - scan->x2) * (scan2->d.re + scan->d.re)) * cmp;
+			scan->parab = 0.5 * (parab1 + parab2);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: destructed image:
             if(astrometry){
 		        avgwedgex1=-(scan->x1*scan->ds - scan2->x1*scan2->ds)*mi;
@@ -3253,7 +3382,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 			printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, scan->parab, (scan->ds + scan2->ds)*mi / 2, fabs(scan->parab)*(cmp*cmp) / 10, 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) + 2 * cmp*cmp2)*cmp);
 #endif
 
-			mi = fabs((scan->ds + scan2->ds)*mi *0.5) + fabs(scan->parab)*(cmp*cmp *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) + 2.0 * cmp*cmp2)*cmp;
+			mi = fabs((parab1-parab2) *0.5) + fabs(scan->parab)*(cmp*cmp *0.1) + 1.5*fabs(((scan->d.re - scan2->d.re)*(scan->x1 - scan2->x1) + (scan->d.im - scan2->d.im)*(scan->x2 - scan2->x2)) + 2.0 * cmp*cmp2)*cmp;
 #ifdef _noparab
 			mi = fabs(scan->parab) * 2 + 0 * fabs((scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2 * cmp*cmp / 6);
 			scan->parab = 0.;
@@ -3263,6 +3392,13 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 #endif
 			pref=(scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) *0.5;
 			theta->Mag += ((scan->dJ>0) ? -1 : 1)*( pref + scan->parab);
+#ifdef _ERRORS_ANALYTIC
+			char filnam[32];
+			sprintf(filnam, "%02dfoll.txt", NPS);
+			FILE* f = fopen(filnam, "a+");
+			fprintf(f, "%.15le %.15le %.15le\n", ((scan->dJ > 0) ? -1 : 1)* (pref), ((scan->dJ > 0) ? -1 : 1)* (scan->parab), mi);
+			fclose(f);
+#endif
 			if(astrometry){
 				dx2=scan2->x2 - scan->x2;
 				avgx1=scan->x1 + scan2->x1;
@@ -3305,12 +3441,14 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 		while (npres) {
 			scan = cpres[issoc[0]]->last;
 			scan2 = cfoll[issoc[1]]->first;
-
 			cmp2 = mi / fabs(scan->d.re*scan2->d.re + scan->d.im*scan2->d.im);
 			cmp = (scan->theta->th - scan2->theta->th);
 			cmp_2 = cmp*cmp;
 			mi = cmp_2*cmp *0.041666666667;
-			scan->parab = (scan->ds + scan2->ds)*mi; // Correzione parabolica
+			parab1 = (scan->ds + scan2->ds)*mi; // Vecchia Correzione parabolica
+			// Nuova correzione parabolica
+			parab2 = 0.0833333333 * ((scan2->x1 - scan->x1) * (scan2->d.im - scan->d.im) - (scan2->x2 - scan->x2) * (scan2->d.re - scan->d.re)) * cmp;
+			scan->parab = 0.5*(parab1+parab2);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////astro: ordinary image:
             if(astrometry){
 		        avgwedgex1=(scan->x1*scan->ds + scan2->x1*scan2->ds)*mi;
@@ -3327,7 +3465,7 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 			printf("\n%le %le %le %le %le %le %le %le", scan->x1, scan->x2, scan->dJ, (scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2, scan->parab, (scan->ds - scan2->ds)*mi / 2, fabs(scan->parab)*(cmp2) / 10, fabs(scan->parab)*(1.5*fabs(cmp2 / (cmp*cmp) - 1)));
 #endif
 
-			mi = fabs((scan->ds - scan2->ds)*mi *0.5) + fabs(scan->parab*(cmp2 *0.1 + 1.5*fabs(cmp2 / (cmp_2) - 1)));
+			mi = fabs((parab1-parab2) *0.5) + fabs(scan->parab*(cmp2 *0.1 + 1.5*fabs(cmp2 / (cmp_2) - 1)));
 #ifdef _noparab
 			mi = fabs(scan->parab) * 2 + 0 * fabs((scan->x2 + scan2->x2)*(scan2->x1 - scan->x1) / 2 * cmp*cmp / 6);
 			scan->parab = 0.;
@@ -3346,7 +3484,13 @@ void VBBinaryLensing::OrderImages(_sols *Sols, _curve *Newpts) {
 				theta->astrox2 += ((scan->dJ>0) ? -1 : 1)*(pref*avgx2*0.25+scan->parabastrox2);
 			}
 			theta->maxerr += mi;
-
+#ifdef _ERRORS_ANALYTIC
+				char filnam[32];
+				sprintf(filnam, "%02dfoll.txt", NPS);
+				FILE* f = fopen(filnam, "a+");
+				fprintf(f, "%.15le %.15le %.15le\n", ((scan->dJ > 0) ? -1 : 1)* (pref), ((scan->dJ > 0) ? -1 : 1)* (scan->parab), mi);
+				fclose(f);
+#endif
 			cpres[issoc[0]]->join(cfoll[issoc[1]]);
 
 			npres--;
@@ -3787,6 +3931,21 @@ _theta *_thetas::insert(double th) {
 	length++;
 	//	scan2->maxerr=0.;
 	return scan2;
+}
+
+void _thetas::remove(_theta* stheta) {
+	_theta *scan;
+	scan = first;
+	while (scan!=0) {
+		if (scan == stheta) {
+			if(scan!=first) scan->prev->next = stheta->next;
+			if (scan != last) scan->next->prev = stheta->prev;
+			delete stheta;
+			length--;
+			break;
+		}
+		scan = scan->next;
+	}
 }
 
 //////////////////////////////

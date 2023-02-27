@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.4 (2022)
+// VBBinaryLensing v3.5 (2023)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -84,12 +84,13 @@ namespace VBBinaryLensingLibrary {
 		double Tol, RelTol, a1,a2, t0_par; 
 		bool astrometry;
 		int satellite,parallaxsystem,t0_par_fixed,nsat;
-		int minannuli,nannuli,NPS;
+		int minannuli,nannuli,NPS,NPcrit;
 		double y_1,y_2,av, therr,astrox1,astrox2;
+
 
 	// Critical curves and caustic calculation
 		_sols *PlotCrit(double a,double q);
-		void PrintCau(double a,double q);
+		void PrintCau(double a,double q,double y1, double y2, double rho);
 
 	// Initialization for calculations including parallax
 		void SetObjectCoordinates(char *Coordinates_file, char *Directory_for_satellite_tables);
@@ -114,6 +115,7 @@ namespace VBBinaryLensingLibrary {
 		double ESPLMag(double u, double rho);
 		double ESPLMag2(double u, double rho);
 		double ESPLMagDark(double u, double rho, double a1);
+		double PSPLMag(double u);
 
 
 	// New (v2) light curve functions, operating on arrays
@@ -152,6 +154,7 @@ namespace VBBinaryLensingLibrary {
 		double BinSourceLightCurveXallarap(double *parameters, double t);
 		double BinSourceBinLensXallarap(double *parameters, double t);
 		double BinSourceSingleLensXallarap(double *parameters, double t);
+		double BinSourceBinLensPOX(double* parameters, double t);
 
 	// Skowron & Gould root calculator
 		void cmplx_roots_gen(complex *, complex *, int, bool, bool);
@@ -199,6 +202,7 @@ public:
 	_thetas(void);
 	~_thetas(void);
 	_theta *insert(double);
+	void remove(_theta*);
 
 
 };

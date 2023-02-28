@@ -79,7 +79,7 @@ printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output
 
 The current range for the pre-calculated table is 1.e-4 < rho < 1.e+2. Sources smaller than the minimum are considered equal to the minimum. Sources larger than the maximum generate an error message. 
 
-By default, VBBinaryLensing works with **uniform sources**. We will come to **Limb Darkening** later on: arbitrary Limb Darkening laws can be implemented in VBBinaryLensing.
+By default, VBBinaryLensing works with **uniform sources**. We will come to **Limb Darkening** [later on](https://github.com/valboz/VBBinaryLensing/blob/master/docs/documentation.md#limb-darkening): arbitrary Limb Darkening laws can be implemented in VBBinaryLensing.
 
 ### Astrometry
 

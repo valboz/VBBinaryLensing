@@ -26,7 +26,7 @@ VBBinaryLensing is also adopted by several user-friendly modeling platforms for 
 
 These platforms offer high-level frameworks for easy modeling of microlensing events. Consider using those codes if you do not want to develop your own modeling or simulation code. On the other hand, if you need direct access to basic functions to include in your own project, this is the right place for you.
 
-A selection of recent reviews about microlensing and its applications can be found [here](\docs\reviews.md).
+A selection of recent reviews about microlensing and its applications can be found [here](/docs/reviews.md).
 
 ## Attribution
 Any use of this code for scientific publications should be acknowledged by citations to the works relevant to your study:

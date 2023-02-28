@@ -273,7 +273,7 @@ printf("Magnification with user-defined LD profile = %lf\n", Mag);  // Output sh
 
 ## Accuracy control
 
-The accuracy goal of the calculation can be controlled by the user through the property ```VBBL.Tol```. In fact, ```BinaryMag2``` will refine its calculations to match the required accuracy goal. The result will be Mag +- VBBL.Tol (absolute accuracy).
+The accuracy goal of the calculation can be controlled by the user through the property ```VBBL.Tol```. In fact, ```ESPLMag2``` and ```BinaryMag2``` refine their calculations until they match the required accuracy goal. The result will be ```Mag``` $\pm$ ```VBBL.Tol``` (absolute accuracy).
 
 Keep in mind that the computational time typically scales as ```VBBL.Tol^(-1/2)```. By default ```VBBL.Tol``` is set to 1.e-2.
 
@@ -289,7 +289,7 @@ Mag = VBBL.BinaryMag2(s, q, y1, y2, Rs);
 printf("Magnification (accuracy at 1.e-4) = %lf\n", Mag); // Output should be 18.2833....
 ```
 
-In general, the photometric precision of ground observatories is around 0.001. Therefore, it makes sense to set a relative precision goal, instead of an asbolute accuracy goal. This is set by ```VBBL.RelTol```. The result will be Mag*(1 +- VBBL.RelTol) (relative precision).
+In general, the photometric precision of ground observatories is around 0.001. Therefore, it makes sense to set a relative precision goal, instead of an asbolute accuracy goal. This is set by ```VBBL.RelTol```. The result will be ```Mag```$\pm$ ```Mag*VBBL.RelTol``` (relative precision).
 
 For example, let us set a poor 10% precision, just to see the difference:
 
@@ -302,7 +302,11 @@ printf("Magnification (relative precision at 1.e-1) = %lf\n", Mag); // Output sh
 If you do not want to use relative precision, just set ```VBBL.RelTol = 0;``` which is the default value.
 
 In general, the calculation stops when the first of the two goals is reached, either absolute accuracy or relative precision.
-  
+
+## Advanced controls
+
+The functions ```ESPLMag2``` and ```BinaryMag2``` are designed 
+
 	// After each calculation, the number of annuli used is available in VBBL.nannuli.
 	// If you are probing extremely tiny caustics with very large sources, you may impose a minimum number of annuli.
 	// Before your calculation, just set

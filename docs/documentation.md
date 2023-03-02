@@ -7,7 +7,9 @@ In this document we will describe all use cases of the VBBinaryLensing library a
 
 ## Quick start
 
-In a typical C++ code, you will include the VBBinaryLensingLibrary.h in your project and then declare an instance to the ```VBBinaryLensing``` class in your program. The ```VBBinaryLensing``` class contains all properties and methods that the user needs for any microlensing computations. In general, you will have to declare one instance to VBBinaryLensing and work with this instance all along your code. Here is a basic start up example:
+In a typical C++ code, you will include the VBBinaryLensingLibrary.h in your project. 
+
+An instance to the ```VBBinaryLensing``` class should be declared in your program. The ```VBBinaryLensing``` class contains all properties and methods that the user needs for any microlensing computations. Here is a basic start up example:
 
 ```
 #include <stdio.h>

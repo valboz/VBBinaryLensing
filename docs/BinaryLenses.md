@@ -1,4 +1,4 @@
-[Back to **Single lenses**](Single lenses.md)
+[Back to **Single lenses**](SingleLenses.md)
 
 
 # Binary lenses
@@ -74,4 +74,4 @@ printf("\nCentroid shift = (%lf,%lf)\n", VBBL.astrox1 - y1, VBBL.astrox2 - y2); 
 
 As before, we note that ```VBBL.astrox1``` and ```VBBL.astrox2``` express the centroid position in the frame centered in the barycenter of the lenses. In order to obtain the centroid with respect to the source position, we just have to subtract `y1` and `y2` respectively.
 
-[Go to: **Limb Darkening**](Limb darkening.md)
+[Go to: **Limb Darkening**](LimbDarkening.md)

@@ -66,4 +66,4 @@ printf("\nCentroid shift = %lf\n", VBBL.astrox1 - u);  // Output should be 0.049
 
 Note that ```VBBL.astrox1``` reports the centroid position with respect to the lens. The centroid position with respect to the source is ```VBBL.astrox1 - u```.
 
-[Go to: **Binary lenses**](Binary lenses.md)
+[Go to: **Binary lenses**](BinaryLenses.md)

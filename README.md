@@ -93,7 +93,7 @@ To check the installation, try:
 Example Jupyter notebooks are included in `examples/python_examples`.
 
 ## Documentation
-Full [documentation for the use of VBBinaryLensing in C++](/docs/documentation.md) is available. This can be a good reference also for Python users. 
+Full [documentation for the use of VBBinaryLensing in C++](/docs/Documentation.md) is available. This can be a good reference also for Python users. 
 
 Furthermore, the vast majority of functions are documented with Python docstrings which can be accessed as, for example, `?VBBL.BinaryMag2()` in
 a Jupyter notebook.

@@ -4,7 +4,7 @@
 
 Real stars are not uniform disks. The intensity declines from the center to the edge of the source, as described by limb darkening laws. VBBinaryLensing has several built-in limb darkening laws and allows the user to specify an arbitrary law.
 
-## Linear limb darkenin
+## Linear limb darkening
 
 The default limb darkening profile is linear, according to
 

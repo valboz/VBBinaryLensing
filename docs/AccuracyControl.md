@@ -6,9 +6,15 @@ The accuracy goal of the calculation can be controlled by the user through the p
 
 Keep in mind that the computational time typically scales as ```VBBL.Tol^(-1/2)```. By default ```VBBL.Tol``` is set to ```1.e-2```.
 
-Here are some examples with the same parameters as before:
+Here are some examples:
 
 ```
+double Mag, s, q, y1, y2;
+s = 0.8;
+q = 0.1;
+y1 = 0.01;
+y2 = 0.01;
+
 VBBL.Tol = 1.e-3; 
 Mag = VBBL.BinaryMag2(s, q, y1, y2, Rs); 
 printf("Magnification (accuracy at 1.e-3) = %lf\n", Mag); // Output should be 18.283....

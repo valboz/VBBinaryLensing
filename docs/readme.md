@@ -42,20 +42,20 @@ In this example we have declared an instance to the ```VBBinaryLensing``` class,
 
 In the following pages, we will describe all functionalities of VBBinaryLensing in detail.
 
-[Single lenses](SingleLenses.md)
+- [Single lenses](SingleLenses.md)
 
-[Binary lenses](BinaryLenses.md)
+- [Binary lenses](BinaryLenses.md)
 
-[Limb Darkening](SingleLenses.md)
+- [Limb Darkening](SingleLenses.md)
 
-[Accuracy Control](SingleLenses.md)
+- [Accuracy Control](SingleLenses.md)
 
-[Light Curve Functions](LightCurves.md)
+- [Light Curve Functions](LightCurves.md)
 
-[Parallax](Parallax.md)
+- [Parallax](Parallax.md)
 
-[Orbital Motion](OrbitalMotion.md)
+- [Orbital Motion](OrbitalMotion.md)
 
-[Binary Sources](BinarySources.md)
+- [Binary Sources](BinarySources.md)
 
-[Advanced Control](AdvancedControl.md)
+- [Advanced Control](AdvancedControl.md)

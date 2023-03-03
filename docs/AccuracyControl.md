@@ -4,7 +4,7 @@
 
 The accuracy goal of the calculation can be controlled by the user through the property ```VBBL.Tol```. In fact, ```ESPLMag2``` and ```BinaryMag2``` refine their calculations until they match the required accuracy goal. The result will be ```Mag``` $\pm$ ```VBBL.Tol``` (absolute accuracy).
 
-Keep in mind that the computational time typically scales as ```VBBL.Tol^(-1/2)```. By default ```VBBL.Tol``` is set to 1.e-2.
+Keep in mind that the computational time typically scales as ```VBBL.Tol^(-1/2)```. By default ```VBBL.Tol``` is set to ```1.e-2```.
 
 Here are some examples with the same parameters as before:
 

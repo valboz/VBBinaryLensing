@@ -76,6 +76,6 @@ printf("Binary lens Magnification = %lf\n", Mag); // Output should be 18.28....
 printf("\nCentroid shift = (%lf,%lf)\n", VBBL.astrox1 - y1, VBBL.astrox2 - y2);  // Output should be (-0.164...,-0.074...)
 ```
 
-As before, we note that ```VBBL.astrox1``` and ```VBBL.astrox2``` express the centroid position in the frame centered in the barycenter of the lenses. In order to obtain the centroid with respect to the source position, we just have to subtract `y1` and `y2` respectively.
+We note that ```VBBL.astrox1``` and ```VBBL.astrox2``` express the centroid position in the frame centered in the barycenter of the lenses. In order to obtain the centroid with respect to the source position, we just have to subtract `y1` and `y2` respectively.
 
 [Go to: **Limb Darkening**](LimbDarkening.md)

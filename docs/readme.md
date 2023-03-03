@@ -36,7 +36,7 @@ int main()
 }
 ```
 
-In this example we have declared an instance to the ```VBBinaryLensing``` class, assigned values to some parameters and then performed a computation of magnification by a binary lens with these parameters. 
+In this example we have declared an instance to the ```VBBinaryLensing``` class, assigned values to some parameters and then we have called ```VBBL.BinaryMag2``to perform a computation of magnification by a binary lens with these parameters. 
 
 ## Summary
 

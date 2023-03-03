@@ -40,7 +40,7 @@ Mag = VBBL.ESPLMag2(u, rho); // Call to the ESPLMag2 function with these paramet
 printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output should be 10.050.....
 ```
 
-The current range for the pre-calculated table is $1^{-4} \leq \rho \leq 10^{+2}$. Sources smaller than the minimum are considered equal to the minimum. Sources larger than the maximum generate an error message. 
+The current range for the pre-calculated table is $10^{-4} \leq \rho \leq 10^{+2}$. Sources smaller than the minimum are considered equal to the minimum. Sources larger than the maximum generate an error message. 
 
 By default, VBBinaryLensing works with **uniform sources**. We will come to **Limb Darkening** [later on](https://github.com/valboz/VBBinaryLensing/blob/master/docs/documentation.md#limb-darkening): arbitrary Limb Darkening laws can be implemented in VBBinaryLensing.
 

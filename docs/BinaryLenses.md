@@ -60,7 +60,7 @@ The `BinaryMag2` function has a quite complicated flow that optimizes the calcul
 
 Astrometry in binary lensing is obtained in the same way as for single lenses. We repeat the steps here outlining the differences.
 
-If you need astrometry calculations together with magnification, you have to turn it on by ```VBBL.astrometry = true``` and read the results in ```VBBL.astrox1``` and ```VBBL.astrox2```. This works in the same way for ```BinaryMag0``` and ```BinaryMag2```.
+If you need astrometry calculations together with magnification, you have to turn astrometry on by ```VBBL.astrometry = true``` and read the results in ```VBBL.astrox1``` and ```VBBL.astrox2```. This works in the same way for ```BinaryMag0``` and ```BinaryMag2```.
 
 ```
 double Mag, s, q, y1, y2,rho;

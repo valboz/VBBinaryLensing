@@ -38,7 +38,7 @@ The resolution of the lens equation is obtained by recasting the lens equation a
 
 ## Binary lensing with extended sources
 
-For extended sources, our recommended general purpose function is `BinaryMag2`, as shown in the quick start section. This also depends on the source radius $\rho$:
+For extended sources, our recommended general purpose function is `BinaryMag2`, as shown in the quick start section. This function also depends on $\rho$, the source radius in units of the total Einstein angle:
 
 ```
 double Mag, s, q, y1, y2,rho;

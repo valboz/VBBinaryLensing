@@ -52,7 +52,7 @@ Mag = VBBL.BinaryMag2(s, q, y1, y2,rho); // Call to the BinaryMag2 function with
 printf("Binary lens Magnification = %lf\n", Mag); // Output should be 18.28....
 ```
 
-The `BinaryMag2` function has a quite complicated flow that optimizes the calculation according to several tests. Users interested to discover more about its internal structure are invited to read until the end of this document.
+The `BinaryMag2` function has a quite complicated flow that optimizes the calculation according to several tests. Users interested to discover more about its internal structure are invited to read until the end of this documentation.
 
 ## Astrometry
 

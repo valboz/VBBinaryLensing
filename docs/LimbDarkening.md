@@ -1,4 +1,4 @@
-[Back to **Binary lenses**](BinaryLenses.md)
+[Back to **Critical curves and caustics**](CriticalCurvesAndCaustics.md)
 
 # Limb darkening
 

@@ -56,7 +56,7 @@ printf("Magnification with quadratic limb darkened source = %lf\n", Mag);  // Ou
 
 ## Logarithmic limb darkening
 
-$$I(\nu) = I(0) \left[ 1 - a1 (1 - \nu)- a2 \nu \ln{\nu} \right]$$
+$$I(\nu) = I(0) \left[ 1 - a1 (1 - \nu)- a2 \; \nu \ln{\nu} \right]$$
 
 ```
 VBBL.SetLDprofile(VBBL.LDlog); 

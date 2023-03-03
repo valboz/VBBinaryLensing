@@ -46,6 +46,8 @@ In the following pages, we will describe all functionalities of VBBinaryLensing 
 
 - [Binary lenses](BinaryLenses.md)
 
+- [Critical curves and caustics](CriticalCurvesAndCaustics.md)
+
 - [Limb Darkening](SingleLenses.md)
 
 - [Accuracy Control](SingleLenses.md)

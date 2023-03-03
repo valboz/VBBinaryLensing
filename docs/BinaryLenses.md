@@ -34,9 +34,11 @@ Mag = VBBL.BinaryMag0(s, q, y1, y2); // Call to the BinaryMag0 function with the
 printf("Magnification of a point-source = %lf\n", Mag);  // Output should be 18.18.....
 ```
 
+The resolution of the lens equation is obtained by recasting the lens equation as a fifth order complex polynomial, whose roots are found by the [Skowron & Gould algorithm](http://www.astrouw.edu.pl/~jskowron/cmplx_roots_sg/), as discussed in the introduction.
+
 ## Binary lensing with extended sources
 
-For extended sources, the correct function is `BinaryMag2`, as shown in the quick start section. This also depends on the source radius $\rho$:
+For extended sources, our recommended general purpose function is `BinaryMag2`, as shown in the quick start section. This also depends on the source radius $\rho$:
 
 ```
 double Mag, s, q, y1, y2,rho;

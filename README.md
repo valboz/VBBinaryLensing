@@ -39,6 +39,9 @@ If specifically relevant to your work, please also cite
  
 
 ## Installation
+
+### Python
+
 The easiest way to install VBBinaryLensing is through `pip`
 ```
 pip install VBBinaryLensing
@@ -48,6 +51,8 @@ repository and run
 ```
 python setup.py install
 ```
+### C++
+
 If you just want to use the C++ library, clone this repository, the 
 library files `VBBinaryLensingLibrary.cpp` and
 `VBBinaryLensing.h` are located in in `VBBinaryLensing/lib`. 

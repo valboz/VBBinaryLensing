@@ -51,6 +51,14 @@ repository and run
 ```
 python setup.py install
 ```
+
+Currently, `VBBinaryLensing` works on Linux, MacOS and python >= 2.7. 
+The python package requires `pybind11` which can be installed with
+```
+pip install pybind11
+```
+The package requires a C++ compiler supporting C++.
+
 ### C++
 
 If you just want to use the C++ library, clone this repository, the 
@@ -66,14 +74,6 @@ The package also contains the following files:
 - `VBBinaryLensing/data/OB151212coords.txt` - Sample file with event coordinates
 - `VBBinaryLensing/data/satellite1.txt` - Sample table for satellite position (Spitzer)
 - `VBBinaryLensing/data/satellite2.txt` - Sample table for satellite position (Kepler)
-
-
-Currently, `VBBinaryLensing` works on Linux, MacOS and python >= 2.7. 
-The python package requires `pybind11` which can be installed with
-```
-pip install pybind11
-```
-The package requires a C++ compiler supporting C++.
 
 ## Example usage
 To check the installation, try:

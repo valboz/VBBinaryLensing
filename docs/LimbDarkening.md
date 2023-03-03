@@ -96,4 +96,21 @@ printf("Magnification with user-defined LD profile = %lf\n", Mag);  // Output sh
 
 **Warning**: the user-defined limb darkening is not available in the Python version of VBBinaryLensing.
 
+## Multi-band observations
+
+Sometimes, simultaneous observations in multi-band are available. In this case, it is possible to repeat the calculation of the magnification for each band changing `VBBL.a1` as appropriate. 
+
+However, there is the possibility to save some time by `BinaryMagMultiDark`. This function exploits the same sequence of concentric annuli to calculate the magnification with different limb darkening coefficients simultaneously. The computational time is then comparable to a single calculation. Here is an example:
+
+```
+const int nbands=4; // number of bands
+double a1_list[nbands] = { 0.2,0.3,0.51,0.6 }; // list of limb darkening coefficients
+double mag_list[nbands]; // array where to store the output
+double Tol = 1.e-3; // Accuracy (see section about accuracy control)
+VBBL.BinaryMagMultiDark(s, q, y1, y2, rho, a1_list, nbands, mag_list, Tol);
+for (int i = 0; i < 4; i++) {
+   printf("BinaryMagMultiDark at band %d: %lf\n", i, mag_list[i]);
+}
+```
+
 [Go to: **Accuracy control**](AccuracyControl.md)

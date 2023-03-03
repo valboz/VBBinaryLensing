@@ -29,7 +29,8 @@ Mycurves = VBBL.PlotCrit(s, q);  // Calculation of the critical curves. The resu
 
 f = fopen("CriticalCurves.txt", "w"); // Let us write the result in an ASCII file
 c = Mycurves->first;
-        // Loop over the critical curves, which are the first n _curve objects in the list, with n = Mycurves->length /2.
+
+// Loop over the critical curves, which are the first n _curve objects in the list, with n = Mycurves->length /2.
 for (int curvenumber = 1; curvenumber <= Mycurves->length / 2; curvenumber++) {  
   fprintf(f, "Critical curve #%d\n", curvenumber);
   for (_point* p = c->first; p; p = p->next) {    // Each _curve is a list of _point objects
@@ -38,7 +39,8 @@ for (int curvenumber = 1; curvenumber <= Mycurves->length / 2; curvenumber++) {
   c = c->next;
 }
 fclose(f);
-        // Loop over the caustics, which are the remaining n _curve objects in the list, with n = Mycurves->length /2.
+
+// Loop over the caustics, which are the remaining n _curve objects in the list, with n = Mycurves->length /2.
 f = fopen("Caustics.txt", "w");
 for (int curvenumber = 1; curvenumber <= Mycurves->length / 2; curvenumber++) {
   fprintf(f, "Caustic #%d\n", curvenumber);

@@ -113,4 +113,6 @@ for (int i = 0; i < 4; i++) {
 }
 ```
 
+`BinaryMagMultiDark` currently works with linear limb darkening only. It is a particular function that has been introduced after a specific scientific request, but we believe it can be useful to general users with easy customization if necessary.
+
 [Go to: **Accuracy control**](AccuracyControl.md)

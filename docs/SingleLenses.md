@@ -50,7 +50,7 @@ For a Point-Source, in the reference frame in which the lens is in the origin, t
 
 $$ \bar x = \frac{u}{u^2+2} + u$$
 
-If you need astrometry calculations together with magnification, you have to turn it on by ```VBBL.astrometry = true``` and read the results in ```VBBL.astrox1```. This works the same for ```PSPLMag``` and ```ESPLMag2```.
+If you need astrometry calculations together with magnification, you have to turn astrometry on by ```VBBL.astrometry = true``` and read the results in ```VBBL.astrox1```. This works in the same way for ```PSPLMag``` and ```ESPLMag2```.
 
 ```
 VBBL.LoadESPLTable("ESPL.tbl"); // Load the pre-calculated table (you only have to do this once)

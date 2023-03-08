@@ -39,3 +39,5 @@ printf("Magnification (relative precision at 1.e-1) = %lf\n", Mag); // Output sh
 If you do not want to use relative precision, just set ```VBBL.RelTol = 0;``` which is the default value.
 
 In general, the calculation stops when the first of the two goals is reached, either absolute accuracy or relative precision.
+
+[Go to **Light Curve Functions**](LightCurves.md)

@@ -6,7 +6,7 @@ VBBinaryLensing offers ready-to-use functions to calculate full microlensing lig
 
 Each of these functions comes in two flavors: calculation of a single point in the light curve with standard parameters; calculation of the whole light curve on an array of times with a single function call.
 
-We start by explaining the single-time versions for each physical case and then we discuss the full light curve calculation in the end.
+We start by explaining the single-point versions for each physical case and then we discuss the full light curve calculation in the end.
 
 ## Point-Source-Point-Lens light curve
 

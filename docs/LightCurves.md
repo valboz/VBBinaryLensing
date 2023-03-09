@@ -78,7 +78,7 @@ Mag = VBBL.ESPLLightCurve(pr, t); // Calculates the ESPL magnification at time t
 printf("ESPL Light Curve at time t: %lf", Mag); // Output should be 68.09...
 ```
 
-The source position is calculated in the same way as for the `PSPLLightCurve` function. All considerations about [Limb Darkening](LimbDarkening.md) apply toi this function as well.
+The source position is calculated in the same way as for the `PSPLLightCurve` function. All considerations about [Limb Darkening](LimbDarkening.md) apply to this function as well.
 
 
 ## Binary Lens light curve

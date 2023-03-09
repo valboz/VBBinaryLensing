@@ -80,9 +80,61 @@ printf("ESPL Light Curve at time t: %lf", Mag); // Output should be 68.09...
 
 The source position is calculated in the same way as for the `PSPLLightCurve` function. All considerations about [Limb Darkening](LimbDarkening.md) apply toi this function as well.
 
+
+## Binary Lens light curve
+
+A minimum set of parameters in binary lensing also includes the mass ratio q, the separation s and the angle $\alpha$ between the source trajectory and the binary lens axis. We remind that our coordinate system is centered in the center of mass, with the first lens on the left and the second lens on the right (see [BinaryLenses](BinaryLenses.md)). The source trajectory is parameterized as follows:
+
+$$ \hat t = \frac{t-t_0}{t_E} $$
+
+$$ y_1 = u_0 ~ sin(\alpha) - \hat t ~ cos(\alpha) $$
+
+$$ y_2 = -u_0 ~ cos(\alpha) - \hat t ~ sin(\alpha) $$
+
+Let us see an example:
+
+```
+VBBinaryLensing VBBL;
+
+double pr[7]; // Array of parameters
+double u0, t0, tE, rho, alpha, s, q;
+double t, Mag;
+
+u0 = -0.01; // Impact parameter
+t0 = 7550.4; // Time of closest approach to the center of mass
+tE = 100.3; // Einstein time
+rho = 0.01; // Source radius
+s = 0.8; // Separation between the two lenses
+q = 0.1; // Mass ratio
+alpha = 0.53; // Angle of the source trajectory
+
+pr[0] = log(s); 
+pr[1] = log(q);
+pr[2] = u0;
+pr[3] = alpha;
+pr[4] = log(rho);
+pr[5] = log(tE);
+pr[6] = t0;
+
+t=7551.6; // Time at which we want to calculate the magnification
+
+Mag = VBBL.BinaryLightCurve(pr, t); // Calculates the Binary Lens magnification at time t with parameters in pr
+printf("Binary Light Curve at time t: %lf", Mag); // Output should be 31.00...
+```
+
+As before, the coordinates of the source are stored in the public properties `VBBL.y_1` and `VBBL.y_2` of the VBBinaryLensing class. These can be useful to draw the source trajectory relative to the caustics.
+
+[Limb Darkening](LimbDarkening.md) and [accuracy goal](AccuracyControl.md) can be specified as shown in the respective sections.
+
+We finally mention a possible variant in the parameterization. With the function `BinaryLightCurveW` the time of closest approach `t0` and the impact parameter `u0` are relative to the position of the caustic of the mass on the right, whose center lies at coordinates 
+
+$$\left(\frac{1}{1+q} \left( s - \frac{1}{s} \right), 0 \right)$$
+
+This parameterization is useful for fitting wide binary models.
+
 ## Full light curve with one call
 
-We may want to calculate the full light curve on an array of times. For example if we have a set of observations taken by a given telescope or if we want to simulate a light curve with a given time sampling. This is possible if we also give the arrays of time as additional argument. Furthermore, we also need to give the locations where the outputs must be stored. This means that the function expects an array for the magnification, an array for the source coordinate y1 and one more for the coordinate y2, as shown in the example.
+We may want to calculate the full light curve on an array of times. For example if we have a set of observations taken by a given telescope or if we want to simulate a light curve with a given time sampling. This is possible if we also give the arrays of time as additional argument. Furthermore, we also need to give the locations where the outputs must be stored. This means that the function expects an array for the magnification, an array for the source coordinate y1 and one more for the coordinate y2, as shown in the following example, which refers to the PSPL light curve.
 
 ```
 VBBinaryLensing VBBL;
@@ -122,5 +174,7 @@ Now the array `mags` contains the magnification for each time specified in the a
 Moreover, we also have the source trajectory relative to the lens in the arrays `y1s` and `y2s`, which can be useful to draw plots with the source trajectory as discussed before.
 
 Apart from the compactness of the code, some computational advantage of the use of the single-call light curve function emerges with higher order effects, in which some calculations are re-used and not repeated at every function call.
+
+The full light curve calculation is offered for each physical case (PSPL, ESPL, Binary) with a syntax identical to the example for the PSPL light curve shown explicitly here.
 
 [Go to **Parallax**](Parallax.md)

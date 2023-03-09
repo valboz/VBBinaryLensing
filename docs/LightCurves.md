@@ -35,6 +35,19 @@ printf("PSPL Light Curve at time t: %lf", Mag); // Output should be 64.13...
 
 The use of logarithms for some parameters is useful e.g. in Markov chains or fitting when the possible values may span several orders of magnitudes.
 
+To make contact with the section [Single lenses](SingleLenses.md), we also report how the source position is calculated with our standard parameters:
+
+
+$$y_1=-\frac{t-t_0}{t_E}$$
+
+$$y_2=-u_0$$
+
+$$u=\sqrt{y_1^2+y_2^2}$$
+
+This $u$ is the source angular separation relative to the lens in Einstein radii, as discussed in the section [Single lenses](SingleLenses.md).
+
+The coordinates of the source are stored in the public properties `VBBL.y_1` and `VBBL.y_2` of the VBBinaryLensing class. For a PSPL model there is rotational symmetry, so we do not care too much about the role of y1 and y2, but this notation is consistent with that used in the other functions. The information on the source position can be useful to draw plots with the source trajectory relative to the caustics.
+
 ## Full light curve with one call
 
 We may want to calculate the full light curve on an array of times. For example if we have a set of observations taken by a given telescope or if we want to simulate a light curve with a given time sampling. This is possible if we also give the arrays of time as additional argument. Furthermore, we also need to give the locations where the outputs must be stored. This means that the function expects an array for the magnification, an array for the source coordinate y1 and one more for the coordinate y2, as shown in the example.
@@ -74,11 +87,7 @@ for (int i = 0; i < np; i++) {
 
 Now the array `mags` contains the magnification for each time specified in the array `times`.
 
-Moreover, we also have the source trajectory relative to the lens in the arrays `y1s` and `y2s`, which can be useful to draw plots with the source trajectory. The convention used here is that the source comes from the right to the left (positive to negative y1) with y2 fixed to -u0. This is consistent with the other light curve calculations where the rotational symmetry is lost. In detail, we have
-
-$$y_1=-\frac{t-t_0}{t_E}$$
-
-$$y_2=-u_0$$
+Moreover, we also have the source trajectory relative to the lens in the arrays `y1s` and `y2s`, which can be useful to draw plots with the source trajectory as discussed before.
 
 Apart from the compactness of the code, some computational advantage of the use of the single-call light curve function emerges with higher order effects, in which some calculations are re-used and not repeated at every function call.
 

@@ -51,7 +51,7 @@ The coordinates of the source are stored in the public properties `VBBL.y_1` and
 
 ## Extended-Source-Point-Lens light curve
 
-Everything is similar to what we already discussed before. We just have te source radius as an additional parameter
+Everything is similar to what we already discussed before. We just have the source radius as an additional parameter
 
 ```
 VBBinaryLensing VBBL;

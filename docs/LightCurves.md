@@ -87,9 +87,9 @@ A minimum set of parameters in binary lensing also includes the mass ratio q, th
 
 $$ \hat t = \frac{t-t_0}{t_E} $$
 
-$$ y_1 = u_0 ~ sin(\alpha) - \hat t ~ cos(\alpha) $$
+$$ y_1 = u_0 ~ \sin(\alpha) - \hat t ~ \cos(\alpha) $$
 
-$$ y_2 = -u_0 ~ cos(\alpha) - \hat t ~ sin(\alpha) $$
+$$ y_2 = -u_0 ~ \cos(\alpha) - \hat t ~ \sin(\alpha) $$
 
 Let us see an example:
 

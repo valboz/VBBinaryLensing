@@ -6,7 +6,9 @@ VBBinaryLensing offers ready-to-use functions to calculate full microlensing lig
 
 Each of these functions comes in two flavors: calculation of a single point in the light curve with standard parameters; calculation of the whole light curve on an array of times with a single function call.
 
-## Point-Lens-Point-Source light curve
+We start by explaining the single-time versions for each physical case and then we discuss the full light curve calculation in the end.
+
+## Point-Source-Point-Lens light curve
 
 Let us start with the Paczynski curve (see [Single lenses](SingleLenses.md) section). 
 
@@ -37,16 +39,46 @@ The use of logarithms for some parameters is useful e.g. in Markov chains or fit
 
 To make contact with the section [Single lenses](SingleLenses.md), we also report how the source position is calculated with our standard parameters:
 
-
 $$y_1=-\frac{t-t_0}{t_E}$$
 
 $$y_2=-u_0$$
 
 $$u=\sqrt{y_1^2+y_2^2}$$
 
-This $u$ is the source angular separation relative to the lens in Einstein radii, as discussed in the section [Single lenses](SingleLenses.md).
+$u$ is the source angular separation relative to the lens in Einstein radii, as discussed in the section [Single lenses](SingleLenses.md).
 
 The coordinates of the source are stored in the public properties `VBBL.y_1` and `VBBL.y_2` of the VBBinaryLensing class. For a PSPL model there is rotational symmetry, so we do not care too much about the role of y1 and y2, but this notation is consistent with that used in the other functions. The information on the source position can be useful to draw plots with the source trajectory relative to the caustics.
+
+## Extended-Source-Point-Lens light curve
+
+Everything is similar to what we already discussed before. We just have te source radius as an additional parameter
+
+```
+VBBinaryLensing VBBL;
+
+double pr[4]; // Array of parameters
+double u0, t0, tE, rho;
+double t, Mag;
+
+u0 = 0.01; // Impact parameter
+tE = 100.3; // Einstein time
+t0 = 7550.4; // Time of closest approach to the center of mass
+rho = 0.01; // Source radius
+
+pr[0] = log(u0); // Note that we give some parameters in log scale
+pr[1] = log(tE);
+pr[2] = t0;
+pr[3] = log(rho);
+
+t=7551.6; // Time at which we want to calculate the magnification
+
+VBBL.LoadESPLTable("ESPL.tbl"); // Do not forget to load the pre-calculated tables before the first ESPL calculation!
+
+Mag = VBBL.ESPLLightCurve(pr, t); // Calculates the ESPL magnification at time t with parameters in pr
+printf("ESPL Light Curve at time t: %lf", Mag); // Output should be 68.09...
+```
+
+The source position is calculated in the same way as for the `PSPLLightCurve` function. All considerations about [Limb Darkening](LimbDarkening.md) apply toi this function as well.
 
 ## Full light curve with one call
 

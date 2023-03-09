@@ -35,7 +35,7 @@ Mag = VBBL.PSPLLightCurve(pr, t); // Calculates the PSPL magnification at time t
 printf("PSPL Light Curve at time t: %lf", Mag); // Output should be 64.13...
 ```
 
-The use of logarithms for some parameters is useful e.g. in Markov chains or fitting when the possible values may span several orders of magnitudes.
+The use of logarithms for some parameters is useful e.g. in Markov chains or other fitting algorithms when the possible values that occur in real cases may span several orders of magnitudes.
 
 To make contact with the section [Single lenses](SingleLenses.md), we also report how the source position is calculated with our standard parameters:
 

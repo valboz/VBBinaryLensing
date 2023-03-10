@@ -89,7 +89,9 @@ $$ \hat t = \frac{t-t_0}{t_E} $$
 
 $$ y_1 = u_0 ~ \sin(\alpha) - \hat t ~ \cos(\alpha) $$
 
-$$ y_2 = -u_0 ~ \cos(\alpha) - \hat t ~ \sin(\alpha) $$
+$$ y_2 = -u_0 ~ \cos(\alpha) - \hat t ~ \sin(\alpha) $$ 
+
+<img src="sourcetrajconvention.png" width = 600>
 
 Let us see an example:
 
@@ -134,7 +136,7 @@ This parameterization is useful for fitting wide binary models.
 
 ## Full light curve with one call
 
-We may want to calculate the full light curve on an array of times. For example if we have a set of observations taken by a given telescope or if we want to simulate a light curve with a given time sampling. All light curve functions in VBBinaryLensing has an overload in which the time `t` is replaced by an array of times as additional argument. Furthermore, we also need to give the locations where the outputs must be stored. This means that the function expects an array for the magnification, an array for the source coordinate y1 and one more for the coordinate y2, as shown in the following example, which refers to the PSPL light curve.
+We may want to calculate the full light curve on an array of times. For example if we have a set of observations taken by a given telescope or if we want to simulate a light curve with a given time sampling. All light curve functions in VBBinaryLensing have an overload in which the time `t` is replaced by an array of times as additional argument. Furthermore, we also need to give the locations where the outputs must be stored. This means that the function expects an array for the magnification, an array for the source coordinate y1 and one more for the coordinate y2, as shown in the following example, which refers to the PSPL light curve.
 
 ```
 VBBinaryLensing VBBL;
@@ -164,8 +166,10 @@ for(int i=0;i<np;i++){
 }
 
 VBBL.PSPLLightCurve(pr, times, mags, y1s, y2s, np); // Calculates the whole light curve and stores the magnifications in the array mags
+
+// Let's print the results
 for (int i = 0; i < np; i++) {
-  printf("\n%lf %lf %lf", mags[i], y2a[i], y2s[i]);
+  printf("\n%lf %lf %lf %lf", times[i], mags[i], y2a[i], y2s[i]);
 }
 ```
 

@@ -2,7 +2,7 @@
 
 # Orbital motion
 
-Binary lenses orbit around the common center of mass. If the microlensing event is long enough, we cannot neglect this effect. However, if the effect is small, most orbital parameters remain unconstrained. Rather than adding too many dimensions to our parameter space, it can be sufficient to restric to circular orbits to describe the subtle deviations in our microlensing event.
+Binary lenses orbit around the common center of mass. If the microlensing event is long enough, we cannot neglect this effect. However, as long as this effect remains small, most orbital parameters remain unconstrained. Rather than adding too many dimensions to our parameter space, in order to describe the subtle deviations in our microlensing event, it can be sufficient to restrict to circular orbits.
 
 VBBinaryLensing offers two functions:
 
@@ -76,7 +76,7 @@ All values are specified at time $t_{0,orb}=t_{0,par}$. The units are $day^{-1}$
 
 For more details, you might see the appendix of [Skowron et al. (2011)](https://ui.adsabs.harvard.edu/abs/2011ApJ...738...87S/abstract). In general, the component $\gamma_3$ is poorly constrained by the data, but it is important to stress that setting $\gamma_3=0$ is NOT equivalent to the linear approximation. Since microlensing is only sensitive to the projected distance, orbits with $\gamma_3 \rightarrow - \gamma_3$ are indistinguishable.
 
-Conventional orbital elements can be easily recovered from the component of $\vec \gamma$. In particular, we have
+Conventional orbital elements can be easily recovered from the components of $\vec \gamma$. In particular, we have
 
 $$a = s \frac{\sqrt{\gamma_1^2 + \gamma_3^2}}{\gamma_3}$$
 
@@ -86,14 +86,15 @@ $$ \cos i = \frac{\gamma_3}{\sqrt{\gamma_1^2 + \gamma_3^2}} \frac{\gamma_2}{ |\v
 
 $$ \tan \phi_0 =- \frac{\gamma_1 |\vec \gamma|}{\gamma_3 \sqrt{\gamma_1^2 + \gamma_3^2}} $$
 
-where $a$ is the orbital radius (still in units of the Einstein angle), $T$ is the orbital period in days, $i$ is the inclination with respect to the sky plane, $\phi_0$ is the phase angle from the line of nodes of the orbit with the sky plane. As stated before, it is very difficult to have precise estimates of the orbital parameters if only one of the three components is poorly constrained.
+where $a$ is the orbital radius (still in units of the Einstein angle), $T$ is the orbital period in days, $i$ is the inclination with respect to the sky plane, $\phi_0$ is the phase angle from the line of nodes of the orbit with the sky plane. As stated before, it is very difficult to have precise estimates of the orbital parameters even if only one of the three components is poorly constrained.
 
 ## Keplerian orbital motion
 
 If the microlensing event is long compared to the orbital period of the binary lens, it is possible to attempt a full orbital fit including eccentricity. A convenient parameterization introduced by [Bozza, Khalouei and Bachelet (2021)](https://ui.adsabs.harvard.edu/abs/2021MNRAS.505..126B/abstract) considers two additional parameters to the three components of the vector $\vec \gamma$.
 
-$$r_s \equiv \frac{s_z}{s}$$, the ratio of the longitudinal coordinate of the second lens to the projected separation
-$$a_s \equiv \frac{a}{\sqrt{s_z^2+s^2}}$$, the ratio of the semimajor axis to the current 3-D separation of the lenses.
+$r_s \equiv \frac{s_z}{s}$, the ratio of the longitudinal coordinate of the second lens to the projected separation
+
+$a_s \equiv \frac{a}{\sqrt{s_z^2+s^2}}$, the ratio of the semimajor axis to the current 3-D separation of the lenses.
 
 The function `BinaryLightCurveKepler` therefore accepts a total of 14 parameters and its use is similar to that of `BinaryLightCurveOrbital`. So we do not repeat the example here.
 

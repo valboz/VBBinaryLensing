@@ -78,12 +78,25 @@ For more details, you might see the appendix of [Skowron et al. (2011)](https://
 
 Conventional orbital elements can be easily recovered from the component of $\vec \gamma$. In particular, we have
 
-$$\omega= \frac{2\pi}{T} = \frac{\gamma_3}{\sqrt{\gamma_1^2 + \gamma_3^2}}  |\vec \gamma |$$
+$$a = s \frac{\sqrt{\gamma_1^2 + \gamma_3^2}}{\gamma_3}$$
+
+$$n = \frac{2\pi}{T} =  \frac{\gamma_3}{\sqrt{\gamma_1^2 + \gamma_3^2}} |\vec \gamma |$$
 
 $$ \cos i = \frac{\gamma_3}{\sqrt{\gamma_1^2 + \gamma_3^2}} \frac{\gamma_2}{ |\vec \gamma|}$$
 
 $$ \tan \phi_0 =- \frac{\gamma_1 |\vec \gamma|}{\gamma_3 \sqrt{\gamma_1^2 + \gamma_3^2}} $$
 
-where $T$ is the orbital period in days, $i$ is the inclination with respect to the sky plane, $\phi_0$ is the phase angle from the line of nodes of the orbit with the sky plane.
+where $a$ is the orbital radius (still in units of the Einstein angle), $T$ is the orbital period in days, $i$ is the inclination with respect to the sky plane, $\phi_0$ is the phase angle from the line of nodes of the orbit with the sky plane. As stated before, it is very difficult to have precise estimates of the orbital parameters if only one of the three components is poorly constrained.
+
+## Keplerian orbital motion
+
+If the microlensing event is long compared to the orbital period of the binary lens, it is possible to attempt a full orbital fit including eccentricity. A convenient parameterization introduced by [Bozza, Khalouei and Bachelet (2021)](https://ui.adsabs.harvard.edu/abs/2021MNRAS.505..126B/abstract) considers two additional parameters to the three components of the vector $\vec \gamma$.
+
+$$r_s \equiv \frac{s_z}{s}$$, the ratio of the longitudinal coordinate of the second lens to the projected separation
+$$a_s \equiv \frac{a}{\sqrt{s_z^2+s^2}}$$, the ratio of the semimajor axis to the current 3-D separation of the lenses.
+
+The function `BinaryLightCurveKepler` therefore accepts a total of 14 parameters and its use is similar to that of `BinaryLightCurveOrbital`. So we do not repeat the example here.
+
+The relations of these parameters to the conventional orbital elements are shown in detail in the appendix of [Bozza, Khalouei and Bachelet (2021)](https://ui.adsabs.harvard.edu/abs/2021MNRAS.505..126B/abstract).
 
 [Go to **Binary Sources**](BinarySources.md)

@@ -24,7 +24,7 @@ VBBinaryLensing VBBL;
 VBBL.SetObjectCoordinates("OB151212coords.txt",".");
 ```
 
-The first argument is the name of the file we have just prepared (these are the coordinates of the event [OGLE-2015-BLG-1212](https://ui.adsabs.harvard.edu/abs/2016ApJ...820...79B/abstract)). The second argument will only be used in case of observations from space (see below).
+The first argument is the name of the file we have just prepared (these are the coordinates of the event [OGLE-2015-BLG-1212](https://ui.adsabs.harvard.edu/abs/2016ApJ...820...79B/abstract)). The second argument will only be used in case of observations from space (see [below](https://github.com/valboz/VBBinaryLensing/blob/master/docs/Parallax.md#satellite-parallax)).
 
 ## Parallax system
 

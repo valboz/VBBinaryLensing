@@ -36,7 +36,7 @@ Finally, we have to decide the reference time for the parallax effect $t_{0,par}
 
 ## Light curve functions with parallax
 
-All light curve functions defined in the [Light Curves](LightCurves.md) section have their corresponding including parallax effect:
+All light curve functions defined in the [Light Curves](LightCurves.md) section have their corresponding counterpart including the parallax effect:
 
 ```
 PSPLLightCurveParallax

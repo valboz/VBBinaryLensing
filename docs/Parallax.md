@@ -100,7 +100,7 @@ In particular, we assume five columns:
 
 Examples of valid satellite ephemerid tables are in [https://github.com/valboz/VBBinaryLensing/tree/master/VBBinaryLensing/data](https://github.com/valboz/VBBinaryLensing/tree/master/VBBinaryLensing/data).
 
-The satellite table(s) should be named "satellite*.txt" (with * replaced by a single character). The satellite table files should be in the directory specified as second argument in the `VBBL.SetObjectCoordinates` function, as shown above. When the `VBBL.SetObjectCoordinates` is executed, the satellite tables are pre-loaded so that they are ready for use in any calculation.
+The satellite table(s) should be named "satellite*.txt" (with * replaced by a single character). The satellite table files should be in the directory specified as second argument in the `VBBL.SetObjectCoordinates` function, as shown [above](https://github.com/valboz/VBBinaryLensing/blob/master/docs/Parallax.md#target-coordinates). When the `VBBL.SetObjectCoordinates` is executed, the satellite tables are pre-loaded so that they are ready for use in any calculation.
 
 If you want the magnification as seen from satellite 1, then just set VBBL.satellite to 1 before the parallax calculation.
 

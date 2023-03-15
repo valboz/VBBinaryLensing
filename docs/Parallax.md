@@ -87,4 +87,29 @@ In this example we have not set `VBBL.t0_par`, which means that $t_{0,par}=t_0$ 
 
 Finally, we add that all light curve functions are available in two versions as explained in [Light Curves](LightCurves.md): the version performing a single calculation of the magnification at time t (as in the example above) and the version calculating the full light curve with one single call (see [Light Curves](LightCurves.md) for details).
 
+## Satellite Parallax
+
+VBBinaryLensing can calculate the magnification as seen from a spacecraft. In order to do that, it is necessary to have the ephemerides of the satellite in the format given by the [NASA Horizons system](http://ssd.jpl.nasa.gov/horizons.cgi).
+
+In particular, we assume five columns:
+- JD
+- RA (degrees)
+- Dec (degrees)
+- Distance from Earth (AU)
+- Distance rate change (not really needed but included by default in Horizons).
+
+Examples of valid satellite ephemerid tables are in [https://github.com/valboz/VBBinaryLensing/tree/master/VBBinaryLensing/data](https://github.com/valboz/VBBinaryLensing/tree/master/VBBinaryLensing/data).
+
+The file name(s) of the satellite table(s) should be named "satellite*.txt" (with * replaced by a single character). The satellite table files should be in the directory specified as second argument in the `VBBL.SetObjectCoordinates` function, as shown above. When the `VBBL.SetObjectCoordinates` is executed, the satellite tables are pre-loaded so that they are ready for use in any calculation.
+
+If you want the magnification as seen from satellite 1, then just set VBBL.satellite to 1 before the parallax calculation.
+
+```
+VBBL.satellite = 1; // All following calculations will be performed as seen from satellite 1 (Spitzer in this example)
+Mag = VBBL.BinaryLightCurveParallax(pr, t);
+printf("Magnification as seen from satellite 1: %lf", Mag); // Output should be 3.88...
+```
+
+If you want to return to the ground do not forget to set VBBL.satellite back to 0!
+
 [Go to **Orbital motion**](OrbitalMotion.md)

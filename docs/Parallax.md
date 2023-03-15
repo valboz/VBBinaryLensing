@@ -36,10 +36,55 @@ Finally, we have to decide the reference time for the parallax effect $t_{0,par}
 
 ## Light curve functions with parallax
 
+All light curve functions defined in the [Light Curves](LightCurves.md) section have their corresponding including parallax effect:
 
+```
+PSPLLightCurveParallax
+ESPLLightCurveParallax
+BinaryLightCurveParallax
+```
 
+The only difference is that the array of parameters must include two more entries for the components of the parallax vector. Here is a full example demonstrating the use of `BinaryLightCurveParallax`:
 
+```
+VBBinaryLensing VBBL; // Declare instance to VBBinaryLensing
 
+double pr[9]; // Array of parameters
+double s, q, u0, alpha, rho, tE, t0, paiN, paiE, t;
 
+VBBL.SetObjectCoordinates("OB151212coords.txt", ".");  // Read target coordinates in file
+VBBL.parallaxsystem = 1; // Here we use North-East components for parallax
+
+u0 = -0.01; // Impact parameter
+t0 = 7550.4; // Time of closest approach to the center of mass
+tE = 100.3; // Einstein time
+rho = 0.01; // Source radius
+s = 0.8; // Separation between the two lenses
+q = 0.1; // Mass ratio
+alpha = 0.53; // Angle between a vector pointing to the left and the source velocity
+paiN = 0.3; // Parallax component in the North direction
+paiE = 0.13; // Parallax component in the East direction
+
+// Let us put all parameters in our array
+pr[0] = log(s);
+pr[1] = log(q);
+pr[2] = u0;
+pr[3] = alpha;
+pr[4] = log(rho);
+pr[5] = log(tE);
+pr[6] = t0;
+pr[7] = paiN;
+pr[8] = paiE;
+
+t = 7551.6; // Time at which we want to calculate the magnification
+
+Mag = VBBL.BinaryLightCurveParallax(pr, t); // Calculates the Binary Lens magnification at time t with parameters in pr
+printf("Binary Light Curve with Parallax at time t: %lf", Mag); // Output should be 31.01...
+
+```
+
+In this example we have not set `VBBL.t0_par`, which means that $t_{0,par}=t_0$ here.
+
+Finally, we add that all light curve functions are available in two versions as explained in [Light Curves](LightCurves.md): the version performing a single calculation of the magnification at time t (as in the example above) and the version calculating the full light curve with one single call (see [Light Curves](LightCurves.md) for details).
 
 [Go to **Orbital motion**](OrbitalMotion.md)

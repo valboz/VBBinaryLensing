@@ -15,7 +15,7 @@ The first function describes circular orbital motion, while the second considers
 
 Both functions discussed here include the parallax calculation. Therefore, a preliminary call to `VBBL.SetObjectCoordinates` is mandatory (see [Parallax](Parallax.md)). If you want to fit orbital motion without parallax, you must set the two components of the parallax to zero.
 
-Finally, the reference time for orbital motion calculation is by default $t_0$, the time of closest approach of the source to the center of mass. If you want to specify a different time, you should to it through $t_{0,par}$ (see [Parallax](Parallax.md#reference-time-for-parallax-t_0par))
+Finally, the reference time for orbital motion calculation is by default $t_0$, the time of closest approach of the source to the center of mass. If you want to specify a different time, you can do it through $t_{0,par}$ (see [Parallax](Parallax.md#reference-time-for-parallax-t_0par)). There is no possibility to set two different reference times $t_{0,orb} \neq $t_{0,par}$$.
 
 ## Circular orbital motion
 

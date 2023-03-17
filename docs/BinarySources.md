@@ -41,7 +41,7 @@ Binary sources can also orbit around a common center of mass. VBBinaryLensing of
 
 $(\xi_\perp, \xi_\parallel)$, projections of the node lines perpendicular and parallel to the source velocity at time $t_0$. Note that the orbital radius in Einstein angle units is $\sqrt{\xi_\perp^2 + \xi_\parallel^2}$;
 
-$n$, angular velocity of the orbit;
+$\omega = \frac{2\pi}{T}$, orbital angular velocity;
 
 $i$, inclination of the orbit;
 

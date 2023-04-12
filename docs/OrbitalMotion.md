@@ -61,7 +61,7 @@ pr[11] = g3;
 t = 7551.6; // Time at which we want to calculate the magnification
 
 Mag = VBBL.BinaryLightCurveOrbital(pr, t); // Calculates the Binary Lens magnification at time t with parameters in pr
-printf("Binary Light Curve with Parallax at time t: %lf", Mag); // Output should be 30.92...
+printf("Binary Light Curve with Parallax and Orbital Motion at time t: %lf", Mag); // Output should be 30.92...
 ```
 
 A circular orbital motion is completely specified by the three components of the angular velocity $\vec \gamma$ of the secondary mass with respect to the first mass. We have

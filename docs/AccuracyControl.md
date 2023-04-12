@@ -9,7 +9,9 @@ Keep in mind that the computational time typically scales as ```VBBL.Tol^(-1/2)`
 Here are some examples:
 
 ```
+VBBinaryLensing VBBL;
 double Mag, s, q, y1, y2;
+
 s = 0.8;
 q = 0.1;
 y1 = 0.01;

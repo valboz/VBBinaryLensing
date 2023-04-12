@@ -31,10 +31,13 @@ printf("PSPL Magnification = %lf", Mag); \\ Output should be 10.037...
 For extended sources, the magnification depends on $\rho$, the **source radius** normalized to the Einstein angle, and can be calculated through elliptic integrals. In order to make VBBinaryLensing as fast as possible, we provide **pre-calculated tables** in the file "ESPL.tbl". This file should be loaded before any calculations involving Extended-Source-Point-Lenses (ESPL).
 
 ```
+VBBinaryLensing VBBL;
+double Mag, u, rho;
+
 VBBL.LoadESPLTable("ESPL.tbl"); // Load the pre-calculated table (you only have to do this once)
 
-double u = 0.1; // Source-lens separation in Einstein radii
-double rho = 0.01; // Source radius in units of the Einstein angle
+u = 0.1; // Source-lens separation in Einstein radii
+rho = 0.01; // Source radius in units of the Einstein angle
 
 Mag = VBBL.ESPLMag2(u, rho); // Call to the ESPLMag2 function with these parameters
 printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output should be 10.050.....

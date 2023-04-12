@@ -56,12 +56,16 @@ $$ \bar x = \frac{u}{u^2+2} + u$$
 If you need astrometry calculations together with magnification, you have to turn astrometry on by ```VBBL.astrometry = true``` and read the results in ```VBBL.astrox1```. This works in the same way for ```PSPLMag``` and ```ESPLMag2```.
 
 ```
+VBBinaryLensing VBBL;
+double Mag,u;
+
 VBBL.LoadESPLTable("ESPL.tbl"); // Load the pre-calculated table (you only have to do this once)
 
-double u = 0.1; // Source-lens separation in Einstein radii
-double rho = 0.01; // Source radius in units of the Einstein angle
+u = 0.1; // Source-lens separation in Einstein radii
+rho = 0.01; // Source radius in units of the Einstein angle
 
 VBBL.astrometry = true; // We want astrometry
+
 Mag = VBBL.ESPLMag2(u, rho); // Call to the ESPLMag2 function with these parameters
 printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output should be 10.050.....
 printf("\nCentroid shift = %lf\n", VBBL.astrox1 - u);  // Output should be 0.0493.....

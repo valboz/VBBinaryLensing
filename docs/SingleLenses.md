@@ -49,7 +49,7 @@ By default, VBBinaryLensing works with **uniform sources**. We will introduce **
 
 ## Astrometry
 
-For a Point-Source, in the reference frame in which the lens is in the origin, the centroid of the images is simply
+For a Point-Source, in the reference frame in which the **lens is in the origin**, the centroid of the images is simply
 
 $$ \bar x = \frac{u}{u^2+2} + u$$
 
@@ -71,6 +71,6 @@ printf("\nMagnification of Extended-source-point-lens = %lf\n", Mag);  // Output
 printf("\nCentroid shift = %lf\n", VBBL.astrox1 - u);  // Output should be 0.0493.....
 ```
 
-Note that ```VBBL.astrox1``` reports the centroid position with respect to the lens. The centroid position with respect to the source is ```VBBL.astrox1 - u```.
+Note that ```VBBL.astrox1``` reports the **centroid position with respect to the lens**. The **centroid position with respect to the source** is ```VBBL.astrox1 - u```.
 
 [Go to: **Binary lenses**](BinaryLenses.md)

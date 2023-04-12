@@ -15,6 +15,8 @@ The use of these objects is very intuitive, as illustrated by this example, whic
 ```
 VBBinaryLensing VBBL; // Instance to VBBinaryLensing
 double s,q;
+int n;
+
 _sols* Mycurves;  // Declaration of a _sols pointer
 _curve* c;  // Declaration of a _curve pointer
 FILE* f;
@@ -27,11 +29,13 @@ Mycurves = VBBL.PlotCrit(s, q);  // Calculation of the critical curves. The resu
                                   // There are n critical curves and n caustics in this list, with n=1,2,3 depending on the caustic topology.
                                   // Mycurves->length will be therefore equal to 2n.
 
+n = Mycurves->length / 2;
+
 f = fopen("CriticalCurves.txt", "w"); // Let us write the result in an ASCII file
 c = Mycurves->first;
 
-// Loop over the critical curves, which are the first n _curve objects in the list, with n = Mycurves->length /2.
-for (int curvenumber = 1; curvenumber <= Mycurves->length / 2; curvenumber++) {  
+// Loop over the critical curves, which are the first n _curve objects in the list.
+for (int curvenumber = 1; curvenumber <= n; curvenumber++) {  
   fprintf(f, "Critical curve #%d\n", curvenumber);
   for (_point* p = c->first; p; p = p->next) {    // Each _curve is a list of _point objects
     fprintf(f, "%lf %lf\n", p->x1, p->x2);      // We just write p->x1 and p->x2 to a file.
@@ -40,9 +44,9 @@ for (int curvenumber = 1; curvenumber <= Mycurves->length / 2; curvenumber++) {
 }
 fclose(f);
 
-// Loop over the caustics, which are the remaining n _curve objects in the list, with n = Mycurves->length /2.
+// Loop over the caustics, which are the remaining n _curve objects in the list.
 f = fopen("Caustics.txt", "w");
-for (int curvenumber = 1; curvenumber <= Mycurves->length / 2; curvenumber++) {
+for (int curvenumber = 1; curvenumber <= n; curvenumber++) {
   fprintf(f, "Caustic #%d\n", curvenumber);
   for (_point* p = c->first; p; p = p->next) {
 		fprintf(f, "%lf %lf\n", p->x1, p->x2);
@@ -56,6 +60,6 @@ delete Mycurves; // Do not forget to free your memory!
 
 Critical curves and caustics are calculated through the resolution of a fourth order complex polynomial (see [reviews](reviews.md)) by the [Skowron & Gould algorithm](http://www.astrouw.edu.pl/~jskowron/cmplx_roots_sg/). 
 
-The number of points calculated for the critical curves is controlled by ```VBBL.NPcrit```, which can be changed by the user according to the desired sampling. The default value is 200.
+The **number of points** calculated for the critical curves is controlled by ```VBBL.NPcrit```, which can be changed by the user according to the desired sampling. The default value is 200.
 
 [Go to: **Limb Darkening**](LimbDarkening.md)

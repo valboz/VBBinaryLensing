@@ -9,41 +9,29 @@ In this section we discuss some technical aspects that can be controlled by an a
 
 Throughout our documentation we have recommended the use of `BinaryMag2` and `ESPLMag2`. These two functions start with a point-source calculation and evaluate the quadrupole correction. If this exceeds a dynamically calculated threshold, then the full extended-source calculation with contour integration is performed. All details about the quadrupole correction and the thresholds to switch from point-source to extended-source are illustrated in [V. Bozza et al., MNRAS 479 (2018) 5157](https://ui.adsabs.harvard.edu/abs/2018MNRAS.479.5157B/abstract). 
 
+## Lower level functions for basic magnification calculations
+
 We already presented the `BinaryMag0` and `PSPLMag` functions for point-source calculations. 
 
 The extended-source calculations are performed by the functions `BinaryMagDark` and `ESPLMagDark`. These functions are called by the parent functions `BinaryMag2` and `ESPLMag2` to perform the contour integration including limb darkening if the quadrupole test indicates that the point-source magnification is inaccurate. Actually, these functions are also directly available to the user who might be interested in them for several reasons. The syntax is very simple:
 
 ```
 Mag = VBBL.BinaryMagDark(s, q, y1, y2, rho, accuracy); // Magnification of a limb-darkened source by a binary lens.
-Mag = VBBL.ESPLMagDark(u, rho); // Magnification of a uniform source by a single lens.
+Mag = VBBL.ESPLMagDark(u, rho); // Magnification of a limb-darkened source by a single lens.
 ```
 
+As explained in the corresponding section, [Limb Darkening](LimbDarkening.md) is obtained by repeating contour integration on concentric annuli. The number and location of the annuli is decided dynamically comparing the accuracy goal with the difference in the results obtained on different contours. 
 
-
+The magnification for a uniform circular source is obtained by the `BinaryMag` and `ESPLMag` functions, which also have a similar syntax
 
 ```
 Mag = VBBL.BinaryMag(s, q, y1, y2, rho, accuracy); // Magnification of a uniform source by a binary lens.
 Mag = VBBL.ESPLMag(u, rho); // Magnification of a uniform source by a single lens.
 ```
 
-
-
-first calculates the point-source magnification through BinaryMag0
-	// Then it evaluates the quadrupole correction. If it is too high, it goes for the full computation.
-	// This is performed by calling BinaryMagDark. This function is also directly available to the user (as it was in v1.0).
-	// Mag = VBBL.BinaryMagDark(s, q, y1, y2, Rs, a1, accuracy); // Note that the limb darkening and the accuracy are required parameters.
-
-	// BinaryMagDark performs contour integration on several annuli. The number and radii of annuli is determined dynamically.
-	// Each contour is treated as a uniform source by a call to the function BinaryMag (also directly available to the user).
-	// Mag = VBBL.BinaryMag(s, q, y1, y2, Rs, accuracy); // Magnification of a uniform source.
-
-	// The use of BinaryMag2 is strongly recommended, since it may save computational time by a factor ranging from 10 to 100.
-	// Useless contour integrations are avoided if the required precision and accuracy are already met 
-	// by the point-source computation.
-
-
-
 ## Number of annuli in limb darkening calculation
+
+The number of annuli depends .................
 
 The functions ```ESPLMag2``` and ```BinaryMag2``` are designed 
 

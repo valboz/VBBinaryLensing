@@ -47,7 +47,7 @@ $$u=\sqrt{y_1^2+y_2^2}$$
 
 $u$ is the source angular separation relative to the lens in Einstein radii, as discussed in the section [Single lenses](SingleLenses.md).
 
-The coordinates of the source are stored in the public properties `VBBL.y_1` and `VBBL.y_2` of the VBBinaryLensing class. For a PSPL model there is rotational symmetry, so we do not care too much about the role of y1 and y2, but this notation is consistent with that used for binary lenses. The information on the source position can be useful to draw plots with the source trajectory relative to the caustics.
+The coordinates of the source at time $t$ as found by these formulae are stored in the public properties `VBBL.y_1` and `VBBL.y_2` of the VBBinaryLensing class. For a PSPL model there is rotational symmetry, so we do not care too much about the role of y1 and y2, but this notation is consistent with that used for binary lenses. The information on the source position can be useful to draw plots with the source trajectory relative to the caustics.
 
 ## Extended-Source-Point-Lens light curve
 

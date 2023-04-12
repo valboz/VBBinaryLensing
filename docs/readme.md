@@ -1,8 +1,6 @@
 
 # Documentation
 
-**Warning: This documentation is still provisional. We hope to conclude it by mid-March 2023.**
-
 In this document we will describe all use cases of the VBBinaryLensing library and provide ready-to-use examples that you can copy/paste to your code. 
 
 ## Quick start

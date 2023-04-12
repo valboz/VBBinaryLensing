@@ -24,7 +24,7 @@ Here is an example of use of `BinaryLightCurveOrbital`:
 ```
 VBBinaryLensing VBBL; // Declare instance to VBBinaryLensing
 
-double pr[9]; // Array of parameters
+double pr[12]; // Array of parameters
 double s, q, u0, alpha, rho, tE, t0, paiN, paiE, g1, g2, g3, t;
 
 VBBL.SetObjectCoordinates("OB151212coords.txt", ".");  // Read target coordinates in file

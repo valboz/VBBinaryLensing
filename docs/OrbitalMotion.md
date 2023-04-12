@@ -2,7 +2,7 @@
 
 # Orbital motion
 
-Binary lenses orbit around the common center of mass. If the microlensing event is long enough, we cannot neglect this effect. However, as long as this effect remains small, most orbital parameters remain unconstrained. Rather than adding too many dimensions to our parameter space, in order to describe the subtle deviations in our microlensing event, it can be sufficient to restrict to circular orbits.
+Binary lenses orbit around the common center of mass. If the microlensing event is long enough, we should take orbital motion into account. However, to first order, microlensing is only sensitive to changes in the projected separation and orientation of the binary lenses, while most orbital parameters remain unconstrained. Rather than adding too many dimensions to our parameter space, in order to describe the subtle deviations in our microlensing event, it can be sufficient to restrict to circular orbits.
 
 VBBinaryLensing offers two functions:
 

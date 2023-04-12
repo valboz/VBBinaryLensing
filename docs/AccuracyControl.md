@@ -28,7 +28,7 @@ printf("Magnification (accuracy at 1.e-4) = %lf\n", Mag); // Output should be 18
 
 ## Precision control
 
-In general, the photometric precision of ground observatories is around 0.001. Therefore, it makes sense to set a relative precision goal, instead of an asbolute accuracy goal. This is set by ```VBBL.RelTol```. The result will be ```Mag```$\pm$ ```Mag*VBBL.RelTol``` (relative precision).
+In general, the photometric precision of ground observatories is not better than 0.001. Therefore, it makes sense to set a relative precision goal, instead of an asbolute accuracy goal. This is set by ```VBBL.RelTol```. The result will be ```Mag```$\pm$ ```Mag*VBBL.RelTol``` (relative precision).
 
 For example, let us set a poor 10% precision, just to see the difference:
 

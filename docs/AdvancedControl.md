@@ -31,16 +31,19 @@ Mag = VBBL.ESPLMag(u, rho); // Magnification of a uniform source by a single len
 
 ## Number of annuli in limb darkening calculation
 
-The number of annuli depends .................
+The number of annuli used in any magnification calculation in VBBinaryLensing is reported through the property `VBBL.nannuli`. This can be a useful diagnostics to know how deep had to go the calculation to meet the required accuracy.
 
-The functions ```ESPLMag2``` and ```BinaryMag2``` are designed 
+Furthermore, there are exceptional situations in which huge sources cover tiny caustics. If both the center and the margin of the source are far from the caustic, there is a chance that `BinaryMag2` does not judge worthwhile to insert any annuli in-between, therefore missing the subtle perturbation by the caustic. In these cases, the user may force VBBinaryLensing to use a minimum number of annuli by changing  `VBBL.minannuli`. 
 
-	// After each calculation, the number of annuli used is available in VBBL.nannuli.
-	// If you are probing extremely tiny caustics with very large sources, you may impose a minimum number of annuli.
-	// Before your calculation, just set
-	// VBBL.minannuli=2; //or whatever you need 
-	// The total number of points used is available in VBBL.NPS
-	printf("Annuli used: %d\nTotal number of points: %d\n", VBBL.nannuli, VBBL.NPS);
+For example, by setting 
+
+`VBBL.minannuli = 2;`
+
+there will always be one annulus between the center and the boundary of the source.
+
+..........................
+
+// The total number of points used is available in VBBL.NPS
 
 
 	//////////////////////////////////////////

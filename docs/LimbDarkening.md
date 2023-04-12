@@ -92,7 +92,7 @@ Mag = VBBL.BinaryMag2(s, q, y1, y2, Rs);
 printf("Magnification with user-defined LD profile = %lf\n", Mag);  // Output should be 18.2712.....
 ```
 
-```VBBL.SetLDprofile``` with two parameters requires the location of the function as the first parameter and the number of points in the grid as the second parameter. The limb darkening law is then pre-calculated on this grid in order to perform all subsequent extended source calculations.
+Note that the two-parameters version of ```VBBL.SetLDprofile``` requires the location of the function as the first parameter and the number of points in the grid as the second parameter. The limb darkening law is then pre-calculated on this grid in order to perform all subsequent extended source calculations.
 
 **Warning**: the user-defined limb darkening is not available in the Python version of VBBinaryLensing.
 

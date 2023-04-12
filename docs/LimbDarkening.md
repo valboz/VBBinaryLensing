@@ -18,7 +18,7 @@ In order to use linear limb darkening in all calculations with extended sources 
 
 ```
 VBBL.a1 = 0.51; // Linear limb darkening coefficient. 
-Mag = VBBL.BinaryMag2(s, q, y1, y2, Rs); // Call to the BinaryMag2
+Mag = VBBL.BinaryMag2(s, q, y1, y2, Rs); // Call to the BinaryMag2 with the same parameter as in the previous section
 printf("Magnification with limb darkened source = %lf\n", Mag);  // Output should be 18.27.....
 ```
 

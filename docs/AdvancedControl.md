@@ -45,24 +45,35 @@ there will always be one annulus between the center and the boundary of the sour
 
 As metioned before, the basic function for contour integration of a uniform source in binary lensing is `BinaryMag`. The inversion of the lens equation is performed on a sample of points on the source boundary. The number and location of points on the source boundary is optimized by a careful estimate of the errors committed in the magnification calculation (see  [V. Bozza, MNRAS 408 (2010) 2188](https://ui.adsabs.harvard.edu/abs/2010MNRAS.408.2188B/abstract) for all details about the algorithm).
 
+### Total number of points in contours
+
 The total number of points on which the lens equation inversion is performed is reported by `VBBL.NPS`. This diagnostics gives the possibility to quantify the computational load of a particular calculation. After a call to `BinaryMag`, `VBBL.NPS` reports the number of points on the source boundary. After a call to `BinaryMagDark`, `VBBL.NPS` reports the total number of points on all annuli used for the limb darkened magnification. After a call to `BinaryMag2`, `VBBL.NPS` reports the total number of points used: either 1 for a point-source or the total number needed for the extended-source calculation.
 
-Another important diagnostics only available with `BinaryMag` is the error estimate `VBBL.therr`. In fact, the sampling on the source boundary continues until the estimated error falls below the accuracy or precision thresholds fixed by `VBBL.Tol` and `VBBL.RelTol` (see [Accuracy Control](AccuracyControl.md)). However, when the input parameters are pushed to extreme values, numerical errors will eventually dominate and preclude any possibilities to meet the desired accuracy. `BinaryMag` will always try to return a reasonable estimate of the magnification by discarding problematic points on the source boundary. This comes to the cost of leaving unavoidable errors in the final result. Therefore, `VBBL.therr` can track such occurrences and report an error estimate that can be useful in these particular situations.
+### Setting the total number of points
 
+`BinaryMag` increases the number of points in the sampling of the source boundary until the estimated error falls below the accuracy or precision thresholds fixed by `VBBL.Tol` and `VBBL.RelTol` (see [Accuracy Control](AccuracyControl.md)). Actually, the accuracy also appear as an explicit parameter in the function syntax:
 
+```
+Mag = VBBL.BinaryMag(s, q, y1, y2, rho, accuracy); // Magnification of a uniform source by a binary lens to the specified accuracy.
+```
 
-in a single call of any of the functions `BinaryMag`
+After the function call, `VBBL.Tol` is updated to the accuracy specified in the call.
 
-..........................
+However, the behavior of the function changes if an accuracy greater than 1 is specified. In this case, the accuracy value becomes the number of points to be used in the sampling of the source boundary. For example,  `VBBL.BinaryMag(s, q, y1, y2, rho, 100);` will calculate the magnification on a boundary with 100 sampling points. The location of the points is still chosen so as to minimize the total error. 
 
-// The total number of points used is available in VBBL.NPS
+This variant of `BinaryMag` can be useful to check how the algorithm proceeds up to a given density of the sampling and identify possible sources of errors.
 
+### Estimated error
 
-	//////////////////////////////////////////
-	// Parameters range
-	//////////////////////////////////////////
+Another important diagnostics only available with `BinaryMag` is the error estimate `VBBL.therr`. The sampling on the source boundary is increased until the estimated error falls below the accuracy or precision thresholds fixed by `VBBL.Tol` and `VBBL.RelTol` (see [Accuracy Control](AccuracyControl.md)). However, when the input parameters are pushed to extreme values, numerical errors will eventually dominate and preclude any possibilities to meet the desired accuracy. `BinaryMag` will always try to return a reasonable estimate of the magnification by discarding problematic points on the source boundary. This comes to the cost of leaving irreducible errors in the final result. Therefore, `VBBL.therr` can track such occurrences and report an error estimate that can be useful in these particular situations.
 
-	// Testing has been performed with 1.e-9 <= q <= 1
+## Parameters range
+
+VBBinaryLensing has been widely tested with particular attention on caustic crossings and all source positions close to caustics. Here we report the recommended ranges of parameters for `BinaryMag2`.
+
+Mass ratio: testing has been performed with $10^{-9} \leq q \leq 1$.
+
+	// 
 	// Failures (errors larger than declared Tolerance) are below 1 in 1000 caustic crossings in the ranges
 	// 0.01< s < 10 for q=1.0
 	// 0.1 < s < 4 for q=1.e-9
@@ -70,8 +81,10 @@ in a single call of any of the functions `BinaryMag`
 	// Above ranges apply to source radius between 1.e-3 to 1.0. 
 	// Outside this range the robustness gradually degrades, 
 	// but we typically obtain very good results for reasonable values of s and q.
-	
-	
+
+Note that lower level functions such as `BinaryMag` and `BinaryMagDark` may have local failures which do not appear in `BinaryMag2`, which takes care of these particular cases.
+
+
 		//////////////////////////////////////////
 	// Image contours
 	//////////////////////////////////////////

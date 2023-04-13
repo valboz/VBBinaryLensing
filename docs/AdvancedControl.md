@@ -2,8 +2,6 @@
 
 In this section we discuss some technical aspects that can be controlled by an advanced user.
 
-## Implementation notes on BinaryMag2 and ESPLMag2
-
 Throughout our documentation we have recommended the use of `BinaryMag2` and `ESPLMag2`. These two functions start with a point-source calculation and evaluate the quadrupole correction. If this exceeds a dynamically calculated threshold, then the full extended-source calculation with contour integration is performed. All details about the quadrupole correction and the thresholds to switch from point-source to extended-source are illustrated in [V. Bozza et al., MNRAS 479 (2018) 5157](https://ui.adsabs.harvard.edu/abs/2018MNRAS.479.5157B/abstract). 
 
 ## Lower level functions for basic magnification calculations

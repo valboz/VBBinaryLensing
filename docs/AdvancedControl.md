@@ -8,7 +8,7 @@ Throughout our documentation we have recommended the use of `BinaryMag2` and `ES
 
 ## Lower level functions for basic magnification calculations
 
-The parent functions `BinaryMag2` and `ESPLMag2` call lower level functions for individual calculations. We already presented the `BinaryMag0` and `PSPLMag` functions for point-source calculations. 
+The parent functions `BinaryMag2` and `ESPLMag2` call lower level functions for individual calculations. We already presented the `BinaryMag0` ([Binary Lenses section](BinaryLenses.md)) and `PSPLMag` ([Single Lenses section](SingleLenses.md)) functions for point-source calculations. 
 
 Whenever the quadrupole test indicates that the point-source is inaccurate, the functions `BinaryMagDark` or `ESPLMagDark` are called to perform extended-source calculations including limb darkening. Also these functions are directly available to the user who might be interested in them for several reasons. The syntax is very simple:
 

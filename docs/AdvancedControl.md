@@ -1,6 +1,3 @@
-
-**Work in progress here**
-
 # Advanced control
 
 In this section we discuss some technical aspects that can be controlled by an advanced user.
@@ -11,9 +8,9 @@ Throughout our documentation we have recommended the use of `BinaryMag2` and `ES
 
 ## Lower level functions for basic magnification calculations
 
-We already presented the `BinaryMag0` and `PSPLMag` functions for point-source calculations. 
+The parent functions `BinaryMag2` and `ESPLMag2` call lower level functions for individual calculations. We already presented the `BinaryMag0` and `PSPLMag` functions for point-source calculations. 
 
-The extended-source calculations are performed by the functions `BinaryMagDark` and `ESPLMagDark`. These functions are called by the parent functions `BinaryMag2` and `ESPLMag2` to perform the contour integration including limb darkening if the quadrupole test indicates that the point-source magnification is inaccurate. Actually, these functions are also directly available to the user who might be interested in them for several reasons. The syntax is very simple:
+Whenever the quadrupole test indicates that the point-source is inaccurate, the functions `BinaryMagDark` or `ESPLMagDark` are called to perform extended-source calculations including limb darkening. Also these functions are directly available to the user who might be interested in them for several reasons. The syntax is very simple:
 
 ```
 Mag = VBBL.BinaryMagDark(s, q, y1, y2, rho, accuracy); // Magnification of a limb-darkened source by a binary lens.
@@ -22,12 +19,14 @@ Mag = VBBL.ESPLMagDark(u, rho); // Magnification of a limb-darkened source by a 
 
 As explained in the corresponding section, [Limb Darkening](LimbDarkening.md) is obtained by repeating contour integration on concentric annuli. The number and location of the annuli is decided dynamically comparing the accuracy goal with the difference in the results obtained on different contours. 
 
-The magnification for a uniform circular source is obtained by the `BinaryMag` and `ESPLMag` functions, which also have a similar syntax
+Both functions `BinaryMagDark` and `ESPLMagDark` call lower level functions to perform each individual contour integration on a uniform disk source. Such lower level functions are `BinaryMag` and `ESPLMag`, which are also accessible to the user and have a similar syntax
 
 ```
 Mag = VBBL.BinaryMag(s, q, y1, y2, rho, accuracy); // Magnification of a uniform source by a binary lens.
 Mag = VBBL.ESPLMag(u, rho); // Magnification of a uniform source by a single lens.
 ```
+
+These functions are particularly useful for diagnostics on particular cases and for overriding the high-level control offered by `BinaryMag2` and `ESPLMag2`, if necessary. 
 
 ## Advanced contol in limb darkening
 

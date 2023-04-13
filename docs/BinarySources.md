@@ -86,7 +86,7 @@ Mag = VBBL.BinSourceSingleLensXallarap(pr, t); // Calculates the Binary Source m
 printf("Binary Source Light Curve at time t: %lf", Mag); // Output should be 2.70...
 ```
 
-In this function we are assuming that all properties of the sources can be deduced by their mass ratio. This is strictly true only if the two components obey some mass-luminosity and mass-radius relation. We are assuming $L \sim M^4$ and $R \sim M^{0.89}$, which are good for solar mass main sequence stars. Therefore, we just need to specify the mass ratio $q_s$ and the flux ratios and the radius ratio of the two stars will follow. If you want different exponents, you can modify the relations by hand in the source code.
+In this function we are assuming that all properties of the sources can be deduced by their mass ratio. This is strictly true only if the two components obey some mass-luminosity and mass-radius relation. We are assuming $L \sim M^4$ and $R \sim M^{0.89}$, which are good for solar mass main sequence stars. Therefore, we just need to specify the mass ratio $q_s$ and the flux and radius ratios of the two stars will follow. If you want different exponents, you can modify the relations by hand in the source code.
 
 Xallarap is also available for binary lenses through the `BinSourceBinaryLensXallarap` function. In this case, the parameters are 13 with the seven parameters for the [static binary lens](BinaryLenses.md) followed by the six parameters for the xallarap.
 

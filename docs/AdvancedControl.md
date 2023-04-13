@@ -51,7 +51,7 @@ The total number of points on which the lens equation inversion is performed is 
 ### Setting the total number of points
 
 `BinaryMag` increases the number of points in the sampling of the source boundary until the estimated error falls below the accuracy or precision thresholds fixed by `VBBL.Tol` and `VBBL.RelTol` (see [Accuracy Control](AccuracyControl.md)). Actually, the accuracy also appear as an explicit parameter in the function syntax
-`VBBL.BinaryMag(s, q, y1, y2, rho, accuracy);`. After the function call, `VBBL.Tol` is updated to the accuracy specified in the call.
+`VBBL.BinaryMag(s, q, y1, y2, rho, accuracy);` After the function call, `VBBL.Tol` is updated to the accuracy specified in the call.
 
 However, the behavior of the function changes if an accuracy greater than 1 is specified. In this case, the accuracy parameter becomes the number of points to be used in the sampling of the source boundary. For example,  `VBBL.BinaryMag(s, q, y1, y2, rho, 100);` will calculate the magnification on a boundary with 100 sampling points. The location of the points is still chosen so as to minimize the total error. 
 

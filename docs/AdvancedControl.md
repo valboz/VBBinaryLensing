@@ -73,16 +73,18 @@ VBBinaryLensing has been widely tested with particular attention on caustic cros
 
 Mass ratio: testing has been performed with $10^{-9} \leq q \leq 1$.
 
-	// 
-	// Failures (errors larger than declared Tolerance) are below 1 in 1000 caustic crossings in the ranges
-	// 0.01< s < 10 for q=1.0
-	// 0.1 < s < 4 for q=1.e-9
-	// y1 and y2 may vary from 0 to 500 without any failures.
-	// Above ranges apply to source radius between 1.e-3 to 1.0. 
-	// Outside this range the robustness gradually degrades, 
-	// but we typically obtain very good results for reasonable values of s and q.
+Failures (errors larger than accuracy goal specified by `VBBL.Tol`) are below 1 in 1000 caustic crossings in the following ranges
 
-Note that lower level functions such as `BinaryMag` and `BinaryMagDark` may have local failures which do not appear in `BinaryMag2`, which takes care of these particular cases.
+$0.01< s < 10$ for $q = 1.0$
+$0.1 < s < 4$ for $q=10^{-9}$
+
+For intermediate mass ratios, these ranges can be easily interpolated.
+
+Concerning the source coordinates $y1$ and $y2$, we have found no restrictions.
+
+Above ranges apply to source radii $10^{-3}\leq \rho \leq 1.0$. Outside this range, the robustness slowly degrades.
+
+Finally, we note that lower level functions such as `BinaryMag` and `BinaryMagDark` may have local failures which do not appear in `BinaryMag2`, which takes care of these particular cases.
 
 
 		//////////////////////////////////////////

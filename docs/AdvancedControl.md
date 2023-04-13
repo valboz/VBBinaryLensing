@@ -76,33 +76,35 @@ Mass ratio: testing has been performed with $10^{-9} \leq q \leq 1$.
 Failures (errors larger than accuracy goal specified by `VBBL.Tol`) are below 1 in 1000 caustic crossings in the following ranges
 
 $0.01< s < 10$ for $q = 1.0$
+
 $0.1 < s < 4$ for $q=10^{-9}$
 
 For intermediate mass ratios, these ranges can be easily interpolated.
 
-Concerning the source coordinates $y1$ and $y2$, we have found no restrictions.
+Concerning the source coordinates $y_1$ and $y_2$, we have found no restrictions.
 
 Above ranges apply to source radii $10^{-3}\leq \rho \leq 1.0$. Outside this range, the robustness slowly degrades.
 
 Finally, we note that lower level functions such as `BinaryMag` and `BinaryMagDark` may have local failures which do not appear in `BinaryMag2`, which takes care of these particular cases.
 
+## Image contours
 
-		//////////////////////////////////////////
-	// Image contours
-	//////////////////////////////////////////
+In classical microlensing, only the total magnification and the astrometric centroid are of interest. However, for illustration purposes or for particular diagnostics, we may be interested in the individual image contours. These can be retrieved by the lowest level versions of `BinaryMag` and `BinaryMag0`, as shown in this example, which prints the points on the image boundaries to an ASCII file.
 
-	// If you want the shapes of the contours of the images there are low-level versions of BinaryMag and BinaryMag0.
-	// This example calculates the magnification and stores the contours in Images. Then the cycle exports the contours in a ASCII file.
-	//_sols *Images;
-	//FILE *f;
-	//
-	//Mag=VBBL.BinaryMag(s,q,y1,y2,Rs,accuracy,&Images);
-	//f=fopen("outcurves.txt","w");
-	//for(_curve *c=Images->first;c;c=c->next){
-	//	for(_point *p=c->first;p;p=p->next){
-	//		fprintf(f,"%.16lf %.16lf\n",p->x1,p->x2);
-	//	}
-	//	fprintf(f,"c\n");
-	//}
-	//fclose(f);
-	//delete Images;
+```
+_sols *Images;
+FILE *f;
+
+Mag=VBBL.BinaryMag(s,q,y1,y2,Rs,accuracy,&Images);
+f=fopen("outcurves.txt","w");
+for(_curve *c=Images->first;c;c=c->next){
+   for(_point *p=c->first;p;p=p->next){
+      fprintf(f,"%.16lf %.16lf\n",p->x1,p->x2);
+   }
+   fprintf(f,"c\n");
+}
+fclose(f);
+delete Images;
+```
+
+The `_sols`, `_curve` and `_point` classes have been already introduced in the [CriticalCurves](CriticalCurves.md) section. Each curve is an image boundary with a given parity. Merging images at caustic crossings will thus be described by two curves, one for the positive parity side and one for the negative parity side.

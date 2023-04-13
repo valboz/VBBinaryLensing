@@ -101,4 +101,4 @@ fclose(f);
 delete Images;
 ```
 
-The `_sols`, `_curve` and `_point` classes have been already introduced in the [CriticalCurves](CriticalCurves.md) section. Each curve is an image boundary with a given parity. Merging images at caustic crossings will thus be described by two curves, one for the positive parity side and one for the negative parity side.
+The `_sols`, `_curve` and `_point` classes have been already introduced in the [Critical Curves](CriticalCurvesAndCaustics.md) section. Each curve is an image boundary with a given parity. Merging images at caustic crossings will thus be described by two curves, one for the positive parity side and one for the negative parity side.

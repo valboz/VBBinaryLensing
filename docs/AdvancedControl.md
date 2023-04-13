@@ -29,7 +29,7 @@ Mag = VBBL.BinaryMag(s, q, y1, y2, rho, accuracy); // Magnification of a uniform
 Mag = VBBL.ESPLMag(u, rho); // Magnification of a uniform source by a single lens.
 ```
 
-## Number of annuli in limb darkening calculation
+## Advanced contol in limb darkening
 
 The number of annuli used in any magnification calculation in VBBinaryLensing is reported through the property `VBBL.nannuli`. This can be a useful diagnostics to know how deep had to go the calculation to meet the required accuracy.
 
@@ -40,6 +40,18 @@ For example, by setting
 `VBBL.minannuli = 2;`
 
 there will always be one annulus between the center and the boundary of the source.
+
+## Advanced control in contour integration
+
+As metioned before, the basic function for contour integration of a uniform source in binary lensing is `BinaryMag`. The inversion of the lens equation is performed on a sample of points on the source boundary. The number and location of points on the source boundary is optimized by a careful estimate of the errors committed in the magnification calculation (see  [V. Bozza, MNRAS 408 (2010) 2188](https://ui.adsabs.harvard.edu/abs/2010MNRAS.408.2188B/abstract) for all details about the algorithm).
+
+The total number of points on which the lens equation inversion is performed is reported by `VBBL.NPS`. This diagnostics gives the possibility to quantify the computational load of a particular calculation. After a call to `BinaryMag`, `VBBL.NPS` reports the number of points on the source boundary. After a call to `BinaryMagDark`, `VBBL.NPS` reports the total number of points on all annuli used for the limb darkened magnification. After a call to `BinaryMag2`, `VBBL.NPS` reports the total number of points used: either 1 for a point-source or the total number needed for the extended-source calculation.
+
+Another important diagnostics only available with `BinaryMag` is the error estimate `VBBL.therr`. In fact, the sampling on the source boundary continues until the estimated error falls below the accuracy or precision thresholds fixed by `VBBL.Tol` and `VBBL.RelTol` (see [Accuracy Control](AccuracyControl.md)). However, when the input parameters are pushed to extreme values, numerical errors will eventually dominate and preclude any possibilities to meet the desired accuracy. `BinaryMag` will always try to return a reasonable estimate of the magnification by discarding problematic points on the source boundary. This comes to the cost of leaving unavoidable errors in the final result. Therefore, `VBBL.therr` can track such occurrences and report an error estimate that can be useful in these particular situations.
+
+
+
+in a single call of any of the functions `BinaryMag`
 
 ..........................
 

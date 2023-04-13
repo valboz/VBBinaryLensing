@@ -32,7 +32,7 @@ These functions are particularly useful for diagnostics on particular cases and 
 
 The number of annuli used in any magnification calculation on a limb-darkened source in VBBinaryLensing is reported through the property `VBBL.nannuli`. This can be a useful diagnostics to know how deep the calculation had to go in order to meet the required accuracy.
 
-Furthermore, there are exceptional situations in which huge sources cover tiny caustics. If both the center and the margin of the source are far from the caustic, there is a chance that `BinaryMag2` does not judge worthwhile to insert any annuli in-between, therefore missing the subtle perturbation by the caustic. In these cases, the user may force VBBinaryLensing to use a minimum number of annuli by changing  `VBBL.minannuli`. 
+Furthermore, there are exceptional situations in which huge sources cover tiny caustics. If both the center and the margin of the source are far from the caustic, there is a chance that `BinaryMag2` does not judge worthwhile to insert any annuli in-between, thereby missing the subtle perturbation by the caustic. In these cases, the user may force VBBinaryLensing to use a minimum number of annuli by changing  `VBBL.minannuli`. 
 
 For example, by setting 
 

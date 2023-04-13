@@ -42,4 +42,10 @@ If you do not want to use relative precision, just set ```VBBL.RelTol = 0;``` wh
 
 In general, the calculation stops when the first of the two goals is reached, either absolute accuracy or relative precision.
 
+## Accuracy in astrometry
+
+VBBinaryLensing allows full direct control on the accuracy of the magnification calculation. The accuracy on the astrometric centroid calculation scales similarly, but is also affected by the source size. As discussed in [V. Bozza, E. Khalouei and E. Bachelet, MNRAS 505 (2021) 126](https://ui.adsabs.harvard.edu/abs/2021MNRAS.505..126B/abstract), a useful formula to track the astrometric accuracy $\delta_{ast}$ as a function of the magnification accuracy $\delta_{phot}$ is
+
+$$\delta_{ast} \simeq 50 \rho ~ \delta_{phot}$$ 
+
 [Go to **Light Curve Functions**](LightCurves.md)

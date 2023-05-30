@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.5 (2023)
+// VBBinaryLensing v3.6 (2023)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -53,6 +53,7 @@ namespace VBBinaryLensingLibrary {
 	class VBBinaryLensing
 #endif
 	{
+	protected:
 		int *ndatasat;
 		double **tsat,***possat;
 		double Mag0, corrquad, corrquad2, safedist;
@@ -102,7 +103,7 @@ namespace VBBinaryLensingLibrary {
 		double BinaryMag(double s,double q,double y1,double y2,double rho,double accuracy, _sols **Images);
 		double BinaryMag(double s,double q ,double y1,double y2,double rho,double accuracy);
 		double BinaryMag2(double s, double q, double y1, double y2, double rho);
-		double BinaryMagDark(double s, double q, double y1, double y2, double rho, double a1,double accuracy);
+		double BinaryMagDark(double s, double q, double y1, double y2, double rho,double accuracy);
 		void BinaryMagMultiDark(double s, double q, double y1, double y2, double rho, double *a1_list, int n_filters, double *mag_list, double accuracy);
 
 	// Limb Darkening control
@@ -114,7 +115,7 @@ namespace VBBinaryLensingLibrary {
 		void LoadESPLTable(char *tablefilename);
 		double ESPLMag(double u, double rho);
 		double ESPLMag2(double u, double rho);
-		double ESPLMagDark(double u, double rho, double a1);
+		double ESPLMagDark(double u, double rho);
 		double PSPLMag(double u);
 
 

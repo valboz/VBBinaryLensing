@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.5 (2023)
+// VBBinaryLensing v3.6 (2023)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -893,7 +893,7 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 		Mag = Mag0;
 	}
 	else {
-		Mag = BinaryMagDark(s, q, y1v, y2a, rho, a1, Tol);
+		Mag = BinaryMagDark(s, q, y1v, y2a, rho, Tol);
 	}
 	Mag0 = 0;
 
@@ -905,7 +905,7 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 }
 
 
-double VBBinaryLensing::BinaryMagDark(double a, double q, double y1, double y2, double RSv, double a1, double Tolnew) {
+double VBBinaryLensing::BinaryMagDark(double a, double q, double y1, double y2, double RSv, double Tolnew) {
 	static double Mag, Magold, Tolv;
     static double LDastrox1,LDastrox2;
 	static double tc, lc, rc, cb,rb;
@@ -1094,7 +1094,8 @@ void VBBinaryLensing::BinaryMagMultiDark(double a, double q, double y1, double y
 	for (int i = 1; i < nfil; i++) {
 		if (a1_list[i] > a1_list[imax]) imax = i;
 	}
-	mag_list[imax] = BinaryMagDark(a, q, y1, y2, RSv, a1_list[imax], Tol);
+	a1 = a1_list[imax];
+	mag_list[imax] = BinaryMagDark(a, q, y1, y2, RSv, Tol);
 
 	for (int i = 0; i < nfil; i++) {
 		if (i != imax) {
@@ -1415,13 +1416,13 @@ double VBBinaryLensing::ESPLMag2(double u, double rho) {
 		}
 	}
 	else {
-		Mag = ESPLMagDark(u, rho, a1);
+		Mag = ESPLMagDark(u, rho);
 	}
 	Mag0 = 0;
 	return Mag;
 }
 
-double VBBinaryLensing::ESPLMagDark(double u, double RSv, double a1) {
+double VBBinaryLensing::ESPLMagDark(double u, double RSv) {
 	double Mag = -1.0, Magold = 0., Tolv = Tol;
 	double tc, rb, lc, rc, cb,u2;
 	int c = 0, flag;
@@ -2881,11 +2882,23 @@ _curve* VBBinaryLensing::NewImages(complex yi, complex* coefs, _theta* theta) {
 	}
 	if (checkJac != -1) {
 //		printf("\ncheckJac!");
-		_point *scan2;
-		for (scan = Prov->first; scan; scan = scan2) {
-			scan2 = scan->next;
-			Prov->drop(scan);
-			delete scan;
+		if (theta->th < 0) {
+			dJ = 0;
+			for (scan = Prov->first; scan; scan = scan->next) {
+				dJ = dJ+ 1 / fabs(scan->dJ);
+			}
+			if (fabs(dJ.re - 1) < Tol) {
+				checkJac = -1;
+				corrquad = 0;
+			}
+		}
+		if(checkJac!=-1){
+			_point* scan2;
+			for (scan = Prov->first; scan; scan = scan2) {
+				scan2 = scan->next;
+				Prov->drop(scan);
+				delete scan;
+			}
 		}
 	}
 	return Prov;

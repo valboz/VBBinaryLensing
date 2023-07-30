@@ -2810,7 +2810,7 @@ _curve* VBBinaryLensing::NewImages(complex yi, complex* coefs, _theta* theta) {
 
 	} 
 	else { 
-		if (good[worst2]*dlmax > good[worst3] + 1.e-12) { // Dubious cases. Better exclude them
+		 if (good[worst2]*dlmax > good[worst3] + 1.e-12 && theta->th>=0) { // Dubious cases. Better exclude them
 			return Prov;
 		}
 		else {		// 5 good roots

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=42", "wheel", "pybind11~=2.6.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -22,9 +22,8 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "pytest",
-    "pybind11",
-    "setuptools",
+    "pytest",  # FIXME: Testing packages is not usually a dependency unless you
+               #         expect your users to run tests.
     "sphinx-astropy",
 ]
 

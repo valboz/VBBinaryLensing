@@ -9,6 +9,8 @@ version = "3.6.1"
 keywords = ['Microlsening magnification and astrometry']
 authors = [
     { name = "Valerio Bozza", email = "valboz@sa.infn.it" },
+    { name = "Fran Bartolić", email = "fb90@st-andrews.ac.uk" },
+    { name = "Etienne Bachelet", email = "etibachelet@gmail.com" },
 ]
 license = { text = "GPL-3.0" }
 requires-python = ">=3.6,<4"

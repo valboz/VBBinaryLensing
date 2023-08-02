@@ -33,3 +33,8 @@ dependencies = [
 Homepage = "https://github.com/valboz/VBBinaryLensing"
 Documentation = "https://www.fisica.unisa.it/gravitationastrophysics/VBBinaryLensing.htm"
 
+[tool.setuptools.packages.find]
+exclude=["tests"]  # FIXME: Remove if you want users use `from VBBinaryLensing import tests`
+
+[tool.setuptools.package-data]
+"VBBinaryLensing.data" = ["*"]

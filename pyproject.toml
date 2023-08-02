@@ -24,8 +24,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "pytest",  # FIXME: Testing packages is not usually a dependency unless you
-               #         expect your users to run tests.
+    "pytest",
     "sphinx-astropy",
 ]
 
@@ -34,7 +33,8 @@ Homepage = "https://github.com/valboz/VBBinaryLensing"
 Documentation = "https://www.fisica.unisa.it/gravitationastrophysics/VBBinaryLensing.htm"
 
 [tool.setuptools.packages.find]
-exclude=["tests"]  # FIXME: Remove if you want users use `from VBBinaryLensing import tests`
+where = ["."]
+
 
 [tool.setuptools.package-data]
-"VBBinaryLensing.data" = ["*"]
+"VBBinaryLensing.data" = ["data/*"]

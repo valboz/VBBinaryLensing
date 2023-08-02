@@ -1,5 +1,4 @@
 import sys
-from pathlib import Path
 
 import setuptools
 from pybind11.setup_helpers import Pybind11Extension
@@ -9,11 +8,13 @@ from setuptools.command.build_ext import build_ext
 ext_modules = [
     Pybind11Extension(
         # Import package name
-        name="VBBinaryLensing",
+        name="VBBinaryLensing.VBBinaryLensing",
 
         # List of C++ source code
-        # Sort source files for reproducibility
-        sources=sorted(Path("VBBinaryLensing/lib/").glob("*.cpp")),
+        sources=[
+            'VBBinaryLensing/lib/python_bindings.cpp',
+            'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'
+        ],
 
         # Path to dir of C++ headers
         include_dirs=["VBBinaryLensing/lib/"],

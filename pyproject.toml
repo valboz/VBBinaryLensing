@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "VBBinaryLensing"
 description = "VBBinaryLensing is a tool for efficient computation in gravitational microlensing events using the advanced contour integration method, supporting single and binary lenses."
-version = "3.6.1"
+version = "3.6.2"
 keywords = ['Microlsening magnification and astrometry']
 authors = [
     { name = "Valerio Bozza", email = "valboz@sa.infn.it" },

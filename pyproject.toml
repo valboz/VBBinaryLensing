@@ -35,6 +35,5 @@ Documentation = "https://www.fisica.unisa.it/gravitationastrophysics/VBBinaryLen
 [tool.setuptools.packages.find]
 where = ["."]
 
-
 [tool.setuptools.package-data]
 "VBBinaryLensing.data" = ["data/*"]

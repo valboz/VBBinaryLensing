@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=42", "wheel", "pybind11~=2.6.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,6 +9,8 @@ version = "3.6.1"
 keywords = ['Microlsening magnification and astrometry']
 authors = [
     { name = "Valerio Bozza", email = "valboz@sa.infn.it" },
+    { name = "Fran Bartolić", email = "fb90@st-andrews.ac.uk" },
+    { name = "Etienne Bachelet", email = "etibachelet@gmail.com" },
 ]
 license = { text = "GPL-3.0" }
 requires-python = ">=3.6,<4"
@@ -23,8 +25,6 @@ classifiers = [
 dependencies = [
     "numpy",
     "pytest",
-    "pybind11",
-    "setuptools",
     "sphinx-astropy",
 ]
 
@@ -32,3 +32,9 @@ dependencies = [
 Homepage = "https://github.com/valboz/VBBinaryLensing"
 Documentation = "https://www.fisica.unisa.it/gravitationastrophysics/VBBinaryLensing.htm"
 
+[tool.setuptools.packages.find]
+where = ["."]
+
+
+[tool.setuptools.package-data]
+"VBBinaryLensing.data" = ["data/*"]

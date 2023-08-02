@@ -1,37 +1,22 @@
-from setuptools import setup, Extension, find_packages
-from setuptools.command.build_ext import build_ext
 import sys
+from pathlib import Path
+
 import setuptools
-import os
-
-__version__ = '3.6.1'
-
-
-class get_pybind_include(object):
-    """Helper class to determine the pybind11 include path
-
-    The purpose of this class is to postpone importing pybind11
-    until it is actually installed, so that the ``get_include()``
-    method can be invoked. """
-
-    def __init__(self, user=False):
-        self.user = user
-
-    def __str__(self):
-        import pybind11
-        return pybind11.get_include(self.user)
-
+from pybind11.setup_helpers import Pybind11Extension
+from setuptools import setup
+from setuptools.command.build_ext import build_ext
 
 ext_modules = [
-    Extension(
-        'VBBinaryLensing',
-        ['VBBinaryLensing/lib/python_bindings.cpp', 'VBBinaryLensing/lib/VBBinaryLensingLibrary.cpp'],
-        include_dirs=[
-            # Path to pybind11 headers
-            get_pybind_include(),
-            get_pybind_include(user=True)
-        ],
-        language='c++'
+    Pybind11Extension(
+        # Import package name
+        name="VBBinaryLensing",
+
+        # List of C++ source code
+        # Sort source files for reproducibility
+        sources=sorted(Path("VBBinaryLensing/lib/").glob("*.cpp")),
+
+        # Path to dir of C++ headers
+        include_dirs=["VBBinaryLensing/lib/"],
     ),
 ]
 
@@ -64,8 +49,6 @@ def cpp_flag(compiler):
 
     raise RuntimeError('Unsupported compiler -- at least C++11 support '
                        'is needed!')
-
-
 
 
 class BuildExt(build_ext):
@@ -101,22 +84,6 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='VBBinaryLensing',
-    version=__version__,
-    author='Valerio Bozza, Fran Bartolic, Etienne Bachelet',
-    author_email='valboz@sa.infn.it, fb90@st-andrews.ac.uk, etibachelet@gmail.com',
-    url='https://github.com/valboz/VBBinaryLensing',
-    description='Python wrapper of the VBBinaryLensing code for \
-            computing microlensing light curves.',
-    long_description='',
     ext_modules=ext_modules,
-    install_requires=['pybind11>=2.3'],
-    setup_requires=['pybind11>=2.3'],
     cmdclass={'build_ext': BuildExt},
-    zip_safe=False,
-    include_package_data=True,
-    packages=['VBBinaryLensing.data'],
-    package_data={'VBBinaryLensing.data': ['data/*',]},
-               
-    
 )

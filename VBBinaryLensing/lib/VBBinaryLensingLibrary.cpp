@@ -1963,7 +1963,7 @@ void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* m
 
 		phit = omega * (ts[i] - t0_par);
 
-		disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+		disp[0] = cos(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
 
 		disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
 
@@ -1975,7 +1975,7 @@ void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* m
 		y2s[i] = -u0 * calpha - tn * salpha;
 		Mag = BinaryMag2(s, q, y1s[i], y2s[i], rho);
 
-		disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+		disp2[0] = -cos(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
 
 		disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
 
@@ -2008,7 +2008,7 @@ void VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double* ts, double
 
 		phit = omega * (ts[i] - t0_par);
 
-		disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+		disp[0] = cos(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
 
 		disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
 
@@ -2023,7 +2023,7 @@ void VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double* ts, double
 		Mag = ESPLMag2(u, rho);  /*If you want only the second source put =0, otherwise replace ESPLMag2(u, rho);*/
 
 
-		disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+		disp2[0] = -cos(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
 
 		disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
 

@@ -58,8 +58,8 @@ VBBL.LoadESPLTable("ESPL.tbl");
 double pr[10]; // Array of parameters
 double u0, t0, tE, rho, xi1, xi2, om, inc, phi0, qs, t, Mag;
 
-u0 = 0.01; // Impact parameter for the center of mass of the sources
-t0 = 7550.4; // Time of closest approach between the lens and the center of mass of the sources
+u0 = 0.01; // Impact parameter for the first source
+t0 = 7550.4; // Time of closest approach for the first source
 tE = 37.3; // Einstein time
 rho = 0.004; // Radius of the first star
 xi1 = 0.011; // Xallarap component 1

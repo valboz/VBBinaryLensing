@@ -39,7 +39,7 @@ Parallax is included in the `BinSourceLightCurveParallax` function, which accept
 
 Binary sources can also orbit around a common center of mass. VBBinaryLensing offers xallarap with circular orbital motion, described by 6 parameters:
 
-$(\xi_\perp, \xi_\parallel)$, projections of the node lines perpendicular and parallel to the source velocity at time $t_0$. Note that the orbital radius in Einstein angle units is $\sqrt{\xi_\perp^2 + \xi_\parallel^2}$;
+$(\xi_\parallel, \xi_\perp)$, projections of the node lines parallel and perpendicular to the source velocity at time $t_0$. Note that the orbital radius in Einstein angle units is $\sqrt{\xi_\parallel^2 + \xi_\perp^2}$;
 
 $\omega = \frac{2\pi}{T}$, orbital angular velocity;
 
@@ -53,9 +53,10 @@ Here is an example with the function `BinSourceSingleLensXallarap`. You may note
 
 ```
 VBBinaryLensing VBBL; // Declare instance to VBBinaryLensing
+VBBL.LoadESPLTable("ESPL.tbl");
 
 double pr[10]; // Array of parameters
-double u0, t0, tE, rho, xi1, xi2, om, inc, phi0, qs, t;
+double u0, t0, tE, rho, xi1, xi2, om, inc, phi0, qs, t, Mag;
 
 u0 = 0.01; // Impact parameter for the center of mass of the sources
 t0 = 7550.4; // Time of closest approach between the lens and the center of mass of the sources

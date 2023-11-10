@@ -622,6 +622,42 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 Magnification array.
             )mydelimiter");
 
+            vbb.def("BinSourceSingleLensXallarap",
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
+                                       std::vector<double> y1s, std::vector<double> y2s,
+                                       std::vector<double> separation)
+            {
+                std::vector<double> mags(times.size());
+                self.BinSourceSingleLensXallarap(params.data(), times.data(), mags.data(), 
+                        y1s.data(), y2s.data(), separation.data(), times.size());
+                return mags;
+            },
+            R"mydelimiter(
+            Binary source Single Lens Xallarap light curve.
+
+            Parameters
+            ----------
+            params : list[float] 	
+                List of parameters [log_tE, log_qs, u0, t0, xi1, xi2, 
+                rho, omega, inc, phi, w2, w3] where xi1 and xi2 are the 
+                components of xallarap parallel and orthogonal to the  
+                seperation between the sources.
+            times : list[float] 
+                Array of times at which the magnification is calculated.
+            y1 : list[float]
+                x-position of the source in the source plane.
+            y2 : list[float]
+                y-position of the source in the source plane.
+            sep_array : list[float]
+                Separation between the two components as a function of time. 
+
+            Returns
+            -------
+            mags: list[float] 
+                Magnification array.
+            )mydelimiter");
+
+
             vbb.def("BinSourceLightCurveXallarap", 
             [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
                                        std::vector<double> y1s, std::vector<double> y2s,

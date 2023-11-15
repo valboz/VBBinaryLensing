@@ -629,7 +629,7 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             {
                 std::vector<double> mags(times.size());
                 self.BinSourceSingleLensXallarap(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), y1s2.data(), y2s2.size());
+                        y1s.data(), y2s.data(), y1s2.data(), y2s2.data(),times.size());
                 return mags;
             },
             R"mydelimiter(

@@ -52,7 +52,7 @@ repository and run
 python setup.py install
 ```
 
-Currently, `VBBinaryLensing` works on Linux, MacOS and python >= 2.7. 
+Currently, `VBBinaryLensing` works on Linux, Windows, MacOS and python >= 2.7. 
 The python package requires `pybind11` which can be installed with
 ```
 pip install pybind11

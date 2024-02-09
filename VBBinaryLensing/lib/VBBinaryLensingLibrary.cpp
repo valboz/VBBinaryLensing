@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.6 (2023)
+// VBBinaryLensing v3.7 (2024)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -78,6 +78,8 @@ VBBinaryLensing::VBBinaryLensing() {
 	ESPLoff = true;
 	multidark = false;
     astrometry=false;
+	mass_luminosity_exponent = 4.0;
+	mass_radius_exponent = 0.9;
 }
 
 VBBinaryLensing::~VBBinaryLensing() {
@@ -215,39 +217,18 @@ void VBBinaryLensing::PrintCau(double a, double q, double y1, double y2, double 
 //////////////////////////////
 //////////////////////////////
 
-
-void VBBinaryLensing::SetObjectCoordinates(char *modelfile, char *sateltabledir) {
-	double RA, Dec, dis, hr, mn, sc, phiprec;
+void VBBinaryLensing::SetObjectCoordinates(char* modelfile, char* sateltabledir) {
+	double RA, Dec, dis, phiprec;
+	FILE* f;
+	char CoordinateString[512];
 	char filename[256];
 	int ic;
-	FILE *f;
-
-	if (nsat) {
-		for (int i = 0; i<nsat; i++) {
-			for (int j = 0; j<ndatasat[i]; j++) free(possat[i][j]);
-			free(tsat[i]);
-			free(possat[i]);
-		}
-		free(tsat);
-		free(possat);
-		free(ndatasat);
-	}
 
 	f = fopen(modelfile, "r");
 	if (f != 0) {
-		fscanf(f, "%lf:%lf:%lf", &hr, &mn, &sc);
-		RA = (hr + mn / 60 + sc / 3600)*M_PI / 12,
-			fscanf(f, "%lf:%lf:%lf", &hr, &mn, &sc);
-		Dec = (fabs(hr) + mn / 60 + sc / 3600)*M_PI / 180;
-		if (hr < 0) Dec = -Dec;
-
-		for (int i = 0; i < 3; i++) {
-			Obj[i] = (cos(RA)*cos(Dec)*Eq2000[i] + sin(RA)*cos(Dec)*Quad2000[i] + sin(Dec)*North2000[i]);
-			rad[i] = Eq2000[i];
-			tang[i] = North2000[i];
-		}
+		fscanf(f, "%[^\n]s", CoordinateString);
 		fclose(f);
-
+		SetObjectCoordinates(CoordinateString);
 
 		// Looking for satellite table files in the specified directory
 		sprintf(filename, "%s%csatellite*.txt", sateltabledir, systemslash);
@@ -262,9 +243,9 @@ void VBBinaryLensing::SetObjectCoordinates(char *modelfile, char *sateltabledir)
 		}
 
 
-		tsat = (double **)malloc(sizeof(double *)*nsat);
-		possat = (double ***)malloc(sizeof(double **)*nsat);
-		ndatasat = (int *)malloc(sizeof(int)*nsat);
+		tsat = (double**)malloc(sizeof(double*) * nsat);
+		possat = (double***)malloc(sizeof(double**) * nsat);
+		ndatasat = (int*)malloc(sizeof(int) * nsat);
 
 		// Reading satellite table files
 		ic = 0;
@@ -310,10 +291,10 @@ void VBBinaryLensing::SetObjectCoordinates(char *modelfile, char *sateltabledir)
 				}
 
 				// Allocating memory according to the length of the table
-				tsat[ic] = (double *)malloc(sizeof(double)*ndatasat[ic]);
-				possat[ic] = (double **)malloc(sizeof(double *)*ndatasat[ic]);
+				tsat[ic] = (double*)malloc(sizeof(double) * ndatasat[ic]);
+				possat[ic] = (double**)malloc(sizeof(double*) * ndatasat[ic]);
 				for (int j = 0; j < ndatasat[ic]; j++) {
-					possat[ic][j] = (double *)malloc(sizeof(double) * 3);
+					possat[ic][j] = (double*)malloc(sizeof(double) * 3);
 				}
 				ndatasat[ic]--;
 
@@ -327,7 +308,7 @@ void VBBinaryLensing::SetObjectCoordinates(char *modelfile, char *sateltabledir)
 							RA *= M_PI / 180;
 							Dec *= M_PI / 180;
 							for (int i = 0; i < 3; i++) {
-								possat[ic][id][i] = dis*(cos(RA)*cos(Dec)*Eq2000[i] + sin(RA)*cos(Dec)*Quad2000[i] + sin(Dec)*North2000[i]);
+								possat[ic][id][i] = dis * (cos(RA) * cos(Dec) * Eq2000[i] + sin(RA) * cos(Dec) * Quad2000[i] + sin(Dec) * North2000[i]);
 							}
 						}
 						else {
@@ -341,10 +322,38 @@ void VBBinaryLensing::SetObjectCoordinates(char *modelfile, char *sateltabledir)
 				ic++;
 			}
 		}
-		if (t0_par_fixed == -1) t0_par_fixed = 0;
-	}else {
+	}
+	else {
 		printf("\nFile not found!\n");
 	}
+}
+
+void VBBinaryLensing::SetObjectCoordinates(char *CoordinateString) {
+	double RA, Dec, hr, mn, sc, deg, pr, ssc;
+
+	if (nsat) {
+		for (int i = 0; i<nsat; i++) {
+			for (int j = 0; j<ndatasat[i]; j++) free(possat[i][j]);
+			free(tsat[i]);
+			free(possat[i]);
+		}
+		free(tsat);
+		free(possat);
+		free(ndatasat);
+	}
+	sscanf(CoordinateString, "%lf:%lf:%lf %lf:%lf:%lf", &hr, &mn, &sc, &deg, &pr, &ssc);
+	RA = (hr + mn / 60 + sc / 3600) * M_PI / 12,
+	Dec = (fabs(deg) + pr / 60 + ssc / 3600) * M_PI / 180;
+	if (deg < 0) Dec = -Dec;
+
+	for (int i = 0; i < 3; i++) {
+		Obj[i] = (cos(RA) * cos(Dec) * Eq2000[i] + sin(RA) * cos(Dec) * Quad2000[i] + sin(Dec) * North2000[i]);
+		rad[i] = Eq2000[i];
+		tang[i] = North2000[i];
+	}	
+	
+	if (t0_par_fixed == -1) t0_par_fixed = 0;
+
 }
 
 void VBBinaryLensing::ComputeParallax(double t, double t0, double *Et) {
@@ -880,7 +889,6 @@ double VBBinaryLensing::BinaryMag2(double s, double q, double y1v, double y2v, d
 	static _sols *Images;
 
 	c = 0;
-
 
 	y2a = fabs(y2v);
 
@@ -1947,6 +1955,27 @@ void VBBinaryLensing::BinSourceLightCurveXallarap(double *pr, double *ts, double
 }
 
 
+void VBBinaryLensing::BinSourceExtLightCurve(double* pr, double* ts, double* mags, double* y1s, double* y2s, int np) {
+	double u1 = pr[2], u2 = pr[3], t01 = pr[4], t02 = pr[5], tE_inv = exp(-pr[0]), FR = exp(pr[1]), rho = exp(pr[6]), rho2, tn, u;
+
+	for (int i = 0; i < np; i++) {
+		tn = (ts[i] - t01) * tE_inv;
+		u = tn * tn + u1 * u1;
+
+		y1s[i] = -tn;
+		y2s[i] = -u1;
+		mags[i] = ESPLMag2(sqrt(u),rho);
+
+		tn = (ts[i] - t02) * tE_inv;
+		u = tn * tn + u2 * u2;
+		rho2 = rho * pow(FR, mass_radius_exponent / mass_luminosity_exponent);
+		mags[i] += FR * ESPLMag2(sqrt(u), rho2);
+		mags[i] /= (1 + FR);
+
+	}
+
+}
+
 void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* mags, double* y1s, double* y2s, int np) {
 	double s = exp(pr[0]), q = exp(pr[1]), rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), u0;
 	double salpha = sin(pr[3]), calpha = cos(pr[3]), xi1 = pr[7], xi2 = pr[8], omega = pr[9], inc = pr[10], phi = pr[11], qs = exp(pr[12]);
@@ -1963,7 +1992,7 @@ void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* m
 
 		phit = omega * (ts[i] - t0_par);
 
-		disp[0] = cos(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+		disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
 
 		disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
 
@@ -1975,7 +2004,7 @@ void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* m
 		y2s[i] = -u0 * calpha - tn * salpha;
 		Mag = BinaryMag2(s, q, y1s[i], y2s[i], rho);
 
-		disp2[0] = -cos(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+		disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
 
 		disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
 
@@ -1985,9 +2014,9 @@ void VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double* ts, double* m
 		u02 = pr[2] + Xal2[1];
 		y1s2 = u02 * salpha - tn2 * calpha;
 		y2s2 = -u02 * calpha - tn2 * salpha;
-		rho2 = rho * pow(qs, 0.89);
+		rho2 = rho * pow(qs, mass_radius_exponent);
 		Mag2 = BinaryMag2(s, q, y1s2, y2s2, rho2);
-		qs4 = pow(qs, 4.0);
+		qs4 = pow(qs, mass_luminosity_exponent);
 		mags[i] = (Mag + qs4 * Mag2) / (1 + qs4);
 	}
 }
@@ -2001,7 +2030,7 @@ void VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double* ts, double
 
 
 
-	if (t0_par_fixed == 0) t0_par = pr[1];
+	t0_par = pr[1];
 
 
 	for (int i = 0; i < np; i++) {
@@ -2034,9 +2063,9 @@ void VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double* ts, double
 		u2 = sqrt(tn2 * tn2 + u02 * u02);
 		y1s2[i] = -tn2;
 		y2s2[i] = -u02;
-		rho2 = rho * pow(qs, 0.89);
+		rho2 = rho * pow(qs, mass_radius_exponent);
 		Mag2 = ESPLMag2(u2, rho2);  /*If you want only the second source put =0, otherwise replace ESPLMag2(u2, rho2);*/
-		qs4 = pow(qs, 4.0);
+		qs4 = pow(qs, mass_luminosity_exponent);
 		mags[i] = (Mag + qs4 * Mag2) / (1 + qs4);
 	}
 }
@@ -2359,7 +2388,6 @@ double VBBinaryLensing::BinSourceLightCurve(double *pr, double t) {
 
 }
 
-
 double VBBinaryLensing::BinSourceLightCurveParallax(double *pr, double t) {
 	double u1 = pr[2], u2 = pr[3], t01 = pr[4], t02 = pr[5], tE_inv = exp(-pr[0]), FR = exp(pr[1]), tn, u, u0, pai1 = pr[6], pai2 = pr[7], w1 = pr[8], w2 = pr[9], w3 = pr[10];
 	double Et[2],mag;
@@ -2453,6 +2481,28 @@ double VBBinaryLensing::BinSourceLightCurveXallarap(double *pr, double t) {
 }
 
 
+double VBBinaryLensing::BinSourceExtLightCurve(double* pr, double t) {
+	double u1 = pr[2], u2 = pr[3], t01 = pr[4], t02 = pr[5], tE_inv = exp(-pr[0]), FR = exp(pr[1]), rho = exp(pr[6]), rho2, tn, u, mag;
+
+	tn = (t - t01) * tE_inv;
+	u = tn * tn + u1 * u1;
+
+	y_1 = -tn;
+	y_2 = -u1;
+	mag = ESPLMag2(sqrt(u), rho);
+
+	tn = (t - t02) * tE_inv;
+	u = tn * tn + u2 * u2;
+	rho2 = rho * pow(FR, mass_radius_exponent / mass_luminosity_exponent);
+
+	mag += FR * ESPLMag2(sqrt(u), rho2);
+	mag /= (1 + FR);
+
+	return mag;
+
+}
+
+
 double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
 
 	double s = exp(pr[0]), q = exp(pr[1]), rho = exp(pr[4]), tn, tE_inv = exp(-pr[5]), u0;
@@ -2470,7 +2520,7 @@ double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
 
 	phit = omega * (t - t0_par);
 
-	disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+	disp[0] = cos(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
 
 	disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
 
@@ -2482,7 +2532,7 @@ double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
 	y2s = -u0 * calpha - tn * salpha;
 	Mag = BinaryMag2(s, q, y1s, y2s, rho);
 
-	disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+	disp2[0] = -cos(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
 
 	disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
 
@@ -2492,9 +2542,9 @@ double VBBinaryLensing::BinSourceBinLensXallarap(double* pr, double t) {
 	u02 = pr[2] + Xal2[1];
 	y1s2 = u02 * salpha - tn2 * calpha;
 	y2s2 = -u02 * calpha - tn2 * salpha;
-	rho2 = rho * pow(qs, 0.89);
+	rho2 = rho * pow(qs, mass_radius_exponent);
 	Mag2 = BinaryMag2(s, q, y1s2, y2s2, rho2);
-	qs4 = pow(qs, 4.0);
+	qs4 = pow(qs, mass_luminosity_exponent);
 	mags = (Mag + qs4*Mag2) / (1 + qs4);
 
 	return mags;
@@ -2512,11 +2562,11 @@ double VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double t) {
 
 
 
-	if (t0_par_fixed == 0) t0_par = pr[1];
+	t0_par = pr[1];
 
 	phit = omega * (t - t0_par);
 
-	disp[0] = sin(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
+	disp[0] = cos(inc) * (-cos(phi) + cos(phi + phit) + phit * sin(phi));
 
 	disp[1] = -phit * cos(phi) - sin(phi) + sin(phi + phit);
 
@@ -2531,7 +2581,7 @@ double VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double t) {
 	Mag = ESPLMag2(u, rho); /*If you want only the second source put =0, otherwise replace ESPLMag2(u, rho);*/
 
 
-	disp2[0] = -sin(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
+	disp2[0] = -cos(inc) * (cos(phi) + cos(phi + phit) / qs - phit * sin(phi));
 
 	disp2[1] = phit * cos(phi) + sin(phi) + sin(phi + phit) / qs;
 
@@ -2542,9 +2592,9 @@ double VBBinaryLensing::BinSourceSingleLensXallarap(double* pr, double t) {
 	u2 = sqrt(tn2 * tn2 + u02 * u02);
 	y1s2 = -tn2;
 	y2s2 = -u02;
-	rho2 = rho * pow(qs, 0.89);
+	rho2 = rho * pow(qs, mass_radius_exponent);
 	Mag2 = ESPLMag2(u2, rho2); /*If you want only the second source put =0, otherwise replace ESPLMag2(u2, rho2);*/
-	qs4 = pow(qs, 4.0);
+	qs4 = pow(qs, mass_luminosity_exponent);
 	mags = (Mag + qs4 * Mag2) / (1 + qs4);
 	return mags;
 }
@@ -2611,8 +2661,8 @@ double VBBinaryLensing::BinSourceBinLensPOX(double* pr, double t) {
 	u01 = u + Xal[1];
 	tn2 = tn + Xal2[0];
 	u02 = u + Xal2[1];
-	rho2 = rho * pow(qs, 0.89);
-	qs4 = pow(qs, 4.0);
+	rho2 = rho * pow(qs, mass_radius_exponent);
+	qs4 = pow(qs, mass_luminosity_exponent);
 
 
 /*	y1s = u01 * salpha - tn1 * calpha;
@@ -2677,7 +2727,7 @@ double VBBinaryLensing::BinSourceBinLensPOX(double* pr, double t) {
 	JJalt2=(1-J1c*Jalt);\
 	J3=J2*J1c*JJalt2;\
 	J3=(J3-conj(J3)*Jalt)/(JJalt2*JJalt2*dJ.re);\
-	cq=(J3.re*J3.re+J3.im*J3.im);
+	cq=(dJ.re<-100)? 0.0 : (J3.re*J3.re+J3.im*J3.im);
 	
 
 _curve* VBBinaryLensing::NewImages(complex yi, complex* coefs, _theta* theta) {
@@ -2810,7 +2860,7 @@ _curve* VBBinaryLensing::NewImages(complex yi, complex* coefs, _theta* theta) {
 
 	} 
 	else { 
-		 if (good[worst2]*dlmax > good[worst3] + 1.e-12 && theta->th>=0) { // Dubious cases. Better exclude them
+		if (good[worst2]*dlmax > good[worst3] + 1.e-12  && theta->th>=0) { // Dubious cases. Better exclude them
 			return Prov;
 		}
 		else {		// 5 good roots

@@ -27,6 +27,8 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 "Linear limb darkening coefficient. I(r)=I(0)(1-a1(1-\sqrt{1-r^2/\rho^2}))");
         vbb.def_readwrite("a2", &VBBinaryLensing::a2,
                 "Secontd limb darkening coefficient.");
+        vbb.def_readwrite("NPcrit", &VBBinaryLensing::NPcrit,
+            "Number of points in critical curves or caustics.");
         vbb.def_readwrite("minannuli", &VBBinaryLensing::minannuli,
                 "Minimum number of annuli to calculate for limb darkening.");
         vbb.def_readwrite("parallaxsystem", &VBBinaryLensing::parallaxsystem,
@@ -44,6 +46,11 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 "The x component of the light centroid.");
         vbb.def_readwrite("astrox2", &VBBinaryLensing::astrox2,
                 "The y component of the light centroid.");
+        vbb.def_readwrite("mass_luminosity_exponent", &VBBinaryLensing::mass_luminosity_exponent,
+            "Exponent for the mass-luminosity relation: L = M^q; default value is q=4.0");
+        vbb.def_readwrite("mass_radius_exponent", &VBBinaryLensing::mass_radius_exponent,
+            "Exponent for the mass-radius relation: R = M^q; default value is q=0.89");
+
         vbb.def("LoadESPLTable", &VBBinaryLensing::LoadESPLTable,
             """Loads a pre calculated binary table for extended source calculation.""");
         // Maginfication calculations
@@ -262,68 +269,17 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 Magnification.
             )mydelimiter");
 
-        // Light curve calculations
-        vbb.def("PSPLLightCurve",
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
-            {
-                std::vector<double> mags(times.size());
-                self.PSPLLightCurve(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
-            },
+        vbb.def("SetObjectCoordinates", (void (VBBinaryLensing::*)(char *, char *)) &VBBinaryLensing::SetObjectCoordinates,
             R"mydelimiter(
-            PSPL light curve for a full array of observations.
-
+            Sets the astronomical coordinates of the microlensing target.            
+            
             Parameters
             ----------
-            params : list[float]
-                List of parameters [log_u0, log_tE, t0].
-            times : list[float] 
-                Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
-            Returns
-            -------
-            mags: list[float] 
-                Magnification array.
+            CoordinateString : string 
+                Format \"hr:mn:sc +deg:pr:sc\".
             )mydelimiter");
 
-        vbb.def("PSPLLightCurveParallax", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
-            {
-                std::vector<double> mags(times.size());
-                self.PSPLLightCurveParallax(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
-            },
-            R"mydelimiter(
-            PSPL light curve for a full array of observations including parallax.
-
-            Parameters
-            ----------
-            params : list[float]
-                List of parameters [u0, log_tE, t0, pai1, pai2] where pai1 and 
-                pai2 are the components of parallax parallel and orthogonal 
-                to the Earth's acceleration.
-            times : list[float] 
-                Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
-            Returns
-            -------
-            mags: list[float] 
-                Magnification array.
-            )mydelimiter");
-
-        vbb.def("SetObjectCoordinates", &VBBinaryLensing::SetObjectCoordinates,
+        vbb.def("SetObjectCoordinates", (void (VBBinaryLensing::*)(char*)) &VBBinaryLensing::SetObjectCoordinates,
             R"mydelimiter(
             Sets the astronomical coordinates of the microlensing target and 
             specifies the path where to look for the position tables 
@@ -337,14 +293,73 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 Name of the directory containing the position tables of the satellites. 
             )mydelimiter");
 
-        vbb.def("ESPLLightCurve", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+        // Light curve calculations
+        vbb.def("PSPLLightCurve",
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.ESPLLightCurve(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.PSPLLightCurve(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
+            },
+            R"mydelimiter(
+            PSPL light curve for a full array of observations.
+
+            Parameters
+            ----------
+            params : list[float]
+                List of parameters [log_u0, log_tE, t0].
+            times : list[float] 
+                Array of times at which the magnification is calculated.
+
+            Returns
+            -------
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
+            )mydelimiter");
+
+        vbb.def("PSPLLightCurveParallax", 
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
+            {
+                std::vector<double> mags(times.size());
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.PSPLLightCurveParallax(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
+           },
+            R"mydelimiter(
+            PSPL light curve for a full array of observations including parallax.
+
+            Parameters
+            ----------
+            params : list[float]
+                List of parameters [u0, log_tE, t0, pai1, pai2] where pai1 and 
+                pai2 are the components of parallax parallel and orthogonal 
+                to the Earth's acceleration.
+            times : list[float] 
+                Array of times at which the magnification is calculated.
+ 
+            Returns
+            -------
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
+            )mydelimiter");
+
+        vbb.def("ESPLLightCurve", 
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
+            {
+                std::vector<double> mags(times.size());
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.ESPLLightCurve(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
             },
             R"mydelimiter(
             ESPL light curve for a full array of observations.
@@ -355,25 +370,23 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 List of parameters [log_u0, log_tE, t0, log_rho] 
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
         vbb.def("ESPLLightCurveParallax", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.ESPLLightCurveParallax(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
-            },
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.ESPLLightCurveParallax(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
+             },
             R"mydelimiter(
             ESPL light curve for a full array of observations including parallax.
 
@@ -384,24 +397,22 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 are the two components of the parallax.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
         vbb.def("BinaryLightCurve", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinaryLightCurve(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.BinaryLightCurve(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
             },
             R"mydelimiter(
             Static binary lens light curve for a given set of parameters.
@@ -413,25 +424,23 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 List of parameters [log_s, log_q, u0, alpha, log_rho, log_tE, t0]
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
 
         vbb.def("BinaryLightCurveW", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinaryLightCurveW(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.BinaryLightCurveW(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
             },
             R"mydelimiter(
             Static binary lens light curve for a given set of parameters 
@@ -445,25 +454,23 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 where u0_c and t0_c are defined with respect to the center of the caustic.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
         vbb.def("BinaryLightCurveParallax", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinaryLightCurveParallax(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
-            },
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.BinaryLightCurveParallax(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
+             },
             R"mydelimiter(
             Static binary lens light curve for a given set of parameters including parallax.
             Uses the BinaryMag2 function.
@@ -476,26 +483,24 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 Earth's acceleration.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
 
         vbb.def("BinaryLightCurveOrbital", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s,
-                                       std::vector<double> separation)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinaryLightCurveOrbital(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), separation.data(), times.size());
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                std::vector<double> separations(times.size());
+                self.BinaryLightCurveOrbital(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), separations.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s, separations };
+                return results;
             },
             R"mydelimiter(
             Static binary lens light curve for a given set of parameters including parallax.
@@ -511,28 +516,24 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 circular motion), defined as w1=(ds/dt)/s, w2=dalpha/dt, w3=(dsz/dt)/s.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-            sep_array : list[float]
-                Separation between the two components as a function of time. 
 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array, separation-between-lenses array]
             )mydelimiter");
             
         vbb.def("BinaryLightCurveKepler", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s,
-                                       std::vector<double> separation)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinaryLightCurveKepler(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), separation.data(), times.size());
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                std::vector<double> separations(times.size());
+                self.BinaryLightCurveKepler(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), separations.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s, separations };
+                return results;
             },
             R"mydelimiter(
              binary lens light curve for a given set of parameters including keplerian orbital motion.
@@ -548,27 +549,23 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 circular motion), defined as w1=(ds/dt)/s, w2=dalpha/dt, w3=(dsz/dt)/s.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-            sep_array : list[float]
-                Separation between the two components as a function of time. 
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array, separation-between-lenses array]
             )mydelimiter");
 
             vbb.def("BinSourceLightCurve", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinSourceLightCurve(params.data(), times.data(), mags.data(), 
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.BinSourceLightCurve(params.data(), times.data(), mags.data(),
                         y1s.data(), y2s.data(), times.size());
-                return mags;
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
             },
             R"mydelimiter(
             Light curve for a single lens and a binary source. Sources are 
@@ -580,25 +577,23 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 List of parameters [log_tE, log_fluxratio, u0_1, u0_2, t0_1, t0_2]
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
-            Returns
+ 
+           Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
 
             vbb.def("BinSourceLightCurveParallax", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinSourceLightCurveParallax(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), times.size());
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                self.BinSourceLightCurveParallax(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                return results;
             },
             R"mydelimiter(
             Light curve for a single lens and a binary source including parallax.
@@ -611,26 +606,25 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 Earth's acceleration.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
             )mydelimiter");
 
             vbb.def("BinSourceSingleLensXallarap",
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s,
-                                       std::vector<double> y1s2, std::vector<double> y2s2)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinSourceSingleLensXallarap(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), y1s2.data(), y2s2.data(),times.size());
-                return mags;
+                std::vector<double> y1s1(times.size());
+                std::vector<double> y2s1(times.size());
+                std::vector<double> y1s2(times.size());
+                std::vector<double> y2s2(times.size());
+                self.BinSourceSingleLensXallarap(params.data(), times.data(), mags.data(),
+                    y1s1.data(), y2s1.data(), y1s2.data(), y2s2.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s1,y2s1,y1s2,y2s2 };
+                return results;
             },
             R"mydelimiter(
             Binary source Single Lens Xallarap light curve.
@@ -644,29 +638,84 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 seperation between the sources.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-            sep_array : list[float]
-                Separation between the two components as a function of time. 
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float],list[float],list[float]] 
+                [Magnification array, source 1 position y1 array, source 1 position y2 array, source 2 position y1 array, source 2 position y2 array]
+             )mydelimiter");
+
+            vbb.def("BinSourceExtLightCurve",
+                [](VBBinaryLensing& self, std::vector<double> params, std::vector<double> times)
+                {
+                    std::vector<double> mags(times.size());
+                    std::vector<double> y1s(times.size());
+                    std::vector<double> y2s(times.size());
+                    self.BinSourceExtLightCurve(params.data(), times.data(), mags.data(),
+                        y1s.data(), y2s.data(), times.size());
+                    std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                    return results;
+                },
+                R"mydelimiter(
+            Light curve for a single lens and a binary source. Sources are 
+            treated as point-like.
+
+            Parameters
+            ----------
+            params : list[float]
+                List of parameters [log_tE, log_fluxratio, u0_1, u0_2, t0_1, t0_2, rho]
+            times : list[float] 
+                Array of times at which the magnification is calculated.
+ 
+           Returns
+            -------
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, source position y1 array, source position y2 array]
+            )mydelimiter");
+
+
+            vbb.def("BinSourceBinLensXallarap",
+                [](VBBinaryLensing& self, std::vector<double> params, std::vector<double> times)
+                {
+                    std::vector<double> mags(times.size());
+                    std::vector<double> y1s(times.size());
+                    std::vector<double> y2s(times.size());
+                    self.BinSourceBinLensXallarap(params.data(), times.data(), mags.data(),
+                        y1s.data(), y2s.data(), times.size());
+                    std::vector< std::vector<double> > results{ mags,y1s,y2s };
+                    return results;
+                },
+                R"mydelimiter(
+            Binary source Single Lens Xallarap light curve.
+
+            Parameters
+            ----------
+            params : list[float] 	
+                List of parameters [log_s, log_q, u0, alpha, log_rho, log_tE, t0, xi1, xi2, 
+                omega, inc, phi, log_qs] where xi1 and xi2 are the 
+                components of xallarap parallel and orthogonal to the  
+                separation between the sources.
+            times : list[float] 
+                Array of times at which the magnification is calculated.
+  
+            Returns
+            -------
+            results: list[list[float],list[float],list[float]] 
+                [Magnification array, y1 array, y2 array]
             )mydelimiter");
 
 
             vbb.def("BinSourceLightCurveXallarap", 
-            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times,
-                                       std::vector<double> y1s, std::vector<double> y2s,
-                                       std::vector<double> y1s2, std::vector<double> y2s2)
+            [](VBBinaryLensing &self, std::vector<double> params, std::vector<double> times)
             {
                 std::vector<double> mags(times.size());
-                self.BinSourceSingleLensXallarap(params.data(), times.data(), mags.data(), 
-                        y1s.data(), y2s.data(), y1s2.data(), y2s2.data(), times.size())
-                return mags;
+                std::vector<double> y1s(times.size());
+                std::vector<double> y2s(times.size());
+                std::vector<double> separations(times.size());
+                self.BinSourceLightCurveXallarap(params.data(), times.data(), mags.data(),
+                    y1s.data(), y2s.data(), separations.data(), times.size());
+                std::vector< std::vector<double> > results{ mags,y1s,y2s, separations };
+                return results;
             },
             R"mydelimiter(
             Binary source light curve.
@@ -687,17 +736,11 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
                 circular motion), defined as w1=(ds/dt)/s, w2=dalpha/dt, w3=(dsz/dt)/s.
             times : list[float] 
                 Array of times at which the magnification is calculated.
-            y1 : list[float]
-                x-position of the source in the source plane.
-            y2 : list[float]
-                y-position of the source in the source plane.
-            sep_array : list[float]
-                Separation between the two components as a function of time. 
-
+ 
             Returns
             -------
-            mags: list[float] 
-                Magnification array.
+            results: list[list[float],list[float],list[float],list[float]] 
+                [Magnification array, y1 array, y2 array, separation-between-lenses array]
             )mydelimiter");
 
 
@@ -706,8 +749,7 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
         vbb.def("PlotCrit", &VBBinaryLensing::PlotCrit,
             py::return_value_policy::reference,
             R"mydelimiter(
-            Static binary lens light curve for a given set of parameters including parallax.
-            Uses the BinaryMag2 function.
+            Critical curves and caustics for given separation and mass ratio.
 
             Parameters
             ----------
@@ -720,7 +762,90 @@ PYBIND11_MODULE(VBBinaryLensing, m) {
             Returns
             -------
             solutions : _sols
-                Magnification array.
+                List of critical curves and caustics.
+            )mydelimiter");
+
+        vbb.def("Caustics",
+            [](VBBinaryLensing& self, double s, double q)
+            {
+                _sols *critcau;
+        
+                critcau = self.PlotCrit(s,q);
+                int ncaus = critcau->length / 2;
+                std::list <std::vector<std::vector<double>>> caustics{};
+                _curve* c = critcau->first;
+                for (int i = 0; i < ncaus; i++) c = c->next;
+                for (int i = 0; i < ncaus; i++) {
+                    std::vector<double> y(c->length);
+                    std::vector<std::vector<double>> cau(2, y);
+                    _point* p = c->first;
+                    for (int j = 0; j < c->length; j++) {
+                        cau[0][j] = p->x1;
+                        cau[1][j] = p->x2;
+                        p = p->next;
+                    }
+                    caustics.push_back(cau);
+                    c = c->next;
+                }
+                delete critcau;
+                return caustics;
+            },
+            R"mydelimiter(
+            Caustics for given separation and mass ratio.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 such that m1<m2 
+
+            Returns
+            -------
+            solutions : _sols
+                List of caustics.
+            )mydelimiter");
+
+        vbb.def("CriticalCurves",
+            [](VBBinaryLensing& self, double s, double q)
+            {
+                _sols* critcau;
+
+                critcau = self.PlotCrit(s, q);
+                int ncrits = critcau->length / 2;
+                std::list <std::vector<std::vector<double>>> criticalcurves{};
+                _curve* c = critcau->first;
+                for (int i = 0; i < ncrits; i++) {
+                    std::vector<double> y(c->length);
+                    std::vector<std::vector<double>> crit(2, y);
+                    _point* p = c->first;
+                    for (int j = 0; j < c->length; j++) {
+                        crit[0][j] = p->x1;
+                        crit[1][j] = p->x2;
+                        p = p->next;
+                    }
+                    criticalcurves.push_back(crit);
+                    c = c->next;
+                }
+                delete critcau;
+                return criticalcurves;
+            },
+            R"mydelimiter(
+            Critical curves for given separation and mass ratio.
+
+            Parameters
+            ----------
+            s : float 
+                The projected separation of the binary lens in units of the 
+                Einstein radius corresponding to the total mass.
+            q : float 
+                Binary lens mass fraction q = m1/m2 such that m1<m2 
+
+            Returns
+            -------
+            solutions : _sols
+                List of critical curves.
             )mydelimiter");
 
         // Limb darkening

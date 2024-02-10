@@ -1,4 +1,4 @@
-// VBBinaryLensing v3.6 (2023)
+// VBBinaryLensing v3.7 (2024)
 //
 // This code has been developed by Valerio Bozza (University of Salerno) and collaborators.
 // Any use of this code for scientific publications should be acknowledged by a citation to:
@@ -82,7 +82,8 @@ namespace VBBinaryLensingLibrary {
 
 	public: 
 
-		double Tol, RelTol, a1,a2, t0_par; 
+		double Tol, RelTol, a1,a2, t0_par;
+		double mass_radius_exponent, mass_luminosity_exponent;
 		bool astrometry;
 		int satellite,parallaxsystem,t0_par_fixed,nsat;
 		int minannuli,nannuli,NPS,NPcrit;
@@ -95,6 +96,7 @@ namespace VBBinaryLensingLibrary {
 
 	// Initialization for calculations including parallax
 		void SetObjectCoordinates(char *Coordinates_file, char *Directory_for_satellite_tables);
+		void SetObjectCoordinates(char *CoordinateString);
 
 	// Magnification calculation functions.
 
@@ -135,6 +137,7 @@ namespace VBBinaryLensingLibrary {
 		void BinSourceLightCurve(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinSourceLightCurveParallax(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 		void BinSourceLightCurveXallarap(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, double *sep_array, int np);
+		void BinSourceExtLightCurve(double* parameters, double* t_array, double* mag_array, double* y1_array, double* y2_array, int np);
 		void BinSourceSingleLensXallarap(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, double *y1_array2, double *y2_array2, int np);
 		void BinSourceBinLensXallarap(double *parameters, double *t_array, double *mag_array, double *y1_array, double *y2_array, int np);
 
@@ -153,6 +156,7 @@ namespace VBBinaryLensingLibrary {
 		double BinSourceLightCurve(double *parameters, double t);
 		double BinSourceLightCurveParallax(double *parameters, double t);
 		double BinSourceLightCurveXallarap(double *parameters, double t);
+		double BinSourceExtLightCurve(double* parameters, double t);
 		double BinSourceBinLensXallarap(double *parameters, double t);
 		double BinSourceSingleLensXallarap(double *parameters, double t);
 		double BinSourceBinLensPOX(double* parameters, double t);

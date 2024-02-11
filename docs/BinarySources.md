@@ -49,13 +49,13 @@ Only one source size is specified as an independent parameter, while the source 
 
 ## Mass-radius-luminosity relations for binary sources
 
-The mass-luminosity relation in VBBinaryLensing is a power law of the form $L \sim M^q$ where the exponent $q$ is given by the variable 'VBBL.mass_luminosity_exponent', whose default value is $4.0$.
+The mass-luminosity relation in VBBinaryLensing is a power law of the form $L \sim M^q$ where the exponent $q$ is given by the variable `VBBL.mass_luminosity_exponent`, whose default value is $4.0$.
 
-The mass-radius relation is a power law of the form $\rho \sim M^p$ where the exponent $p$ is given by the variable 'VBBL.mass_radius_exponent', whose default value is $0.9$.
+The mass-radius relation is a power law of the form $\rho \sim M^p$ where the exponent $p$ is given by the variable `VBBL.mass_radius_exponent`, whose default value is $0.9$.
 
-Therefore, in the function 'BinSourceExtLightCurve', if the flux ratio is 'FR' and the radius of the first source is 'rho', the radius of the second source is calculated as $rho * FR^{p/q}$.
+Therefore, in the function `BinSourceExtLightCurve`, if the flux ratio is `FR` and the radius of the first source is `rho`, the radius of the second source is calculated as $rho * FR^{p/q}$.
 
-The user can customize the two exponents by changing 'VBBL.mass_luminosity_exponent' and 'VBBL.mass_radius_exponent' as appropriate for the sources in the specific microlensing event and for the observation band.
+The user can customize the two exponents by changing `VBBL.mass_luminosity_exponent` and `VBBL.mass_radius_exponent` as appropriate for the sources in the specific microlensing event and for the observation band.
 
 ## Xallarap
 

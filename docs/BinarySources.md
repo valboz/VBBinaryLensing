@@ -35,6 +35,28 @@ The output of BinSourceLightCurve is a magnification compared to the baseline fl
 
 Parallax is included in the `BinSourceLightCurveParallax` function, which accepts two more parameters for the parallax components, as illustrated in the [Parallax](Parallax.md) section.
 
+## Extended binary sources
+
+If the finite size of the sources is relevant, one can use `BinSourceLightCurve` function
+
+```
+rho = 0.01; // Size of source 1
+pr[6] = log(rho); 
+Mag = VBBL.BinSourceExtLightCurve(pr, t); // Calculates the magnification for extended binary sources
+```
+
+Only one source size is specified as an independent parameter, while the source size of the second source is obtained through mass-radius-luminosity relations. This ensures that the user has full control on the physical consistency of the model.
+
+## Mass-radius-luminosity relations for binary sources
+
+The mass-luminosity relation in VBBinaryLensing is a power law of the form $L \sim M^q$ where the exponent $q$ is given by the variable 'VBBL.mass_luminosity_exponent', whose default value is $4.0$.
+
+The mass-radius relation is a power law of the form $\rho \sim M^p$ where the exponent $p$ is given by the variable 'VBBL.mass_radius_exponent', whose default value is $0.9$.
+
+Therefore, in the function 'BinSourceExtLightCurve', if the flux ratio is 'FR' and the radius of the first source is 'rho', the radius of the second source is calculated as $rho * FR^(p/q)$.
+
+The user can customize the two exponents by changing 'VBBL.mass_luminosity_exponent' and 'VBBL.mass_radius_exponent' as appropriate for the sources in the specific microlensing event and for the observation band.
+
 ## Xallarap
 
 Binary sources can also orbit around a common center of mass. VBBinaryLensing offers xallarap with circular orbital motion, described by 6 parameters:
@@ -87,7 +109,7 @@ Mag = VBBL.BinSourceSingleLensXallarap(pr, t); // Calculates the Binary Source m
 printf("Binary Source Light Curve at time t: %lf", Mag); // Output should be 2.70...
 ```
 
-In this function we are assuming that all properties of the sources can be deduced by their mass ratio. This is strictly true only if the two components obey some mass-luminosity and mass-radius relation. We are assuming $L \sim M^4$ and $R \sim M^{0.89}$, which are good for solar mass main sequence stars. Therefore, we just need to specify the mass ratio $q_s$ and the flux and radius ratios of the two stars will follow. If you want different exponents, you can modify the relations by hand in the source code.
+In this function we are assuming that all properties of the sources can be deduced by their mass ratio through the mass-radius-luminosity relations specified above and customizable by the user. Therefore, the flux ratio will be $FR = qs^q$, where $q$ is given by 'VBBL.mass_luminosity_exponent' and the radius of the second source will be $rho * qs^p$, where $p$ is given by 'VBBL.mass_radius_exponent'.
 
 Xallarap is also available for binary lenses through the `BinSourceBinaryLensXallarap` function. In this case, the parameters are 13 with the seven parameters for the [static binary lens](BinaryLenses.md) followed by the six parameters for the xallarap.
 

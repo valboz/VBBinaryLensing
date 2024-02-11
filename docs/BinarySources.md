@@ -53,7 +53,7 @@ The mass-luminosity relation in VBBinaryLensing is a power law of the form $L \s
 
 The mass-radius relation is a power law of the form $\rho \sim M^p$ where the exponent $p$ is given by the variable `VBBL.mass_radius_exponent`, whose default value is $0.9$.
 
-Therefore, in the function `BinSourceExtLightCurve`, if the flux ratio is `FR` and the radius of the first source is `rho`, the radius of the second source is calculated as $rho * FR^{p/q}$.
+Therefore, in the function `BinSourceExtLightCurve`, if the flux ratio is `FR` and the radius of the first source is `rho`, the radius of the second source is calculated as `rho * FR^{p/q}`.
 
 The user can customize the two exponents by changing `VBBL.mass_luminosity_exponent` and `VBBL.mass_radius_exponent` as appropriate for the sources in the specific microlensing event and for the observation band.
 
@@ -109,7 +109,7 @@ Mag = VBBL.BinSourceSingleLensXallarap(pr, t); // Calculates the Binary Source m
 printf("Binary Source Light Curve at time t: %lf", Mag); // Output should be 2.70...
 ```
 
-In this function we are assuming that all properties of the sources can be deduced by their mass ratio through the mass-radius-luminosity relations specified above and customizable by the user. Therefore, the flux ratio will be $FR = qs^q$, where $q$ is given by 'VBBL.mass_luminosity_exponent' and the radius of the second source will be $rho * qs^p$, where $p$ is given by 'VBBL.mass_radius_exponent'.
+In this function we are assuming that all properties of the sources can be deduced by their mass ratio through the mass-radius-luminosity relations specified above and customizable by the user. Therefore, the flux ratio will be `FR = qs^q`, where `q` is given by 'VBBL.mass_luminosity_exponent' and the radius of the second source will be `rho * qs^p`, where `p` is given by 'VBBL.mass_radius_exponent'.
 
 Xallarap is also available for binary lenses through the `BinSourceBinaryLensXallarap` function. In this case, the parameters are 13 with the seven parameters for the [static binary lens](BinaryLenses.md) followed by the six parameters for the xallarap.
 

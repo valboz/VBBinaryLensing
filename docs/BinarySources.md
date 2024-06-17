@@ -106,7 +106,7 @@ pr[9] = log(qs);
 t = 7551.6; // Time at which we want to calculate the magnification
 
 Mag = VBBL.BinSourceSingleLensXallarap(pr, t); // Calculates the Binary Source magnification at time t with parameters in pr
-printf("Binary Source Light Curve at time t: %lf", Mag); // Output should be 2.70...
+printf("Binary Source Light Curve at time t: %lf", Mag); // Output should be 29.76...
 ```
 
 In this function we are assuming that all properties of the sources can be deduced by their mass ratio through the mass-radius-luminosity relations specified above and customizable by the user. Therefore, the flux ratio will be `FR = qs^q`, where `q` is given by `VBBL.mass_luminosity_exponent` and the radius of the second source will be `rho * qs^p`, where `p` is given by `VBBL.mass_radius_exponent`.

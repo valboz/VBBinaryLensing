@@ -1,7 +1,7 @@
 [![Join the chat at https://gitter.im/VBBinaryLensing/Lobby](https://badges.gitter.im/VBBinaryLensing/Lobby.svg)](https://gitter.im/VBBinaryLensing/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # NOTICE
-This is a legacy package no longer maintained. Please use the new package [VBMicrolensing](https://github.com/valboz/VBMicrolensing), which contains all the functions of `VBBinaryLensing` with further optimizations and supports multiple lensing too!
+This is a legacy package no longer maintained. Please use the new package [VBMicrolensing](https://github.com/valboz/VBMicrolensing), which contains all the functions of `VBBinaryLensing` with further optimizations and support for multiple lensing!
 
 # VBBinaryLensing
 
